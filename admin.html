@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة الإدارة — دوامتان زرقاوتان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header class="admin-header"><a href="index.html" class="brand">渦 <span>دوامتان <b>زرقاوتان</b></span></a><div class="head-actions"><span id="modeLabel">وضع محلي</span><a href="index.html">عرض الموقع ↗</a></div></header>
+<main class="admin-wrap">
+<section id="loginCard" class="admin-card login-card" hidden>
+  <span class="section-kicker">ADMIN</span><h1>تسجيل الدخول</h1>
+  <p>عند ربط Supabase، استخدم حساب المدير الذي أنشأته في لوحة المصادقة.</p>
+  <input id="loginEmail" type="email" placeholder="البريد الإلكتروني">
+  <input id="loginPassword" type="password" placeholder="كلمة المرور">
+  <button class="admin-btn primary" id="loginBtn">دخول</button>
+  <button class="text-btn" id="localModeBtn">استخدام الوضع المحلي</button>
+  <div id="loginMsg" class="msg"></div>
+</section>
+
+<div id="dashboard" hidden>
+  <div class="admin-top">
+    <div><span class="section-kicker">CONTROL CENTER</span><h1>لوحة التحكم</h1><p>إدارة معلومات المانجا والفصول وصفحات القراءة.</p></div>
+    <button id="logoutBtn" class="admin-btn ghost">تسجيل الخروج</button>
+  </div>
+
+  <section class="admin-card">
+    <div class="card-head"><div><h2>معلومات المانجا</h2><p>تظهر مباشرة في الصفحة الرئيسية.</p></div><span class="save-dot" id="saveState">● محفوظ</span></div>
+    <div class="form-grid">
+      <label>الاسم العربي<input id="fTitle"></label>
+      <label>الاسم الإنجليزي<input id="fEnglish"></label>
+      <label>الاسم الياباني<input id="fJapanese"></label>
+      <label>الحالة<input id="fStatus"></label>
+      <label>الكاتب<input id="fAuthor"></label>
+      <label>الرسام<input id="fArtist"></label>
+      <label class="full">التصنيفات (مفصولة بفواصل)<input id="fGenres"></label>
+      <label class="full">الوصف<textarea id="fDescription"></textarea></label>
+      <label class="full">الغلاف<input id="coverFile" type="file" accept="image/*"><small>في الوضع السحابي يتم رفعه إلى Storage.</small></label>
+    </div>
+    <button class="admin-btn primary" id="saveInfo">حفظ المعلومات</button>
+  </section>
+
+  <section class="admin-card">
+    <div class="card-head"><div><h2>إضافة فصل</h2><p>ارفع صفحات الفصل دفعة واحدة، وسيتم ترتيبها حسب اسم الملف.</p></div></div>
+    <div class="form-grid">
+      <label>رقم الفصل<input id="chapterNumber" type="number" step="1"></label>
+      <label>اسم الفصل<input id="chapterTitle" placeholder="الفصل 1"></label>
+      <label>تاريخ النشر<input id="chapterDate" type="date"></label>
+      <label class="full">صفحات الفصل<input id="pageFiles" type="file" accept="image/*" multiple></label>
+    </div>
+    <p class="hint">يفضّل تسمية الصور: 001.jpg، 002.jpg، 003.jpg… للحصول على ترتيب مضمون.</p>
+    <button class="admin-btn primary" id="addChapter">إضافة ونشر الفصل</button>
+    <div id="chapterMsg" class="msg"></div>
+  </section>
+
+  <section class="admin-card">
+    <div class="card-head"><div><h2>الفصول المنشورة</h2><p id="chapterSummary"></p></div></div>
+    <div id="chaptersAdmin"></div>
+  </section>
+
+  <section class="admin-card">
+    <div class="card-head"><div><h2>نسخة احتياطية</h2><p>الوضع المحلي يحفظ البيانات في هذا المتصفح. التصدير مفيد للنسخ الاحتياطي.</p></div></div>
+    <div class="button-row">
+      <button class="admin-btn ghost" id="exportBtn">تصدير JSON</button>
+      <label class="admin-btn ghost import-label">استيراد JSON<input id="importFile" type="file" accept="application/json" hidden></label>
+      <button class="admin-btn danger" id="resetBtn">إعادة ضبط الوضع المحلي</button>
+    </div>
+  </section>
+</div>
+</main>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

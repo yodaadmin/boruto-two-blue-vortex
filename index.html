@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111b">
+<meta name="description" content="بوروتو: دوامتان زرقاوتان — موقع قراءة المانجا">
+<title>بوروتو: دوامتان زرقاوتان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-orbit orbit-a"></div><div class="bg-orbit orbit-b"></div>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-mark">渦</span><span>دوامتان <b>زرقاوتان</b></span></a>
+  <nav class="main-nav">
+    <a class="active" href="index.html">الرئيسية</a>
+    <a href="#chapters">الفصول</a>
+    <a href="#about">معلومات المانجا</a>
+    <a href="reader.html?latest=1">ابدأ القراءة</a>
+  </nav>
+  <button class="icon-btn" id="mobileMenu" aria-label="القائمة">☰</button>
+</header>
+
+<main>
+<section class="hero container">
+  <div class="hero-art">
+    <div class="cover-frame"><img id="cover" src="assets/cover.png" alt="غلاف المانجا"></div>
+    <div class="cover-glow"></div>
+  </div>
+  <div class="hero-copy">
+    <div class="eyebrow">BORUTO • TWO BLUE VORTEX</div>
+    <h1 id="title">بوروتو: دوامتان زرقاوتان</h1>
+    <p class="subtitle" id="english">BORUTO -TWO BLUE VORTEX-</p>
+    <p class="hero-desc" id="description">بعد أن تم تعديل ذكريات الجميع، يجد بوروتو نفسه مطارداً من قريته. وبعد هروبه مع ساسكي، ما المستقبل الذي ينتظر بوروتو...؟</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#chapters">استعراض الفصول <span>←</span></a>
+      <a class="btn ghost" href="#about">عن المانجا</a>
+    </div>
+    <div class="meta-strip">
+      <span><i>الحالة</i><b id="status">مستمرة</b></span>
+      <span><i>الصدور</i><b>شهري</b></span>
+      <span><i>الفصول</i><b id="chapterCount">0</b></span>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="chapters">
+  <div class="section-heading">
+    <div><span class="section-kicker">CHAPTERS</span><h2>قائمة الفصول</h2><p>اختر الفصل وابدأ القراءة مباشرة.</p></div>
+    <div class="chapter-tools">
+      <div class="search"><span>⌕</span><input id="search" placeholder="ابحث عن رقم أو اسم الفصل..." aria-label="البحث"></div>
+      <select id="sort" aria-label="ترتيب الفصول"><option value="desc">الأحدث أولاً</option><option value="asc">الأقدم أولاً</option></select>
+    </div>
+  </div>
+  <div id="chapterGrid" class="chapter-grid"></div>
+</section>
+
+<section class="section about-section container" id="about">
+  <div class="section-heading simple"><div><span class="section-kicker">ABOUT</span><h2>معلومات المانجا</h2></div></div>
+  <div class="about-grid">
+    <div class="about-card about-main"><div class="mini-label">القصة</div><p id="aboutDescription"></p></div>
+    <div class="about-card"><div class="mini-label">الكاتب</div><strong id="author">Masashi Kishimoto</strong></div>
+    <div class="about-card"><div class="mini-label">الرسام</div><strong id="artist">Mikio Ikemoto</strong></div>
+    <div class="about-card"><div class="mini-label">الاسم الياباني</div><strong id="japanese">BORUTO -TWO BLUE VORTEX-</strong></div>
+    <div class="about-card wide"><div class="mini-label">التصنيفات</div><div id="genres" class="chips"></div></div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="brand small"><span class="brand-mark">渦</span><span>دوامتان <b>زرقاوتان</b></span></div>
+    <span>موقع قراءة مستقل</span>
+    <a href="admin.html">إدارة الموقع</a>
+  </div>
+</footer>
+<script src="config.js"></script><script src="app.js"></script>
+</body>
+</html>
