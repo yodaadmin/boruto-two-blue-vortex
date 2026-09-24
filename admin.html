@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة إدارة المانجا</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07111b;color:#edf5fb;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+header{position:sticky;top:0;z-index:20;background:#07111bf2;border-bottom:1px solid #223847;backdrop-filter:blur(12px)}
+.top{max-width:1100px;margin:auto;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+a{color:#9edcff;text-decoration:none}.wrap{max-width:1100px;margin:auto;padding:18px}
+.card{background:#0d1b27;border:1px solid #203747;border-radius:18px;padding:18px;margin-bottom:16px}
+h1,h2,h3{margin:0 0 9px}p,small{color:#aebfcb;line-height:1.7}
+input,button{font:inherit}input{width:100%;background:#08131d;color:#fff;border:1px solid #2b4557;border-radius:11px;padding:11px;margin-top:6px}
+button{border:0;border-radius:11px;padding:10px 14px;cursor:pointer}.primary{background:#36a9e8;color:#041019;font-weight:800}.ghost{background:#172a38;color:#e0f1fa}.danger{background:#64232b;color:#fff}.success{background:#1d6045;color:#fff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.full{grid-column:1/-1}
+.msg{background:#08141f;border:1px solid #203747;border-radius:11px;padding:11px;margin-top:12px;white-space:pre-wrap}
+.chapter{border-top:1px solid #213846;padding:15px 0}.chapter:first-child{border-top:0}
+.pages{margin-top:12px}.page{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;padding:9px;border:1px solid #203747;background:#091722;border-radius:12px;margin:7px 0}
+.thumb{width:72px;height:86px;object-fit:contain;background:#000;border-radius:8px}.num{font-weight:800}.muted{color:#8fa5b4}
+.hidden{display:none!important}.modal{position:fixed;inset:0;background:#0009;z-index:50;display:flex;align-items:center;justify-content:center;padding:15px}.modalbox{max-width:700px;width:100%;max-height:90vh;overflow:auto;background:#0d1b27;border:1px solid #294455;border-radius:18px;padding:18px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.page{grid-template-columns:58px 1fr}.page .actions{grid-column:1/-1}.thumb{width:58px;height:70px}}
+</style>
+</head>
+<body>
+<header><div class="top"><strong>لوحة إدارة المانجا</strong><div class="row"><a href="index.html">الموقع</a><button id="logout" class="ghost">خروج</button></div></div></header>
+
+<main class="wrap">
+<section id="login" class="card">
+<h1>تسجيل دخول الإدارة</h1>
+<label>البريد الإلكتروني<input id="email" type="email"></label>
+<label>كلمة المرور<input id="password" type="password"></label>
+<button id="loginBtn" class="primary" style="margin-top:10px">دخول</button>
+<div id="loginMsg" class="msg"></div>
+</section>
+
+<section id="app" class="hidden">
+<div class="card">
+<div class="row" style="justify-content:space-between"><div><h1>لوحة التحكم</h1><small>إدارة الفصول والصفحات من الهاتف بدون تعديل GitHub.</small></div><button id="newChapter" class="primary">+ إضافة فصل</button></div>
+<div id="appMsg" class="msg"></div>
+</div>
+
+<div id="chapterEditor" class="card hidden">
+<h2 id="editorTitle">إضافة فصل</h2>
+<div class="grid">
+<label>رقم الفصل<input id="cNumber" type="number" min="1"></label>
+<label>عنوان الفصل<input id="cTitle" type="text"></label>
+<label>تاريخ النشر<input id="cDate" type="date"></label>
+</div>
+<div class="row" style="margin-top:12px"><button id="saveChapter" class="primary">حفظ الفصل</button><button id="cancelChapter" class="ghost">إلغاء</button></div>
+<div id="chapterMsg" class="msg"></div>
+</div>
+
+<div class="card">
+<h2>الفصول</h2>
+<div id="chapters">جاري التحميل...</div>
+</div>
+</section>
+</main>
+
+<div id="pageModal" class="modal hidden">
+<div class="modalbox">
+<div class="row" style="justify-content:space-between">
+<div><h2 id="pageTitle">إدارة الصفحات</h2><small id="pageSubtitle"></small></div>
+<button id="closePages" class="ghost">إغلاق</button>
+</div>
+<div class="card" style="margin-top:15px;background:#091722">
+<label>إضافة صفحات<input id="pageFiles" type="file" accept="image/jpeg,image/png,image/webp,image/*" multiple></label>
+<small>يتم ترتيب الملفات رقميًا حسب اسمها، مثل 001.jpg ثم 002.jpg.</small>
+<div class="row" style="margin-top:10px"><button id="uploadPages" class="primary">رفع الصفحات</button></div>
+<div id="pageMsg" class="msg"></div>
+</div>
+<div id="pageList"></div>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://smgvqaunvvkbwkkgmccx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6";
+const {createClient}=supabase;
+const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+let editingId=null, activeChapter=null;
+
+function say(el,t){$(el).textContent=t||""}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function numName(name){let m=name.match(/\d+/g);return m?Number(m[m.length-1]):999999999}
+
+async function boot(){
+ const {data}=await db.auth.getSession();
+ if(data.session){$("login").classList.add("hidden");$("app").classList.remove("hidden");loadChapters();}
+ else {$("login").classList.remove("hidden");$("app").classList.add("hidden");}
+}
+$("loginBtn").onclick=async()=>{
+ say("loginMsg","جاري تسجيل الدخول...");
+ const {error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(error)return say("loginMsg","فشل الدخول: "+error.message);
+ $("login").classList.add("hidden");$("app").classList.remove("hidden");loadChapters();
+};
+$("logout").onclick=async()=>{await db.auth.signOut();location.reload()};
+
+$("newChapter").onclick=()=>{
+ editingId=null;$("editorTitle").textContent="إضافة فصل";
+ $("cNumber").value="";$("cTitle").value="";$("cDate").value="";
+ $("chapterEditor").classList.remove("hidden");say("chapterMsg","");
+ window.scrollTo({top:0,behavior:"smooth"});
+};
+$("cancelChapter").onclick=()=>$("chapterEditor").classList.add("hidden");
+
+$("saveChapter").onclick=async()=>{
+ const n=Number($("cNumber").value), title=$("cTitle").value.trim(), date=$("cDate").value||null;
+ if(!Number.isInteger(n)||n<1)return say("chapterMsg","رقم الفصل غير صحيح.");
+ if(!title)return say("chapterMsg","اكتب عنوان الفصل.");
+ $("saveChapter").disabled=true;say("chapterMsg","جاري الحفظ...");
+ try{
+   let {data:manga,error:me}=await db.from("manga").select("id").limit(1).maybeSingle();
+   if(me)throw me;
+   if(!manga){
+     const r=await db.from("manga").insert({title:"بوروتو: دوامتان زرقاوتان",english:"Boruto: Two Blue Vortex",japanese:"BORUTO -TWO BLUE VORTEX-",status:"مستمرة",author:"Masashi Kishimoto",artist:"Mikio Ikemoto",genres:["أكشن","مغامرات","شونين","قوة خارقة","دراما","خيال علمي"],description:"بعد أن تم تعديل ذكريات الجميع، يجد بوروتو نفسه مطارداً من قريته. وبعد هروبه مع ساسكي، ما المستقبل الذي ينتظر بوروتو...?"}).select("id").single();
+     if(r.error)throw r.error;manga=r.data;
+   }
+   let r;
+   if(editingId) r=await db.from("chapters").update({number:n,title,published_at:date}).eq("id",editingId);
+   else r=await db.from("chapters").insert({manga_id:manga.id,number:n,title,published_at:date});
+   if(r.error)throw r.error;
+   say("chapterMsg","تم الحفظ بنجاح.");$("chapterEditor").classList.add("hidden");await loadChapters();
+ }catch(e){say("chapterMsg","خطأ: "+e.message)}finally{$("saveChapter").disabled=false}
+};
+
+async function loadChapters(){
+ const {data,error}=await db.from("chapters").select("id,number,title,published_at,pages(id,page_number,storage_path)").order("number",{ascending:false});
+ if(error)return $("chapters").textContent="خطأ: "+error.message;
+ if(!data?.length)return $("chapters").textContent="لا توجد فصول.";
+ $("chapters").innerHTML=data.map(c=>`
+ <div class="chapter">
+  <div class="row" style="justify-content:space-between">
+   <div><strong>الفصل ${esc(c.number)} — ${esc(c.title)}</strong><div class="muted">${esc(c.published_at||"بدون تاريخ")} · ${c.pages?.length||0} صفحة</div></div>
+   <div class="row">
+    <button class="ghost" onclick="editChapter('${c.id}')">✏️ تعديل</button>
+    <button class="ghost" onclick="managePages('${c.id}')">📄 الصفحات</button>
+    <button class="danger" onclick="deleteChapter('${c.id}')">🗑️ حذف</button>
+   </div>
+  </div>
+ </div>`).join("");
+}
+
+window.editChapter=async id=>{
+ const {data,error}=await db.from("chapters").select("*").eq("id",id).single();
+ if(error)return alert(error.message);
+ editingId=id;$("editorTitle").textContent="تعديل الفصل";
+ $("cNumber").value=data.number;$("cTitle").value=data.title||"";$("cDate").value=data.published_at||"";
+ $("chapterEditor").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.deleteChapter=async id=>{
+ if(!confirm("حذف الفصل وجميع سجلات صفحاته؟"))return;
+ const {data:pages}=await db.from("pages").select("storage_path").eq("chapter_id",id);
+ if(pages?.length)await db.storage.from("manga-pages").remove(pages.map(p=>p.storage_path));
+ const {error}=await db.from("chapters").delete().eq("id",id);
+ if(error)alert("تعذر الحذف: "+error.message);else loadChapters();
+};
+
+window.managePages=async id=>{
+ const {data,error}=await db.from("chapters").select("id,number,title,pages(id,page_number,storage_path)").eq("id",id).single();
+ if(error)return alert(error.message);
+ activeChapter=data;$("pageTitle").textContent=`صفحات الفصل ${data.number}`;
+ $("pageSubtitle").textContent=data.title||"";
+ $("pageModal").classList.remove("hidden");say("pageMsg","");await renderPages();
+};
+
+$("closePages").onclick=()=>{$("pageModal").classList.add("hidden");activeChapter=null};
+async function renderPages(){
+ if(!activeChapter)return;
+ const {data,error}=await db.from("pages").select("*").eq("chapter_id",activeChapter.id).order("page_number",{ascending:true});
+ if(error)return $("pageList").textContent="خطأ: "+error.message;
+ if(!data?.length)return $("pageList").innerHTML='<div class="msg">لا توجد صفحات. أضف JPG/PNG من الأعلى.</div>';
+ $("pageList").innerHTML=data.map(p=>{
+   const url=db.storage.from("manga-pages").getPublicUrl(p.storage_path).data.publicUrl;
+   return `<div class="page">
+    <img class="thumb" src="${url}" alt="صفحة ${p.page_number}">
+    <div><div class="num">صفحة ${p.page_number}</div><small>${esc(p.storage_path)}</small></div>
+    <div class="actions row">
+      <button class="ghost" onclick="movePage('${p.id}',${p.page_number},-1)">↑</button>
+      <button class="ghost" onclick="movePage('${p.id}',${p.page_number},1)">↓</button>
+      <button class="ghost" onclick="replacePage('${p.id}',${p.page_number},'${esc(p.storage_path)}')">استبدال</button>
+      <button class="danger" onclick="deletePage('${p.id}','${esc(p.storage_path)}')">حذف</button>
+    </div>
+   </div>`;
+ }).join("");
+}
+
+$("uploadPages").onclick=async()=>{
+ if(!activeChapter)return;
+ const files=[...$("pageFiles").files].sort((a,b)=>numName(a.name)-numName(b.name)||a.name.localeCompare(b.name,undefined,{numeric:true}));
+ if(!files.length)return say("pageMsg","اختر صفحات أولًا.");
+ $("uploadPages").disabled=true;say("pageMsg","جاري الرفع...");
+ try{
+   const {data:last}=await db.from("pages").select("page_number").eq("chapter_id",activeChapter.id).order("page_number",{ascending:false}).limit(1);
+   let next=(last?.[0]?.page_number||0)+1;
+   for(let i=0;i<files.length;i++){
+     const f=files[i], ext=(f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+     const pageNo=next+i,path=`${activeChapter.id}/${String(pageNo).padStart(4,"0")}.${ext}`;
+     say("pageMsg",`رفع الصفحة ${i+1} من ${files.length}...`);
+     const up=await db.storage.from("manga-pages").upload(path,f,{upsert:true,contentType:f.type||"image/jpeg",cacheControl:"31536000"});
+     if(up.error)throw up.error;
+     const ins=await db.from("pages").insert({chapter_id:activeChapter.id,page_number:pageNo,storage_path:path});
+     if(ins.error)throw ins.error;
+   }
+   $("pageFiles").value="";say("pageMsg","تم رفع الصفحات وربطها بالفصل.");await renderPages();await loadChapters();
+ }catch(e){say("pageMsg","فشل الرفع: "+e.message)}finally{$("uploadPages").disabled=false}
+};
+
+window.deletePage=async(id,path)=>{
+ if(!confirm("حذف هذه الصفحة؟"))return;
+ const r=await db.storage.from("manga-pages").remove([path]); if(r.error)return alert(r.error.message);
+ const d=await db.from("pages").delete().eq("id",id); if(d.error)return alert(d.error.message);
+ await renderPages();await loadChapters();
+};
+
+window.movePage=async(id,n,dir)=>{
+ const target=n+dir;if(target<1)return;
+ const {data:other}=await db.from("pages").select("id,page_number").eq("chapter_id",activeChapter.id).eq("page_number",target).maybeSingle();
+ if(!other)return;
+ const temp=1000000000+Math.floor(Math.random()*1000000);
+ await db.from("pages").update({page_number:temp}).eq("id",id);
+ await db.from("pages").update({page_number:n}).eq("id",other.id);
+ await db.from("pages").update({page_number:target}).eq("id",id);
+ await renderPages();
+};
+
+window.replacePage=async(id,n,oldPath)=>{
+ const input=document.createElement("input");input.type="file";input.accept="image/*";input.click();
+ input.onchange=async()=>{
+   const f=input.files?.[0];if(!f)return;
+   const ext=(f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+   const path=`${activeChapter.id}/${String(n).padStart(4,"0")}.${ext}`;
+   const up=await db.storage.from("manga-pages").upload(path,f,{upsert:true,contentType:f.type||"image/jpeg",cacheControl:"31536000"});
+   if(up.error)return alert(up.error.message);
+   if(oldPath!==path)await db.storage.from("manga-pages").remove([oldPath]);
+   const d=await db.from("pages").update({storage_path:path}).eq("id",id);
+   if(d.error)return alert(d.error.message);
+   await renderPages();
+ };
+};
+
+boot();
+</script>
+</body>
+</html>
