@@ -1,4 +1,0 @@
-const key='boruto_chapters';let chapters=JSON.parse(localStorage.getItem(key)||'null')||[{num:1,name:'بوروتو',date:'2023-08-26'}];
-const $=id=>document.getElementById(id);function save(){localStorage.setItem(key,JSON.stringify(chapters));render()}
-function render(){$('list').innerHTML=chapters.sort((a,b)=>a.num-b.num).map((c,i)=>`<div class="item">الفصل ${c.num}: ${c.name} — ${c.date} <button onclick="del(${i})">حذف</button></div>`).join('')}
-function del(i){chapters.splice(i,1);save()}$('add').onclick=()=>{chapters.push({num:Number($('num').value),name:$('name').value,date:$('date').value});save();$('msg').textContent='تمت الإضافة.'};render();
