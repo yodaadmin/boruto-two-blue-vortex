@@ -1,0 +1,280 @@
+<script>
+const SUPABASE_URL='https://smgvqaunvvkbwkkgmccx.supabase.co';
+const SUPABASE_KEY='sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const requested=new URLSearchParams(location.search).get("chapter");
+
+let images=[];
+let index=0;
+let mode="vertical";
+
+function publicUrl(path){
+  if(!path)return "";
+
+  const clean=String(path)
+    .split("/")
+    .filter(Boolean)
+    .map(encodeURIComponent)
+    .join("/");
+
+  return `${SUPABASE_URL}/storage/v1/object/public/manga-pages/${clean}`;
+}
+
+function escapeHtml(s){
+  return String(s??"").replace(
+    /[&<>"']/g,
+    m=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m])
+  );
+}
+
+function safePageNumber(value,index){
+  const n=Number(value);
+
+  if(Number.isFinite(n) && n>0){
+    return n;
+  }
+
+  return index+1;
+}
+
+async function init(){
+
+  const reader=document.getElementById("reader");
+
+  try{
+
+    if(!requested){
+      throw new Error(
+        "معرّف الفصل غير موجود في الرابط."
+      );
+    }
+
+    /*
+      الرابط يستخدم UUID:
+      ?chapter=7b8c0640-c051-49bd-b18a-eca4e8727ca2
+
+      لذلك نبحث في id وليس number.
+    */
+
+    const ch=await db
+      .from("chapters")
+      .select("id,number,title,published_at")
+      .eq("id",requested)
+      .maybeSingle();
+
+    if(ch.error){
+      throw new Error(
+        "فشل قراءة الفصل: "+ch.error.message
+      );
+    }
+
+    if(!ch.data){
+      throw new Error(
+        "لم يتم العثور على الفصل المطلوب."
+      );
+    }
+
+    const chapter=ch.data;
+
+    const chapterNumber=safePageNumber(
+      chapter.number,
+      0
+    );
+
+    document.getElementById("chapterTitle").textContent =
+      `الفصل ${chapterNumber} — ${chapter.title||""}`;
+
+    /*
+      تحميل صفحات الفصل باستخدام UUID الخاص بالفصل
+    */
+
+    const pg=await db
+      .from("pages")
+      .select("id,page_number,storage_path")
+      .eq("chapter_id",chapter.id)
+      .order("page_number",{ascending:true});
+
+    if(pg.error){
+      throw new Error(
+        "تم العثور على الفصل، لكن تعذر قراءة الصفحات: "+
+        pg.error.message
+      );
+    }
+
+    if(!pg.data || pg.data.length===0){
+      throw new Error(
+        "الفصل موجود، لكن لا توجد صفحات مسجلة له."
+      );
+    }
+
+    images=pg.data.map((p,i)=>({
+
+      page:safePageNumber(
+        p.page_number,
+        i
+      ),
+
+      path:p.storage_path,
+
+      url:publicUrl(
+        p.storage_path
+      )
+
+    }));
+
+    render();
+
+  }catch(e){
+
+    reader.innerHTML=`
+      <div class="status error">
+        <h3>تعذر تحميل الفصل</h3>
+        <div>${escapeHtml(
+          e.message || String(e)
+        )}</div>
+      </div>
+    `;
+
+  }
+}
+
+function render(){
+
+  const reader=document.getElementById("reader");
+
+  reader.innerHTML="";
+
+  images.forEach((p,i)=>{
+
+    const wrap=document.createElement("div");
+
+    wrap.style.width="100%";
+    wrap.style.textAlign="center";
+
+    const img=document.createElement("img");
+
+    img.src=p.url;
+
+    img.alt=`صفحة ${p.page}`;
+
+    img.loading=i<2 ? "eager" : "lazy";
+
+    img.referrerPolicy="no-referrer";
+
+    img.onerror=()=>{
+
+      wrap.innerHTML=`
+        <div class="status error">
+          تعذر تحميل الصفحة ${escapeHtml(p.page)}
+          <br>
+          <small>
+            المسار:
+            ${escapeHtml(p.path)}
+          </small>
+        </div>
+      `;
+
+    };
+
+    wrap.appendChild(img);
+    reader.appendChild(wrap);
+
+  });
+
+  document.getElementById("counter").textContent =
+    `${images.length} صفحة`;
+
+  if(mode==="single"){
+    setSingle(0);
+  }
+}
+
+function setSingle(i){
+
+  if(images.length===0)return;
+
+  index=Math.max(
+    0,
+    Math.min(images.length-1,i)
+  );
+
+  [
+    ...document.querySelectorAll(".reader img")
+  ].forEach((x,n)=>{
+
+    x.classList.toggle(
+      "active",
+      n===index
+    );
+
+  });
+
+  document.getElementById("counter").textContent =
+    `${index+1} / ${images.length}`;
+}
+
+document.getElementById("next").onclick=()=>{
+
+  if(mode==="single"){
+
+    setSingle(index+1);
+
+  }else{
+
+    window.scrollBy({
+      top:window.innerHeight*.85,
+      behavior:"smooth"
+    });
+
+  }
+
+};
+
+document.getElementById("prev").onclick=()=>{
+
+  if(mode==="single"){
+
+    setSingle(index-1);
+
+  }else{
+
+    window.scrollBy({
+      top:-window.innerHeight*.85,
+      behavior:"smooth"
+    });
+
+  }
+
+};
+
+document.getElementById("mode").onclick=()=>{
+
+  mode=mode==="vertical"
+    ? "single"
+    : "vertical";
+
+  document.body.classList.toggle(
+    "single",
+    mode==="single"
+  );
+
+  render();
+
+};
+
+document.getElementById("full").onclick=()=>{
+
+  document.documentElement
+    .requestFullscreen?.();
+
+};
+
+init();
+</script>
