@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>قارئ الفصل — دوامتان زرقاوتان</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#05080c;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+body.light{background:#eee;color:#111}.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#07111bee;border-bottom:1px solid #233746;backdrop-filter:blur(12px)}
+.bar a,.bar button{color:#fff;text-decoration:none;background:#142532;border:0;border-radius:10px;padding:9px 12px;cursor:pointer}.title{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}.title span{font-size:12px;color:#9bb0bd}.title b{font-size:15px}
+.controls{display:flex;gap:6px}.reader{display:flex;flex-direction:column;align-items:center;gap:0;min-height:calc(100vh - 60px);padding-bottom:90px}
+.reader img{display:block;max-width:100%;height:auto;margin:0 auto;user-select:none;-webkit-user-drag:none}body.fit-original .reader img{max-width:none}body.single .reader img{display:none}body.single .reader img.active{display:block;max-height:calc(100vh - 70px);width:auto;object-fit:contain}
+.status{padding:40px 18px;text-align:center;color:#9fb2bf;max-width:900px}.status.error{color:#ff9da8}.bottom{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:11;background:#0c1a25ef;border:1px solid #28404f;border-radius:16px;padding:8px;display:flex;gap:8px;align-items:center;backdrop-filter:blur(10px)}
+.bottom button{background:#18303f;color:#fff;border:0;border-radius:10px;padding:9px 13px;cursor:pointer}.bottom span{font-size:12px;color:#b9cbd5;min-width:90px;text-align:center}
+</style>
+</head>
+<body>
+<header class="bar"><a href="index.html#chapters">‹ الفصول</a><div class="title"><span>بوروتو: دوامتان زرقاوتان</span><b id="chapterTitle">جاري التحميل...</b></div><div class="controls"><button id="mode">↔</button><button id="full">⛶</button></div></header>
+<main id="reader" class="reader"><div class="status">جاري تحميل الصفحات...</div></main>
+<div class="bottom"><button id="prev">السابق</button><span id="counter">—</span><button id="next">التالي</button></div>
+<script>
+const SUPABASE_URL='https://smgvqaunvvkbwkkgmccx.supabase.co';
+const SUPABASE_KEY='sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const requested=new URLSearchParams(location.search).get("chapter");
+let images=[],index=0,mode="vertical";
+
+function publicUrl(path){
+  if(!path)return "";
+  const clean=String(path).split("/").filter(Boolean).map(encodeURIComponent).join("/");
+  return `${SUPABASE_URL}/storage/v1/object/public/manga-pages/${clean}`;
+}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function init(){
+  const reader=document.getElementById("reader");
+  try{
+    if(!requested)throw new Error("رقم الفصل غير موجود في الرابط. افتح الفصل من قائمة الفصول.");
+    const n=Number(requested);
+    if(!Number.isInteger(n)||n<1)throw new Error("رقم الفصل غير صالح: "+escapeHtml(requested));
+
+    // نجلب الفصل أولاً.
+    const ch=await db.from("chapters")
+      .select("id,number,title,published_at")
+      .eq("number",n)
+      .maybeSingle();
+    if(ch.error)throw new Error("فشل قراءة الفصل: "+ch.error.message);
+    if(!ch.data)throw new Error("لم يتم العثور على الفصل رقم "+n+".");
+
+    document.getElementById("chapterTitle").textContent=`الفصل ${ch.data.number} — ${ch.data.title||""}`;
+
+    // ثم الصفحات بشكل منفصل، حتى لا تعتمد القراءة على nested relation.
+    const pg=await db.from("pages")
+      .select("id,page_number,storage_path")
+      .eq("chapter_id",ch.data.id)
+      .order("page_number",{ascending:true});
+
+    if(pg.error)throw new Error("تم العثور على الفصل، لكن تعذر قراءة جدول الصفحات: "+pg.error.message);
+    if(!pg.data?.length)throw new Error("الفصل موجود، لكن لا توجد صفحات مسجلة له.");
+
+    images=pg.data.map(p=>({
+      page:p.page_number,
+      path:p.storage_path,
+      url:publicUrl(p.storage_path)
+    }));
+
+    render();
+  }catch(e){
+    reader.innerHTML=`<div class="status error"><h3>تعذر تحميل الفصل</h3><div>${escapeHtml(e.message||String(e))}</div></div>`;
+  }
+}
+
+function render(){
+  const reader=document.getElementById("reader");
+  reader.innerHTML="";
+  images.forEach((p,i)=>{
+    const wrap=document.createElement("div");
+    wrap.style.width="100%";
+    wrap.style.textAlign="center";
+    const img=document.createElement("img");
+    img.src=p.url;
+    img.alt=`صفحة ${p.page}`;
+    img.loading=i<2?"eager":"lazy";
+    img.referrerPolicy="no-referrer";
+    img.onerror=()=>{
+      wrap.innerHTML=`<div class="status error">تعذر تحميل الصفحة ${escapeHtml(p.page)}<br><small>المسار: ${escapeHtml(p.path)}</small></div>`;
+    };
+    wrap.appendChild(img);
+    reader.appendChild(wrap);
+  });
+  document.getElementById("counter").textContent=`${images.length} صفحة`;
+  if(mode==="single")setSingle(0);
+}
+function setSingle(i){
+  index=Math.max(0,Math.min(images.length-1,i));
+  [...document.querySelectorAll(".reader img")].forEach((x,n)=>x.classList.toggle("active",n===index));
+  document.getElementById("counter").textContent=`${index+1} / ${images.length}`;
+}
+document.getElementById("next").onclick=()=>{
+ if(mode==="single")setSingle(index+1);else window.scrollBy({top:window.innerHeight*.85,behavior:"smooth"});
+};
+document.getElementById("prev").onclick=()=>{
+ if(mode==="single")setSingle(index-1);else window.scrollBy({top:-window.innerHeight*.85,behavior:"smooth"});
+};
+document.getElementById("mode").onclick=()=>{
+ mode=mode==="vertical"?"single":"vertical";
+ document.body.classList.toggle("single",mode==="single");
+ render();
+};
+document.getElementById("full").onclick=()=>document.documentElement.requestFullscreen?.();
+init();
+</script>
+</body>
+</html>
