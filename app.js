@@ -15,49 +15,15 @@ genres: [
 ],
 description:
 "بعد أن تم تعديل ذكريات الجميع، يجد بوروتو نفسه مطارداً من قريته. وبعد هروبه مع ساسكي، ما المستقبل الذي ينتظر بوروتو...؟",
-cover: "assets/cover.png",
-chapters: []
+cover: "assets/cover.png"
 };
 
-/* =========================
-LOCAL DATA
-========================= */
-
-function localData() {
-
-try {
-
-const saved =
-  JSON.parse(
-    localStorage.getItem("mangaData") || "{}"
-  );
-
-return {
-  ...DEFAULT_DATA,
-  ...saved,
-
-  chapters:
-    Array.isArray(saved.chapters)
-      ? saved.chapters
-      : []
-};
-
-} catch {
-
-return DEFAULT_DATA;
-
-}
-
-}
-
-/* =========================
-ESCAPE HTML
-========================= */
+/* =========================================================
+HELPERS
+========================================================= */
 
 function esc(value) {
-
-return String(value ?? "")
-.replace(
+return String(value ?? "").replace(
 /[&<>"']/g,
 m => ({
 "&": "&",
@@ -67,200 +33,397 @@ m => ({
 "'": "'"
 }[m])
 );
-
 }
 
-/* =========================
-LOAD DATA
-========================= */
+function isValidUUID(value) {
+return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+String(value || "").trim()
+);
+}
 
-async function loadData() {
+function safeNumber(value, fallback = null) {
+const number = Number(value);
 
-const cfg =
-window.SITE_CONFIG || {};
+return Number.isFinite(number)
+? number
+: fallback;
+}
 
-/*
+/* =========================================================
+SUPABASE CLIENT
+========================================================= */
 
-* إذا لم توجد إعدادات Supabase
-* نستخدم البيانات المحلية.
-  */
+async function getSupabase() {
+
+const cfg = window.SITE_CONFIG || {};
 
 if (
 !cfg.SUPABASE_URL ||
 !cfg.SUPABASE_ANON_KEY
 ) {
+throw new Error(
+"إعدادات Supabase غير موجودة في config.js"
+);
+}
 
-return localData();
+/*
+
+* إذا كانت المكتبة موجودة مسبقًا
+* نستخدمها مباشرة.
+  */
+
+if (window.supabase) {
+
+return window.supabase.createClient(
+  cfg.SUPABASE_URL,
+  cfg.SUPABASE_ANON_KEY
+);
 
 }
 
-try {
-
 /*
- * تحميل مكتبة Supabase
- */
+
+* تحميل مكتبة Supabase تلقائيًا
+  */
+
+const script =
+document.createElement("script");
+
+script.src =
+"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+
+await new Promise(
+(resolve, reject) => {
+
+  script.onload = resolve;
+
+  script.onerror = () =>
+    reject(
+      new Error(
+        "تعذر تحميل مكتبة Supabase."
+      )
+    );
+
+  document.head.appendChild(script);
+
+}
+
+);
 
 if (!window.supabase) {
 
-  const script =
-    document.createElement("script");
+throw new Error(
+  "مكتبة Supabase لم يتم تحميلها."
+);
 
-  script.src =
-    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+}
 
-  await new Promise(
-    (resolve, reject) => {
+return window.supabase.createClient(
+cfg.SUPABASE_URL,
+cfg.SUPABASE_ANON_KEY
+);
 
-      script.onload = resolve;
-      script.onerror = reject;
+}
 
-      document.head.appendChild(
-        script
-      );
+/* =========================================================
+LOCAL DATA
+========================================================= */
 
-    }
+function getLocalData() {
+
+try {
+
+const saved =
+  JSON.parse(
+    localStorage.getItem(
+      "mangaData"
+    ) || "{}"
   );
-
-}
-
-
-/*
- * إنشاء الاتصال
- */
-
-const sb =
-  window.supabase.createClient(
-    cfg.SUPABASE_URL,
-    cfg.SUPABASE_ANON_KEY
-  );
-
-
-/*
- * جلب بيانات المانجا
- */
-
-const mangaResult =
-  await sb
-    .from("manga")
-    .select("*")
-    .limit(1)
-    .maybeSingle();
-
-
-if (
-  mangaResult.error ||
-  !mangaResult.data
-) {
-
-  return localData();
-
-}
-
-
-const manga =
-  mangaResult.data;
-
-
-/*
- * جلب الفصول
- */
-
-const chaptersResult =
-  await sb
-    .from("chapters")
-    .select(
-      "id,number,title,published_at"
-    )
-    .eq(
-      "manga_id",
-      manga.id
-    )
-    .order(
-      "number",
-      {
-        ascending: false,
-        nullsFirst: false
-      }
-    );
-
-
-if (chaptersResult.error) {
-
-  return {
-    ...DEFAULT_DATA,
-    ...manga,
-    cover:
-      manga.cover_url ||
-      "assets/cover.png",
-
-    chapters: []
-  };
-
-}
-
-
-const chapters =
-  Array.isArray(
-    chaptersResult.data
-  )
-    ? chaptersResult.data
-    : [];
 
 
 return {
-
   ...DEFAULT_DATA,
-
-  ...manga,
-
-  cover:
-    manga.cover_url ||
-    "assets/cover.png",
-
-  chapters:
-    chapters.map(
-      chapter => ({
-
-        ...chapter,
-
-        date:
-          chapter.published_at ||
-          ""
-
-      })
-    )
-
+  ...saved
 };
 
-} catch (error) {
+} catch {
 
-console.error(
-  "loadData error:",
-  error
+return {
+  ...DEFAULT_DATA
+};
+
+}
+
+}
+
+/* =========================================================
+LOAD MANGA + CHAPTERS FROM SUPABASE
+========================================================= */
+
+async function loadData() {
+
+const sb =
+await getSupabase();
+
+/* -------------------------------------------------------
+جلب المانجا
+------------------------------------------------------- */
+
+const mangaResult =
+await sb
+.from("manga")
+.select("*")
+.limit(1)
+.maybeSingle();
+
+if (mangaResult.error) {
+
+throw new Error(
+  "خطأ في قراءة جدول manga: " +
+  mangaResult.error.message
 );
 
-return localData();
-
 }
 
-}
+const manga =
+mangaResult.data || {};
 
-/* =========================
-RENDER
-========================= */
+/* -------------------------------------------------------
+جلب الفصول الموجودة فعليًا
 
-async function render() {
+ مهم جدًا:
+ لا نستخدم localStorage للفصول هنا.
+ Supabase هو المصدر الرئيسي.
 
-const d =
-await loadData();
+------------------------------------------------------- */
+
+let chaptersQuery =
+sb
+.from("chapters")
+.select(
+"id,number,title,published_at,manga_id"
+);
 
 /*
 
-* معلومات المانجا
+* إذا كان manga يحتوي id
+* نربط الفصول بهذه المانجا فقط.
   */
 
-for (
-const key of [
+if (manga.id) {
+
+chaptersQuery =
+  chaptersQuery.eq(
+    "manga_id",
+    manga.id
+  );
+
+}
+
+const chaptersResult =
+await chaptersQuery
+.order(
+"number",
+{
+ascending: false,
+nullsFirst: false
+}
+);
+
+if (chaptersResult.error) {
+
+throw new Error(
+  "خطأ في قراءة جدول chapters: " +
+  chaptersResult.error.message
+);
+
+}
+
+/*
+
+* Supabase هو المصدر الوحيد للفصول.
+  */
+
+const rawChapters =
+Array.isArray(
+chaptersResult.data
+)
+? chaptersResult.data
+: [];
+
+/*
+
+* ننظف البيانات.
+* 
+* أي سجل ليس لديه UUID صالح
+* لن يظهر كفصل قابل للفتح.
+  */
+
+const chapters =
+rawChapters
+.filter(
+chapter =>
+chapter &&
+isValidUUID(
+chapter.id
+)
+)
+.map(
+chapter => ({
+
+      id:
+        String(
+          chapter.id
+        ).trim(),
+
+      number:
+        safeNumber(
+          chapter.number
+        ),
+
+      title:
+        chapter.title || "",
+
+      published_at:
+        chapter.published_at ||
+        "",
+
+      date:
+        chapter.published_at ||
+        "",
+
+      manga_id:
+        chapter.manga_id || null
+
+    })
+  );
+
+/*
+
+* إزالة أي UUID مكرر
+  */
+
+const unique = new Map();
+
+for (const chapter of chapters) {
+
+if (!unique.has(chapter.id)) {
+
+  unique.set(
+    chapter.id,
+    chapter
+  );
+
+}
+
+}
+
+const cleanChapters =
+Array.from(
+unique.values()
+);
+
+/*
+
+* ترتيب رقمي حقيقي.
+* 
+* مثال:
+* 
+* 10
+* 9
+* 8
+* 7
+* 
+* وليس:
+* 
+* 9
+* 8
+* 7
+* 10
+  */
+
+cleanChapters.sort(
+(a, b) => {
+
+  const an =
+    safeNumber(
+      a.number,
+      -Infinity
+    );
+
+  const bn =
+    safeNumber(
+      b.number,
+      -Infinity
+    );
+
+
+  return bn - an;
+
+}
+
+);
+
+return {
+
+...DEFAULT_DATA,
+
+...manga,
+
+title:
+  manga.title ||
+  DEFAULT_DATA.title,
+
+english:
+  manga.english ||
+  DEFAULT_DATA.english,
+
+japanese:
+  manga.japanese ||
+  DEFAULT_DATA.japanese,
+
+status:
+  manga.status ||
+  DEFAULT_DATA.status,
+
+author:
+  manga.author ||
+  DEFAULT_DATA.author,
+
+artist:
+  manga.artist ||
+  DEFAULT_DATA.artist,
+
+description:
+  manga.description ||
+  DEFAULT_DATA.description,
+
+genres:
+  Array.isArray(
+    manga.genres
+  )
+    ? manga.genres
+    : DEFAULT_DATA.genres,
+
+cover:
+  manga.cover_url ||
+  manga.cover ||
+  DEFAULT_DATA.cover,
+
+chapters:
+  cleanChapters
+
+};
+
+}
+
+/* =========================================================
+RENDER MANGA INFORMATION
+========================================================= */
+
+function renderMangaInfo(data) {
+
+const fields = [
 "title",
 "english",
 "description",
@@ -268,18 +431,23 @@ const key of [
 "artist",
 "japanese",
 "status"
-]
-) {
+];
+
+for (const field of fields) {
 
 const element =
-  document.getElementById(key);
+  document.getElementById(
+    field
+  );
 
-if (element) {
 
-  element.textContent =
-    d[key] || "";
-
+if (!element) {
+  continue;
 }
+
+
+element.textContent =
+  data[field] || "";
 
 }
 
@@ -289,13 +457,32 @@ if (element) {
   */
 
 const cover =
-document.getElementById("cover");
+document.getElementById(
+"cover"
+);
 
 if (cover) {
 
 cover.src =
-  d.cover ||
-  "assets/cover.png";
+  data.cover ||
+  DEFAULT_DATA.cover;
+
+}
+
+/*
+
+* وصف قسم المعلومات
+  */
+
+const aboutDescription =
+document.getElementById(
+"aboutDescription"
+);
+
+if (aboutDescription) {
+
+aboutDescription.textContent =
+  data.description || "";
 
 }
 
@@ -305,12 +492,14 @@ cover.src =
   */
 
 const genres =
-document.getElementById("genres");
+document.getElementById(
+"genres"
+);
 
 if (genres) {
 
 genres.innerHTML =
-  (d.genres || [])
+  (data.genres || [])
     .map(
       genre =>
         `<span>${esc(genre)}</span>`
@@ -321,42 +510,30 @@ genres.innerHTML =
 
 /*
 
-* وصف المانجا
-  */
-
-const about =
-document.getElementById(
-"aboutDescription"
-);
-
-if (about) {
-
-about.textContent =
-  d.description || "";
-
-}
-
-/*
-
 * عدد الفصول
   */
 
-const count =
+const chapterCount =
 document.getElementById(
 "chapterCount"
 );
 
-if (count) {
+if (chapterCount) {
 
-count.textContent =
-  (d.chapters || []).length;
+chapterCount.textContent =
+  String(
+    data.chapters.length
+  );
 
 }
 
-/*
+}
 
-* شبكة الفصول
-  */
+/* =========================================================
+RENDER CHAPTERS
+========================================================= */
+
+function renderChapters(data) {
 
 const grid =
 document.getElementById(
@@ -364,9 +541,7 @@ document.getElementById(
 );
 
 if (!grid) {
-
 return;
-
 }
 
 /*
@@ -374,14 +549,14 @@ return;
 * البحث
   */
 
-const search =
+const searchInput =
 document.getElementById(
 "search"
 );
 
-const q =
+const search =
 (
-search?.value ||
+searchInput?.value ||
 ""
 )
 .trim()
@@ -392,96 +567,80 @@ search?.value ||
 * الترتيب
   */
 
-const sort =
+const sortSelect =
 document.getElementById(
 "sort"
-)?.value ||
+);
+
+const sort =
+sortSelect?.value ||
 "desc";
 
 /*
 
-* تجهيز الفصول
+* نسخة مستقلة من الفصول
   */
 
 let chapters =
-Array.isArray(d.chapters)
-? [...d.chapters]
-: [];
+[...data.chapters];
 
 /*
 
-* البحث برقم الفصل أو عنوانه
+* البحث
   */
 
+if (search) {
+
 chapters =
-chapters.filter(
-chapter => {
+  chapters.filter(
+    chapter => {
 
-    const number =
-      String(
-        chapter.number ??
-        ""
+      const number =
+        String(
+          chapter.number ?? ""
+        );
+
+      const title =
+        String(
+          chapter.title || ""
+        );
+
+
+      return (
+        `${number} ${title}`
+          .toLowerCase()
+          .includes(search)
       );
 
-    const title =
-      String(
-        chapter.title ??
-        ""
-      );
+    }
+  );
 
-    return (
-      `${number} ${title}`
-        .toLowerCase()
-        .includes(q)
-    );
-
-  }
-);
+}
 
 /*
 
-* ترتيب رقمي حقيقي
-* 
-* وليس ترتيبًا نصيًا.
+* الترتيب
   */
 
 chapters.sort(
-(a,b) => {
+(a, b) => {
 
   const an =
-    Number(a.number);
+    safeNumber(
+      a.number,
+      -Infinity
+    );
 
   const bn =
-    Number(b.number);
+    safeNumber(
+      b.number,
+      -Infinity
+    );
 
 
-  if (
-    !Number.isFinite(an) &&
-    !Number.isFinite(bn)
-  ) {
-
-    return 0;
-
-  }
-
-
-  if (!Number.isFinite(an)) {
-
-    return 1;
-
-  }
-
-
-  if (!Number.isFinite(bn)) {
-
-    return -1;
-
-  }
-
-
-  return sort === "desc"
-    ? bn - an
-    : an - bn;
+  return sort === "asc"
+    ? an - bn
+    : bn - an;
 
 }
 
@@ -489,7 +648,7 @@ chapters.sort(
 
 /*
 
-* لا توجد فصول
+* لا توجد نتائج
   */
 
 if (!chapters.length) {
@@ -507,7 +666,7 @@ grid.innerHTML = `
     </h3>
 
     <p>
-      أضف أول فصل من لوحة الإدارة.
+      أضف فصلًا من لوحة الإدارة.
     </p>
 
   </div>
@@ -520,18 +679,7 @@ return;
 
 /*
 
-* ==================================================
-* IMPORTANT
-* 
-* رابط الفصل يستخدم:
-* 
-* reader-2.html?chapter=UUID
-* 
-* وليس:
-* 
-* reader.html?chapter=...
-* 
-* ==================================================
+* إنشاء بطاقات الفصول
   */
 
 grid.innerHTML =
@@ -540,13 +688,30 @@ chapters
 (chapter, index) => {
 
       /*
-       * UUID الحقيقي للفصل
+       * UUID الحقيقي
        */
 
-      const chapterId =
+      const id =
         String(
-          chapter.id || ""
+          chapter.id
         ).trim();
+
+
+      /*
+       * لا نعرض رابطًا لفصل
+       * بدون UUID صالح.
+       *
+       * لكن هذا لن يحدث عادةً
+       * لأن loadData قام بتنقيته.
+       */
+
+      if (
+        !isValidUUID(id)
+      ) {
+
+        return "";
+
+      }
 
 
       /*
@@ -554,14 +719,16 @@ chapters
        */
 
       const number =
-        Number(
+        safeNumber(
           chapter.number
         );
 
 
-      const displayNumber =
-        Number.isFinite(number)
-          ? String(number).padStart(2, "0")
+      const numberText =
+        number !== null
+          ? String(
+              number
+            ).padStart(2, "0")
           : "--";
 
 
@@ -572,7 +739,7 @@ chapters
       const title =
         chapter.title ||
         (
-          Number.isFinite(number)
+          number !== null
             ? `الفصل ${number}`
             : "الفصل"
         );
@@ -589,51 +756,18 @@ chapters
 
 
       /*
-       * حماية من UUID مفقود
-       */
-
-      if (!chapterId) {
-
-        return `
-
-          <div class="chapter-card">
-
-            <div class="chapter-number">
-              ${esc(displayNumber)}
-            </div>
-
-            <div class="chapter-info">
-
-              <span>
-                فصل غير صالح
-              </span>
-
-              <h3>
-                ${esc(title)}
-              </h3>
-
-              <small>
-                معرّف الفصل مفقود
-              </small>
-
-            </div>
-
-          </div>
-
-        `;
-
-      }
-
-
-      /*
-       * الرابط الصحيح للقارئ
+       * الرابط النهائي.
+       *
+       * مهم:
+       *
+       * reader-2.html
+       *
+       * وليس reader.html
        */
 
       const readerUrl =
         "reader-2.html?chapter=" +
-        encodeURIComponent(
-          chapterId
-        );
+        encodeURIComponent(id);
 
 
       return `
@@ -648,7 +782,7 @@ chapters
         >
 
           <div class="chapter-number">
-            ${esc(displayNumber)}
+            ${esc(numberText)}
           </div>
 
           <div class="chapter-info">
@@ -665,9 +799,15 @@ chapters
               ${esc(title)}
             </h3>
 
-            <small>
-              ${esc(date)}
-            </small>
+            ${
+              date
+                ? `
+                  <small>
+                    ${esc(date)}
+                  </small>
+                `
+                : ""
+            }
 
           </div>
 
@@ -685,9 +825,9 @@ chapters
 
 }
 
-/* =========================
-SEARCH
-========================= */
+/* =========================================================
+EVENTS
+========================================================= */
 
 const searchInput =
 document.getElementById(
@@ -700,17 +840,19 @@ searchInput.addEventListener(
 "input",
 () => {
 
-  render();
+  if (window.MANGA_DATA) {
+
+    renderChapters(
+      window.MANGA_DATA
+    );
+
+  }
 
 }
 
 );
 
 }
-
-/* =========================
-SORT
-========================= */
 
 const sortSelect =
 document.getElementById(
@@ -723,7 +865,13 @@ sortSelect.addEventListener(
 "change",
 () => {
 
-  render();
+  if (window.MANGA_DATA) {
+
+    renderChapters(
+      window.MANGA_DATA
+    );
+
+  }
 
 }
 
@@ -731,8 +879,122 @@ sortSelect.addEventListener(
 
 }
 
-/* =========================
-START
-========================= */
+/* =========================================================
+INITIALIZE
+========================================================= */
 
-render();
+async function initSite() {
+
+try {
+
+const data =
+  await loadData();
+
+
+/*
+ * نخزن البيانات الحالية
+ * في الذاكرة فقط.
+ *
+ * لا نخزن الفصول في localStorage.
+ */
+
+window.MANGA_DATA =
+  data;
+
+
+renderMangaInfo(
+  data
+);
+
+
+renderChapters(
+  data
+);
+
+
+console.log(
+  "Manga loaded successfully.",
+  {
+    chapters:
+      data.chapters.length,
+
+    ids:
+      data.chapters.map(
+        chapter =>
+          chapter.id
+      )
+  }
+);
+
+} catch (error) {
+
+console.error(
+  "Site initialization error:",
+  error
+);
+
+
+/*
+ * لا نعرض بيانات قديمة
+ * إذا فشل Supabase.
+ *
+ * لأن المطلوب أن تكون
+ * قائمة الفصول مطابقة
+ * لما هو موجود فعليًا
+ * في Supabase.
+ */
+
+const grid =
+  document.getElementById(
+    "chapterGrid"
+  );
+
+
+if (grid) {
+
+  grid.innerHTML = `
+
+    <div class="empty-chapters">
+
+      <div class="empty-icon">
+        !
+      </div>
+
+      <h3>
+        تعذر تحميل الفصول
+      </h3>
+
+      <p>
+        تحقق من اتصال Supabase
+        ثم أعد تحميل الصفحة.
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+const count =
+  document.getElementById(
+    "chapterCount"
+  );
+
+
+if (count) {
+
+  count.textContent =
+    "0";
+
+}
+
+}
+
+}
+
+/* =========================================================
+START
+========================================================= */
+
+initSite();
