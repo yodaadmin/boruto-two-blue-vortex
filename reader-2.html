@@ -1,14 +1,11 @@
 <!doctype html>
+
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#05080c">
-<title>قارئ الفصل — دوامتان زرقاوتان</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<title>قارئ الفصل — دوامتان زرقاوتان</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 *{box-sizing:border-box}
 
 html,body{
@@ -77,6 +74,12 @@ body.light{
   gap:0;
   min-height:calc(100vh - 60px);
   padding-bottom:90px
+}
+
+.page-wrap{
+  width:100%;
+  text-align:center;
+  line-height:0
 }
 
 .reader img{
@@ -154,42 +157,23 @@ body.single .reader img.active{
   min-width:90px;
   text-align:center
 }
-</style>
-</head>
-
-<body>
-
-<header class="bar">
-
-  <a href="index.html#chapters">
+</style></head><body><header class="bar">  <a href="index.html#chapters">
     ‹ الفصول
-  </a>
-
-  <div class="title">
+  </a>  <div class="title">
     <span>بوروتو: دوامتان زرقاوتان</span>
     <b id="chapterTitle">جاري التحميل...</b>
-  </div>
-
-  <div class="controls">
+  </div>  <div class="controls">
     <button id="mode">↔</button>
     <button id="full">⛶</button>
-  </div>
-
-</header>
-
-<main id="reader" class="reader">
+  </div></header><main id="reader" class="reader">
   <div class="status">
     جاري تحميل الصفحات...
   </div>
-</main>
-
-<div class="bottom">
+</main><div class="bottom">
   <button id="prev">السابق</button>
   <span id="counter">—</span>
   <button id="next">التالي</button>
-</div>
-
-<script>
+</div><script>
 
 const SUPABASE_URL =
   'https://smgvqaunvvkbwkkgmccx.supabase.co';
@@ -218,7 +202,7 @@ let mode = "vertical";
 
 
 /* =========================
-   Helpers
+   HELPERS
 ========================= */
 
 function escapeHtml(value){
@@ -238,9 +222,9 @@ function escapeHtml(value){
 }
 
 
-/*
- * إنشاء رابط الصورة من Storage
- */
+/* =========================
+   STORAGE URL
+========================= */
 
 function publicUrl(path){
 
@@ -264,21 +248,23 @@ function publicUrl(path){
 }
 
 
-/*
- * هل القيمة UUID؟
- */
+/* =========================
+   UUID CHECK
+========================= */
 
 function isUUID(value){
 
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    .test(String(value || "").trim());
+    .test(
+      String(value || "").trim()
+    );
 
 }
 
 
-/*
- * رقم آمن للصفحة
- */
+/* =========================
+   SAFE NUMBER
+========================= */
 
 function safePageNumber(value,index){
 
@@ -288,7 +274,9 @@ function safePageNumber(value,index){
     Number.isFinite(n) &&
     n > 0
   ){
+
     return n;
+
   }
 
   return index + 1;
@@ -315,20 +303,17 @@ async function init(){
 
     }
 
+
     const chapterId =
       String(requested).trim();
 
 
     /*
-     * مهم:
-     *
-     * إذا كان الرابط يحتوي UUID
+     * إذا كان الرابط UUID:
      * نبحث في id.
      *
-     * إذا كان يحتوي رقمًا
+     * إذا كان رقمًا:
      * نبحث في number.
-     *
-     * لا نحول UUID إلى Number.
      */
 
     let chapterResult;
@@ -342,13 +327,17 @@ async function init(){
           .select(
             "id,number,title,published_at"
           )
-          .eq("id",chapterId)
+          .eq(
+            "id",
+            chapterId
+          )
           .maybeSingle();
 
     }else{
 
       const number =
         Number(chapterId);
+
 
       if(
         !Number.isInteger(number) ||
@@ -361,21 +350,21 @@ async function init(){
 
       }
 
+
       chapterResult =
         await db
           .from("chapters")
           .select(
             "id,number,title,published_at"
           )
-          .eq("number",number)
+          .eq(
+            "number",
+            number
+          )
           .maybeSingle();
 
     }
 
-
-    /*
-     * خطأ Supabase
-     */
 
     if(chapterResult.error){
 
@@ -386,10 +375,6 @@ async function init(){
 
     }
 
-
-    /*
-     * الفصل غير موجود
-     */
 
     if(!chapterResult.data){
 
@@ -404,9 +389,9 @@ async function init(){
       chapterResult.data;
 
 
-    /*
-     * عنوان الفصل
-     */
+    /* =========================
+       CHAPTER TITLE
+    ========================= */
 
     const numberText =
       safePageNumber(
@@ -421,11 +406,9 @@ async function init(){
         `الفصل ${numberText} — ${chapter.title || ""}`;
 
 
-    /*
-     * جلب صفحات الفصل
-     *
-     * باستخدام UUID الحقيقي للفصل.
-     */
+    /* =========================
+       LOAD PAGES
+    ========================= */
 
     const pagesResult =
       await db
@@ -456,7 +439,9 @@ async function init(){
 
 
     const pageRows =
-      pagesResult.data || [];
+      Array.isArray(pagesResult.data)
+        ? pagesResult.data
+        : [];
 
 
     if(!pageRows.length){
@@ -468,9 +453,9 @@ async function init(){
     }
 
 
-    /*
-     * تجهيز الصور
-     */
+    /* =========================
+       BUILD IMAGES
+    ========================= */
 
     images =
       pageRows
@@ -489,7 +474,9 @@ async function init(){
               ),
 
             path:
-              p.storage_path,
+              String(
+                p.storage_path
+              ),
 
             url:
               publicUrl(
@@ -507,6 +494,36 @@ async function init(){
       );
 
     }
+
+
+    /*
+     * =================================================
+     * التعديل المهم:
+     *
+     * نعيد ترتيب الصفحات رقميًا داخل المتصفح.
+     *
+     * حتى لو أعادت قاعدة البيانات الصفوف بهذا الشكل:
+     *
+     * 1
+     * 3
+     * 5
+     * 4
+     * 2
+     *
+     * سيصبح الترتيب النهائي:
+     *
+     * 1
+     * 2
+     * 3
+     * 4
+     * 5
+     * =================================================
+     */
+
+    images.sort(
+      (a,b) =>
+        a.page - b.page
+    );
 
 
     /*
@@ -566,11 +583,9 @@ function render(){
       const wrap =
         document.createElement("div");
 
-      wrap.style.width =
-        "100%";
 
-      wrap.style.textAlign =
-        "center";
+      wrap.className =
+        "page-wrap";
 
 
       const img =
@@ -653,7 +668,9 @@ function render(){
 function setSingle(i){
 
   if(!images.length){
+
     return;
+
   }
 
 
@@ -701,7 +718,9 @@ document
 
     if(mode === "single"){
 
-      setSingle(index + 1);
+      setSingle(
+        index + 1
+      );
 
     }else{
 
@@ -730,7 +749,9 @@ document
 
     if(mode === "single"){
 
-      setSingle(index - 1);
+      setSingle(
+        index - 1
+      );
 
     }else{
 
@@ -794,7 +815,5 @@ document
 
 init();
 
-</script>
-
-</body>
+</script></body>
 </html>
