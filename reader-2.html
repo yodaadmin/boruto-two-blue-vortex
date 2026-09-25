@@ -1,12 +1,12 @@
 <!doctype html>
 
-<html lang="ar" dir="rtl">
-<head>
+<html lang="ar" dir="rtl"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05080c">
-<title>قارئ الفصل — دوامتان زرقاوتان</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
-*{box-sizing:border-box}
+<meta name="theme-color" content="#05080c"><title>قارئ الفصل — دوامتان زرقاوتان</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+*{
+  box-sizing:border-box
+}
 
 html,body{
   margin:0;
@@ -159,21 +159,31 @@ body.single .reader img.active{
 }
 </style></head><body><header class="bar">  <a href="index.html#chapters">
     ‹ الفصول
-  </a>  <div class="title">
-    <span>بوروتو: دوامتان زرقاوتان</span>
-    <b id="chapterTitle">جاري التحميل...</b>
-  </div>  <div class="controls">
-    <button id="mode">↔</button>
-    <button id="full">⛶</button>
-  </div></header><main id="reader" class="reader">
-  <div class="status">
+  </a>  <div class="title"><span>
+  بوروتو: دوامتان زرقاوتان
+</span>
+
+<b id="chapterTitle">
+  جاري التحميل...
+</b>
+
+  </div>  <div class="controls"><button id="mode">
+  ↔
+</button>
+
+<button id="full">
+  ⛶
+</button>
+
+  </div></header><main id="reader" class="reader">  <div class="status">
     جاري تحميل الصفحات...
-  </div>
-</main><div class="bottom">
-  <button id="prev">السابق</button>
-  <span id="counter">—</span>
-  <button id="next">التالي</button>
-</div><script>
+  </div></main><div class="bottom">  <button id="prev">
+    السابق
+  </button>  <span id="counter">
+    —
+  </span>  <button id="next">
+    التالي
+  </button></div><script>
 
 const SUPABASE_URL =
   'https://smgvqaunvvkbwkkgmccx.supabase.co';
@@ -196,8 +206,11 @@ const requested =
   new URLSearchParams(location.search)
     .get("chapter");
 
+
 let images = [];
+
 let index = 0;
+
 let mode = "vertical";
 
 
@@ -236,7 +249,9 @@ function publicUrl(path){
     String(path)
       .split("/")
       .filter(Boolean)
-      .map(encodeURIComponent)
+      .map(
+        encodeURIComponent
+      )
       .join("/");
 
   return (
@@ -266,9 +281,13 @@ function isUUID(value){
    SAFE NUMBER
 ========================= */
 
-function safePageNumber(value,index){
+function safePageNumber(
+  value,
+  fallback = null
+){
 
-  const n = Number(value);
+  const n =
+    Number(value);
 
   if(
     Number.isFinite(n) &&
@@ -279,7 +298,110 @@ function safePageNumber(value,index){
 
   }
 
-  return index + 1;
+  return fallback;
+
+}
+
+
+/* =========================
+   EXTRACT PAGE NUMBER
+   FROM FILE NAME
+========================= */
+
+/*
+
+  مثال:
+
+  UUID/0001.jpg
+  UUID/0002.jpg
+  UUID/0010.jpg
+
+  تصبح:
+
+  1
+  2
+  10
+
+*/
+
+function getPageNumberFromPath(path){
+
+  const value =
+    String(path || "").trim();
+
+
+  /*
+   * نأخذ اسم الملف الأخير
+   */
+
+  const filename =
+    value
+      .split("/")
+      .pop() || "";
+
+
+  /*
+   * نبحث عن الرقم الموجود
+   * قبل امتداد الصورة
+   */
+
+  const match =
+    filename.match(
+      /^(\d+)\.(jpg|jpeg|png|webp|gif)$/i
+    );
+
+
+  if(match){
+
+    const number =
+      Number(match[1]);
+
+
+    if(
+      Number.isFinite(number)
+    ){
+
+      return number;
+
+    }
+
+  }
+
+
+  /*
+   * محاولة احتياطية:
+   *
+   * إذا كان اسم الملف مثل:
+   *
+   * page-0001.jpg
+   */
+
+  const fallbackMatch =
+    filename.match(
+      /(\d+)(?=\.[^.]+$)/
+    );
+
+
+  if(fallbackMatch){
+
+    const number =
+      Number(
+        fallbackMatch[1]
+      );
+
+
+    if(
+      Number.isFinite(number)
+    ){
+
+      return number;
+
+    }
+
+  }
+
+
+  return null;
 
 }
 
@@ -291,7 +413,10 @@ function safePageNumber(value,index){
 async function init(){
 
   const reader =
-    document.getElementById("reader");
+    document.getElementById(
+      "reader"
+    );
+
 
   try{
 
@@ -305,21 +430,23 @@ async function init(){
 
 
     const chapterId =
-      String(requested).trim();
+      String(
+        requested
+      ).trim();
 
 
-    /*
-     * إذا كان الرابط UUID:
-     * نبحث في id.
-     *
-     * إذا كان رقمًا:
-     * نبحث في number.
-     */
+    /* =========================
+       LOAD CHAPTER
+    ========================= */
 
     let chapterResult;
 
 
-    if(isUUID(chapterId)){
+    if(
+      isUUID(
+        chapterId
+      )
+    ){
 
       chapterResult =
         await db
@@ -333,10 +460,13 @@ async function init(){
           )
           .maybeSingle();
 
+
     }else{
 
       const number =
-        Number(chapterId);
+        Number(
+          chapterId
+        );
 
 
       if(
@@ -366,7 +496,9 @@ async function init(){
     }
 
 
-    if(chapterResult.error){
+    if(
+      chapterResult.error
+    ){
 
       throw new Error(
         "فشل قراءة الفصل: " +
@@ -376,7 +508,9 @@ async function init(){
     }
 
 
-    if(!chapterResult.data){
+    if(
+      !chapterResult.data
+    ){
 
       throw new Error(
         "لم يتم العثور على الفصل المطلوب."
@@ -393,17 +527,22 @@ async function init(){
        CHAPTER TITLE
     ========================= */
 
-    const numberText =
+    const chapterNumber =
       safePageNumber(
-        chapter.number,
-        0
+        chapter.number
       );
 
 
     document
-      .getElementById("chapterTitle")
+      .getElementById(
+        "chapterTitle"
+      )
       .textContent =
-        `الفصل ${numberText} — ${chapter.title || ""}`;
+        `الفصل ${
+          chapterNumber ?? ""
+        } — ${
+          chapter.title || ""
+        }`;
 
 
     /* =========================
@@ -419,16 +558,12 @@ async function init(){
         .eq(
           "chapter_id",
           chapter.id
-        )
-        .order(
-          "page_number",
-          {
-            ascending:true
-          }
         );
 
 
-    if(pagesResult.error){
+    if(
+      pagesResult.error
+    ){
 
       throw new Error(
         "تم العثور على الفصل، لكن تعذر قراءة الصفحات: " +
@@ -439,12 +574,16 @@ async function init(){
 
 
     const pageRows =
-      Array.isArray(pagesResult.data)
+      Array.isArray(
+        pagesResult.data
+      )
         ? pagesResult.data
         : [];
 
 
-    if(!pageRows.length){
+    if(
+      !pageRows.length
+    ){
 
       throw new Error(
         "الفصل موجود، لكن لا توجد صفحات مسجلة له."
@@ -459,35 +598,84 @@ async function init(){
 
     images =
       pageRows
+
         .filter(
-          p =>
-            p &&
-            p.storage_path
+          page =>
+            page &&
+            page.storage_path
         )
+
         .map(
-          (p,i) => ({
+          (page,i) => {
 
-            page:
-              safePageNumber(
-                p.page_number,
-                i
-              ),
-
-            path:
+            const path =
               String(
-                p.storage_path
-              ),
+                page.storage_path
+              ).trim();
 
-            url:
-              publicUrl(
-                p.storage_path
-              )
 
-          })
+            /*
+             * الرقم الحقيقي للصفحة
+             * يؤخذ من اسم الملف.
+             */
+
+            const filenameNumber =
+              getPageNumberFromPath(
+                path
+              );
+
+
+            /*
+             * إذا لم نستطع استخراج الرقم
+             * نستخدم page_number كحل احتياطي.
+             */
+
+            const databaseNumber =
+              safePageNumber(
+                page.page_number
+              );
+
+
+            const pageNumber =
+              filenameNumber !== null
+                ? filenameNumber
+                : databaseNumber;
+
+
+            return {
+
+              id:
+                page.id,
+
+              page:
+                pageNumber,
+
+              databasePage:
+                databaseNumber,
+
+              filenamePage:
+                filenameNumber,
+
+              path:
+
+                path,
+
+              url:
+
+                publicUrl(
+                  path
+                )
+
+            };
+
+          }
+
         );
 
 
-    if(!images.length){
+    if(
+      !images.length
+    ){
 
       throw new Error(
         "تم العثور على الصفحات، لكن مسارات الصور فارغة."
@@ -496,34 +684,101 @@ async function init(){
     }
 
 
-    /*
-     * =================================================
-     * التعديل المهم:
-     *
-     * نعيد ترتيب الصفحات رقميًا داخل المتصفح.
-     *
-     * حتى لو أعادت قاعدة البيانات الصفوف بهذا الشكل:
-     *
-     * 1
-     * 3
-     * 5
-     * 4
-     * 2
-     *
-     * سيصبح الترتيب النهائي:
-     *
-     * 1
-     * 2
-     * 3
-     * 4
-     * 5
-     * =================================================
-     */
+    /* =========================
+       SORT BY FILE NAME
+========================= */
 
     images.sort(
-      (a,b) =>
-        a.page - b.page
+      (a,b) => {
+
+        /*
+         * الأولوية المطلقة:
+         *
+         * رقم الملف.
+         *
+         * 0001
+         * 0002
+         * 0003
+         * 0004
+         * 0005
+         */
+
+        if(
+          a.filenamePage !== null &&
+          b.filenamePage !== null
+        ){
+
+          return (
+            a.filenamePage -
+            b.filenamePage
+          );
+
+        }
+
+
+        /*
+         * إذا كانت إحدى الصفحات
+         * بلا رقم ملف، نعتمد على
+         * الرقم المستخرج منها.
+         */
+
+        if(
+          a.page !== null &&
+          b.page !== null
+        ){
+
+          return (
+            a.page -
+            b.page
+          );
+
+        }
+
+
+        /*
+         * احتياط أخير.
+         */
+
+        return (
+          String(a.path)
+            .localeCompare(
+              String(b.path),
+              undefined,
+              {
+                numeric:true
+              }
+            )
+        );
+
+      }
     );
+
+
+    /*
+     * إعادة ترقيم العرض الداخلي
+     *
+     * هذا يجعل العداد دائمًا:
+     *
+     * 1 / 5
+     * 2 / 5
+     * 3 / 5
+     * 4 / 5
+     * 5 / 5
+     *
+     * بحسب الترتيب الحقيقي للصور.
+     */
+
+    images =
+      images.map(
+        (image,i) => ({
+
+          ...image,
+
+          displayIndex:
+            i + 1
+
+        })
+      );
 
 
     /*
@@ -572,7 +827,10 @@ async function init(){
 function render(){
 
   const reader =
-    document.getElementById("reader");
+    document.getElementById(
+      "reader"
+    );
+
 
   reader.innerHTML = "";
 
@@ -581,7 +839,9 @@ function render(){
     (page,i) => {
 
       const wrap =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
 
       wrap.className =
@@ -589,7 +849,9 @@ function render(){
 
 
       const img =
-        document.createElement("img");
+        document.createElement(
+          "img"
+        );
 
 
       img.className =
@@ -601,7 +863,7 @@ function render(){
 
 
       img.alt =
-        `صفحة ${page.page}`;
+        `صفحة ${page.displayIndex}`;
 
 
       img.loading =
@@ -622,13 +884,17 @@ function render(){
             <div class="status error">
 
               تعذر تحميل الصفحة
-              ${escapeHtml(page.page)}
+              ${escapeHtml(
+                page.displayIndex
+              )}
 
               <br>
 
               <small>
                 المسار:
-                ${escapeHtml(page.path)}
+                ${escapeHtml(
+                  page.path
+                )}
               </small>
 
             </div>
@@ -638,21 +904,30 @@ function render(){
         };
 
 
-      wrap.appendChild(img);
+      wrap.appendChild(
+        img
+      );
 
-      reader.appendChild(wrap);
+
+      reader.appendChild(
+        wrap
+      );
 
     }
   );
 
 
   document
-    .getElementById("counter")
+    .getElementById(
+      "counter"
+    )
     .textContent =
       `${images.length} صفحة`;
 
 
-  if(mode === "single"){
+  if(
+    mode === "single"
+  ){
 
     setSingle(0);
 
@@ -667,7 +942,9 @@ function render(){
 
 function setSingle(i){
 
-  if(!images.length){
+  if(
+    !images.length
+  ){
 
     return;
 
@@ -701,9 +978,15 @@ function setSingle(i){
 
 
   document
-    .getElementById("counter")
+    .getElementById(
+      "counter"
+    )
     .textContent =
-      `${index + 1} / ${images.length}`;
+      `${
+        index + 1
+      } / ${
+        images.length
+      }`;
 
 }
 
@@ -713,10 +996,14 @@ function setSingle(i){
 ========================= */
 
 document
-  .getElementById("next")
+  .getElementById(
+    "next"
+  )
   .onclick = () => {
 
-    if(mode === "single"){
+    if(
+      mode === "single"
+    ){
 
       setSingle(
         index + 1
@@ -744,10 +1031,14 @@ document
 ========================= */
 
 document
-  .getElementById("prev")
+  .getElementById(
+    "prev"
+  )
   .onclick = () => {
 
-    if(mode === "single"){
+    if(
+      mode === "single"
+    ){
 
       setSingle(
         index - 1
@@ -775,7 +1066,9 @@ document
 ========================= */
 
 document
-  .getElementById("mode")
+  .getElementById(
+    "mode"
+  )
   .onclick = () => {
 
     mode =
@@ -800,7 +1093,9 @@ document
 ========================= */
 
 document
-  .getElementById("full")
+  .getElementById(
+    "full"
+  )
   .onclick = () => {
 
     document.documentElement
