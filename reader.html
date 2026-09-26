@@ -4,11 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#05080c">
+
 <title>قارئ الفصل — دوامتان زرقاوتان</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
+/* =========================================================
+   BASE
+========================================================= */
+
 *{
   box-sizing:border-box;
 }
@@ -17,10 +23,21 @@ html,
 body{
   margin:0;
   padding:0;
+
   background:#05080c;
   color:#fff;
-  font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
-  transition: background .3s ease;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  transition:
+    background .3s ease,
+    color .3s ease;
 }
 
 html{
@@ -31,678 +48,1870 @@ body{
   overflow-x:hidden;
 }
 
-a,
 button,
-select{
+select,
+a{
   font:inherit;
 }
 
+
 /* =========================================================
-   TOP BAR
+   TOP READER BAR
 ========================================================= */
 
 .bar{
   position:sticky;
+
   top:0;
   z-index:100;
+
   height:60px;
 
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
+
+  gap:12px;
 
   padding:8px 14px;
 
-  background:rgba(7,17,27,.92);
-  border-bottom:1px solid #233746;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(9,20,30,.96),
+      rgba(7,17,27,.91)
+    );
 
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
+  border-bottom:
+    1px solid rgba(118,229,253,.10);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.20);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 
-.bar-right{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
 
+/* LEFT / RIGHT GROUPS */
+
+.bar-right,
 .bar-left{
   display:flex;
+
   align-items:center;
-  gap:8px;
+
+  gap:7px;
+
+  min-width:0;
 }
+
+
+/* GENERAL TOP BUTTON */
 
 .bar a,
 .bar button,
 .bar select{
-  color:#fff;
-  text-decoration:none;
-  background:#142532;
-  border:1px solid rgba(255,255,255,.04);
-  border-radius:10px;
-  padding:7px 12px;
-  cursor:pointer;
-  transition:.2s ease;
-  font-size:13px;
-}
 
-.bar select{
+  height:36px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#eaf8fc;
+
+  text-decoration:none;
+
+  background:
+    rgba(20,37,50,.82);
+
+  border:
+    1px solid rgba(118,229,253,.08);
+
+  border-radius:11px;
+
+  padding:
+    0 11px;
+
+  cursor:pointer;
+
   outline:none;
-  max-width: 140px;
-  text-overflow: ellipsis;
+
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
 }
 
 .bar a:hover,
 .bar button:hover,
 .bar select:hover{
-  background:#1a3444;
+
+  background:
+    rgba(24,52,68,.96);
+
+  border-color:
+    rgba(118,229,253,.18);
+
+  box-shadow:
+    0 5px 18px rgba(0,0,0,.20);
 }
 
-.title{
-  min-width:0;
+.bar a:active,
+.bar button:active{
+
+  transform:
+    scale(.96);
+}
+
+
+/* HOME BUTTON */
+
+.home-btn{
+
+  gap:7px;
+
+  white-space:nowrap;
+
+  font-size:12px;
+}
+
+.home-icon{
+
+  width:18px;
+  height:18px;
+
+  display:grid;
+  place-items:center;
+
+  color:#76e5fd;
+
+  font-size:14px;
+}
+
+
+/* SETTINGS BUTTON */
+
+.settings-btn{
+
+  width:36px;
+
+  padding:0 !important;
+
+  font-size:16px;
+
+  position:relative;
+}
+
+.settings-btn::before{
+
+  content:"";
+
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:#76e5fd;
+
+  position:absolute;
+
+  top:6px;
+  right:6px;
+
+  box-shadow:
+    0 0 9px rgba(118,229,253,.55);
+}
+
+
+/* FULLSCREEN */
+
+.full-btn{
+
+  width:36px;
+
+  padding:0 !important;
+
+  font-size:17px;
+}
+
+
+/* CHAPTER SELECT */
+
+.chapter-select-wrap{
+
+  position:relative;
+
   display:flex;
-  flex-direction:column;
   align-items:center;
+}
+
+.chapter-select-wrap::before{
+
+  content:"☰";
+
+  position:absolute;
+
+  right:10px;
+
+  color:#76e5fd;
+
+  font-size:11px;
+
+  pointer-events:none;
+
+  z-index:2;
+}
+
+.bar select{
+
+  appearance:none;
+  -webkit-appearance:none;
+
+  min-width:118px;
+  max-width:145px;
+
+  padding:
+    0 28px
+    0 11px;
+
+  font-size:11px;
+
+  text-overflow:ellipsis;
+}
+
+
+/* TITLE */
+
+.title{
+
+  min-width:0;
+
+  flex:1;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
   gap:1px;
+
   text-align:center;
 }
 
 .title span{
-  font-size:10px;
-  color:#8fa4b1;
+
+  color:#78909c;
+
+  font-size:9px;
+
   white-space:nowrap;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
-  max-width:30vw;
+
+  max-width:32vw;
 }
 
 .title b{
+
+  color:#eefbff;
+
   font-size:12px;
+
+  font-weight:650;
+
   white-space:nowrap;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
-  max-width:30vw;
+
+  max-width:32vw;
 }
+
 
 /* =========================================================
    READER
 ========================================================= */
 
 .reader{
+
   width:100%;
+
+  min-height:
+    calc(100vh - 60px);
+
   display:flex;
+
   flex-direction:column;
+
   align-items:center;
-  min-height:calc(100vh - 60px);
-  padding:0 0 90px;
+
+  padding:
+    0 0 70px;
 }
 
+
+/* PAGE */
+
 .page-wrap{
+
   width:100%;
+
   margin:0;
   padding:0;
+
   text-align:center;
+
   line-height:0;
+
   background:transparent;
-  transition: margin-bottom .2s ease;
+
+  transition:
+    margin-bottom .2s ease;
 }
 
 .reader img{
+
   display:block;
+
   width:auto;
+
   max-width:100%;
+
   height:auto;
+
   margin:0 auto;
   padding:0;
+
   user-select:none;
+
   -webkit-user-drag:none;
+
   line-height:0;
-  transition: filter .2s ease;
+
+  transition:
+    filter .2s ease;
 }
 
 body.fit-original .reader img{
+
   max-width:none;
 }
+
 
 /* =========================================================
    SINGLE PAGE MODE
 ========================================================= */
 
 body.single .reader img{
+
   display:none;
 }
 
 body.single .reader img.active{
+
   display:block;
+
   width:auto;
+
   max-width:100%;
-  max-height:calc(100vh - 70px);
+
+  max-height:
+    calc(100vh - 70px);
+
   object-fit:contain;
 }
+
 
 /* =========================================================
    STATUS
 ========================================================= */
 
 .status{
+
+  width:min(900px,calc(100% - 30px));
+
   padding:40px 18px;
+
   text-align:center;
+
   color:#9fb2bf;
-  max-width:900px;
+
+  font-size:13px;
 }
 
 .status.error{
+
   color:#ff9da8;
 }
 
 .status h3{
-  margin:0 0 12px;
+
+  margin:
+    0 0 10px;
+
+  font-size:17px;
 }
 
 .status small{
+
   color:#8296a4;
+
   word-break:break-all;
 }
 
+
 /* =========================================================
-   COMPREHENSIVE READING SETTINGS PANEL
+   SETTINGS BACKDROP
+========================================================= */
+
+.settings-backdrop{
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:115;
+
+  background:
+    rgba(0,0,0,.20);
+
+  opacity:0;
+
+  visibility:hidden;
+
+  pointer-events:none;
+
+  transition:
+    opacity .2s ease,
+    visibility .2s ease;
+}
+
+.settings-backdrop.open{
+
+  opacity:1;
+
+  visibility:visible;
+
+  pointer-events:auto;
+}
+
+
+/* =========================================================
+   SETTINGS PANEL
 ========================================================= */
 
 .settings-panel{
+
   position:fixed;
-  top:68px;
+
+  top:67px;
+
   right:14px;
+
   z-index:120;
-  width:min(320px,calc(100vw - 28px));
-  max-height: calc(100vh - 90px);
-  overflow-y: auto;
+
+  width:
+    min(345px,calc(100vw - 28px));
+
+  max-height:
+    calc(100vh - 82px);
+
+  overflow-y:auto;
+
   padding:14px;
-  border:1px solid #294352;
-  border-radius:16px;
-  background:rgba(8,18,27,.97);
-  box-shadow:0 25px 80px rgba(0,0,0,.55), 0 0 30px rgba(19,171,210,.05);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+
+  border:
+    1px solid rgba(118,229,253,.15);
+
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(10,23,34,.98),
+      rgba(6,15,23,.97)
+    );
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.62),
+    0 0 35px rgba(19,171,210,.06);
+
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+
   opacity:0;
+
   visibility:hidden;
-  transform:translateY(-8px) scale(.98);
-  transition:opacity .2s ease, transform .2s ease, visibility .2s ease;
+
+  transform:
+    translateY(-8px)
+    scale(.97);
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease,
+    visibility .2s ease;
 }
 
 .settings-panel.open{
+
   opacity:1;
+
   visibility:visible;
-  transform:translateY(0) scale(1);
+
+  transform:
+    translateY(0)
+    scale(1);
 }
 
+
+/* SETTINGS HEADER */
+
 .settings-title{
+
   display:flex;
-  justify-content:space-between;
+
   align-items:center;
+  justify-content:space-between;
+
   margin-bottom:12px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
+
+  padding:
+    2px 1px 11px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.07);
+}
+
+.settings-heading{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+.settings-heading-icon{
+
+  width:28px;
+  height:28px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:9px;
+
+  color:#76e5fd;
+
+  background:
+    rgba(19,171,210,.10);
+
+  border:
+    1px solid rgba(118,229,253,.10);
+
+  font-size:14px;
 }
 
 .settings-title strong{
+
+  display:block;
+
+  color:#e9faff;
+
   font-size:13px;
-  color: #76e5fd;
+
+  font-weight:650;
 }
 
-.settings-title button{
-  width:26px;
-  height:26px;
-  border:0;
-  border-radius:7px;
-  color:#fff;
-  background:#142532;
-  cursor:pointer;
-  display:grid;
-  place-items:center;
-  font-size: 14px;
+.settings-title small{
+
+  display:block;
+
+  margin-top:2px;
+
+  color:#718792;
+
+  font-size:9px;
 }
+
+.settings-close{
+
+  width:28px;
+  height:28px;
+
+  display:grid;
+
+  place-items:center;
+
+  border:0;
+
+  border-radius:9px;
+
+  color:#b8cbd4;
+
+  background:#142532;
+
+  cursor:pointer;
+
+  font-size:15px;
+
+  transition:.18s ease;
+}
+
+.settings-close:hover{
+
+  color:#fff;
+
+  background:#1b3544;
+}
+
+
+/* SETTINGS SECTIONS */
+
+.settings-section{
+
+  margin-top:12px;
+}
+
+.settings-section-title{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  margin:
+    0 0 5px;
+
+  padding:
+    0 2px;
+
+  color:#6f8793;
+
+  font-size:9px;
+
+  font-weight:650;
+
+  letter-spacing:.2px;
+}
+
+.settings-section-title::before{
+
+  content:"";
+
+  width:4px;
+  height:4px;
+
+  border-radius:50%;
+
+  background:#13abd2;
+
+  box-shadow:
+    0 0 7px rgba(19,171,210,.5);
+}
+
+
+/* SETTING ROW */
 
 .setting-row{
+
   display:flex;
+
   align-items:center;
   justify-content:space-between;
+
   gap:10px;
-  padding:9px 0;
-  border-top:1px solid rgba(255,255,255,.05);
+
+  min-height:42px;
+
+  padding:
+    7px 0;
+
+  border-top:
+    1px solid rgba(255,255,255,.045);
 }
 
 .setting-row:first-of-type{
+
   border-top:0;
 }
 
-.setting-row span{
-  font-size:11.5px;
-  color:#aebec7;
+.setting-label{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  min-width:0;
 }
 
+.setting-label-icon{
+
+  width:24px;
+  height:24px;
+
+  flex:none;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:7px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  color:#8da8b4;
+
+  font-size:11px;
+}
+
+.setting-label span{
+
+  color:#aebec7;
+
+  font-size:11px;
+
+  white-space:nowrap;
+}
+
+
+/* SETTING ACTIONS */
+
 .setting-actions{
+
   display:flex;
+
+  align-items:center;
+
+  justify-content:flex-end;
+
   gap:4px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+
+  flex-wrap:wrap;
 }
 
 .setting-actions button{
-  border:1px solid #263c49;
-  background:#101f29;
-  color:#dce8ed;
-  border-radius:7px;
-  padding:5px 8px;
-  font-size:10.5px;
+
+  min-height:27px;
+
+  border:
+    1px solid #263c49;
+
+  background:
+    rgba(16,31,41,.90);
+
+  color:#cbd9de;
+
+  border-radius:8px;
+
+  padding:
+    4px 8px;
+
+  font-size:9.5px;
+
   cursor:pointer;
-  transition: .15s ease;
+
+  transition:
+    background .15s ease,
+    border-color .15s ease,
+    color .15s ease,
+    transform .15s ease;
+}
+
+.setting-actions button:hover{
+
+  background:#173241;
+
+  border-color:
+    rgba(118,229,253,.20);
+}
+
+.setting-actions button:active{
+
+  transform:
+    scale(.95);
 }
 
 .setting-actions button.active{
-  background:#13abd2;
+
   color:#031015;
+
+  background:#13abd2;
+
   border-color:#13abd2;
-  font-weight: 600;
+
+  font-weight:700;
+
+  box-shadow:
+    0 4px 14px rgba(19,171,210,.16);
 }
+
 
 /* =========================================================
    SIDE SCRUBBER
 ========================================================= */
 
 .page-scrubber{
+
   position:fixed;
+
   top:60px;
   right:0;
   bottom:0;
+
   z-index:90;
-  width:46px;
+
+  width:48px;
+
   display:flex;
+
   align-items:center;
   justify-content:center;
+
   pointer-events:none;
 }
 
 .scrubber-hitbox{
+
   position:absolute;
+
   top:0;
   right:0;
   bottom:0;
-  width:38px;
+
+  width:40px;
+
   pointer-events:auto;
 }
 
 .scrubber{
+
   position:absolute;
+
   right:5px;
-  width:8px;
+
+  width:7px;
+
   height:62vh;
+
   min-height:190px;
   max-height:680px;
+
   border-radius:999px;
-  background:rgba(255,255,255,.055);
-  border:1px solid rgba(255,255,255,.035);
-  opacity:.16;
-  transition:opacity .2s ease, width .2s ease, background .2s ease;
-  pointer-events:auto;
+
+  background:
+    rgba(255,255,255,.045);
+
+  border:
+    1px solid rgba(255,255,255,.035);
+
+  opacity:.13;
+
   cursor:pointer;
-  box-shadow:0 0 15px rgba(0,0,0,.25);
+
+  pointer-events:auto;
+
+  transition:
+    opacity .2s ease,
+    width .2s ease,
+    background .2s ease;
 }
 
 .scrubber-hitbox:hover .scrubber,
 .scrubber:hover,
 .scrubber.active{
-  opacity:.72;
-  width:10px;
-  background:rgba(19,171,210,.42);
+
+  opacity:.78;
+
+  width:9px;
+
+  background:
+    rgba(19,171,210,.38);
+
+  box-shadow:
+    0 0 16px rgba(19,171,210,.12);
 }
 
 .scrubber-thumb{
+
   position:absolute;
+
   left:50%;
-  width:8px;
-  height:44px;
-  transform:translateX(-50%);
+
+  width:7px;
+  height:42px;
+
+  transform:
+    translateX(-50%);
+
   border-radius:999px;
+
   background:#76e5fd;
-  box-shadow:0 0 12px rgba(118,229,253,.4);
-  transition:top .08s linear;
+
+  box-shadow:
+    0 0 12px rgba(118,229,253,.42);
+
   pointer-events:none;
+
+  transition:
+    top .08s linear;
 }
+
+
+/* SCRUBBER BUTTONS */
 
 .scrubber-top,
 .scrubber-bottom{
+
   position:absolute;
+
   right:-1px;
-  width:26px;
-  height:26px;
+
+  width:25px;
+  height:25px;
+
   display:grid;
+
   place-items:center;
+
   border-radius:50%;
-  background:rgba(9,20,29,.88);
-  border:1px solid rgba(118,229,253,.18);
+
+  background:
+    rgba(7,18,27,.94);
+
+  border:
+    1px solid rgba(118,229,253,.18);
+
   color:#76e5fd;
-  font-size:12px;
+
+  font-size:11px;
+
   opacity:0;
-  transform:translateX(5px);
+
+  transform:
+    translateX(5px);
+
   transition:.2s ease;
+
   cursor:pointer;
+
   pointer-events:auto;
 }
 
-.scrubber-top{ top:-38px; }
-.scrubber-bottom{ bottom:-38px; }
+.scrubber-top{
+  top:-37px;
+}
+
+.scrubber-bottom{
+  bottom:-37px;
+}
 
 .scrubber-hitbox:hover .scrubber-top,
 .scrubber-hitbox:hover .scrubber-bottom,
 .scrubber.active ~ .scrubber-top,
 .scrubber.active ~ .scrubber-bottom{
+
   opacity:1;
-  transform:translateX(0);
+
+  transform:
+    translateX(0);
 }
 
+
+/* SCRUBBER COUNTER */
+
 .scrubber-counter{
+
   position:absolute;
+
   right:18px;
+
   top:50%;
-  transform:translateY(-50%);
-  padding:5px 8px;
-  border-radius:7px;
-  background:rgba(5,10,15,.9);
-  border:1px solid rgba(118,229,253,.15);
+
+  transform:
+    translateY(-50%);
+
+  padding:
+    5px 8px;
+
+  border-radius:8px;
+
+  background:
+    rgba(4,10,15,.94);
+
+  border:
+    1px solid rgba(118,229,253,.13);
+
   color:#dff8ff;
-  font-size:10px;
+
+  font-size:9px;
+
   white-space:nowrap;
+
   opacity:0;
+
   pointer-events:none;
+
   transition:.2s ease;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.30);
 }
 
 .scrubber-hitbox:hover .scrubber-counter,
 .scrubber.active ~ .scrubber-counter{
+
   opacity:1;
 }
+
 
 /* =========================================================
    END OF CHAPTER
 ========================================================= */
 
 .chapter-end{
-  width:min(700px,calc(100% - 28px));
-  margin:70px auto 20px;
-  padding:30px 20px;
+
+  width:
+    min(700px,calc(100% - 28px));
+
+  margin:
+    65px auto 20px;
+
+  padding:
+    30px 20px;
+
   text-align:center;
-  border:1px solid #243943;
-  border-radius:18px;
-  background:radial-gradient(circle at 50% 0, rgba(19,171,210,.12), transparent 65%), #09131b;
-  box-shadow:0 25px 80px rgba(0,0,0,.35);
+
+  border:
+    1px solid rgba(118,229,253,.12);
+
+  border-radius:20px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0,
+      rgba(19,171,210,.12),
+      transparent 65%
+    ),
+    #09131b;
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.35);
 }
 
 .chapter-end h2{
-  margin:0 0 6px;
+
+  margin:
+    0 0 6px;
+
   font-size:20px;
 }
 
 .chapter-end p{
-  margin:0 0 18px;
+
+  margin:
+    0 0 18px;
+
   color:#91a5af;
+
   font-size:12px;
 }
 
 .chapter-end-actions{
+
   display:flex;
+
   justify-content:center;
-  gap:8px;
+
+  gap:7px;
+
   flex-wrap:wrap;
 }
 
 .chapter-end-actions button{
-  border:1px solid #29414e;
+
+  border:
+    1px solid #29414e;
+
   background:#122632;
+
   color:#fff;
+
   border-radius:10px;
-  padding:8px 14px;
+
+  padding:
+    8px 13px;
+
   cursor:pointer;
-  font-size: 12px;
+
+  font-size:11px;
+
   transition:.2s ease;
 }
 
 .chapter-end-actions button:hover{
+
   background:#13abd2;
+
   color:#031015;
+
   border-color:#13abd2;
 }
 
+
 /* =========================================================
-   BOTTOM CONTROL (Hidden in vertical, shown in single page)
+   BOTTOM CONTROLS
+   ONLY SINGLE PAGE
 ========================================================= */
 
 .bottom{
+
   position:fixed;
-  bottom:14px;
+
+  bottom:12px;
+
   left:50%;
-  transform:translateX(-50%);
+
+  transform:
+    translateX(-50%);
+
   z-index:110;
-  background:rgba(12,26,37,.92);
-  border:1px solid #28404f;
-  border-radius:14px;
-  padding:6px;
-  display:none; /* مخفية افتراضياً في الوضع العمودي */
-  gap:6px;
+
+  display:none;
+
   align-items:center;
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+  gap:4px;
+
+  padding:5px;
+
+  border:
+    1px solid rgba(118,229,253,.12);
+
+  border-radius:13px;
+
+  background:
+    rgba(9,22,32,.90);
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.42);
+
+  backdrop-filter:blur(15px);
+  -webkit-backdrop-filter:blur(15px);
 }
 
-.bottom.visible {
-  display: flex;
+.bottom.visible{
+
+  display:flex;
 }
 
 .bottom button{
-  background:#18303f;
-  color:#fff;
+
+  width:31px;
+  height:29px;
+
+  display:grid;
+
+  place-items:center;
+
   border:0;
+
   border-radius:8px;
-  padding:6px 10px;
+
+  background:
+    rgba(24,48,63,.90);
+
+  color:#e9f9fd;
+
   cursor:pointer;
-  font-size: 11px;
+
+  font-size:10px;
+
+  transition:.18s ease;
+}
+
+.bottom button:hover{
+
+  background:#13abd2;
+
+  color:#031015;
 }
 
 .bottom span{
-  font-size:11px;
-  color:#b9cbd5;
-  min-width:70px;
+
+  min-width:65px;
+
   text-align:center;
+
+  color:#9fb5bf;
+
+  font-size:9px;
 }
+
 
 /* =========================================================
    MOBILE
 ========================================================= */
 
 @media(max-width:700px){
+
   .bar{
+
     height:54px;
-    padding:6px 10px;
+
+    padding:
+      6px 8px;
+
+    gap:6px;
   }
+
   .bar a,
   .bar button,
   .bar select{
-    padding:6px 9px;
-    font-size: 12px;
-  }
-  .title span{
-    max-width:25vw;
-    font-size:9px;
-  }
-  .title b{
-    max-width:25vw;
+
+    height:34px;
+
+    border-radius:9px;
+
+    padding:
+      0 8px;
+
     font-size:11px;
   }
+
+  .home-btn{
+
+    width:34px;
+
+    padding:0 !important;
+  }
+
+  .home-btn-text{
+
+    display:none;
+  }
+
+  .chapter-select-wrap::before{
+
+    right:8px;
+  }
+
+  .bar select{
+
+    min-width:95px;
+
+    max-width:110px;
+
+    padding-right:24px;
+  }
+
+  .title span{
+
+    max-width:24vw;
+
+    font-size:8px;
+  }
+
+  .title b{
+
+    max-width:25vw;
+
+    font-size:10px;
+  }
+
+  .settings-panel{
+
+    top:61px;
+
+    right:8px;
+
+    width:
+      min(335px,calc(100vw - 16px));
+
+    max-height:
+      calc(100vh - 70px);
+
+    border-radius:16px;
+  }
+
   .page-scrubber{
+
     top:54px;
+
     width:38px;
   }
+
   .scrubber{
+
     right:3px;
-    width:7px;
+
+    width:6px;
+
     height:55vh;
   }
+
   .scrubber-thumb{
-    width:7px;
-    height:38px;
+
+    width:6px;
+
+    height:36px;
   }
+
   .scrubber-counter{
-    right:15px;
+
+    right:14px;
+
+    font-size:8px;
   }
+
   .bottom{
+
     bottom:8px;
-    padding:5px;
-  }
-  .bottom button{
-    padding:6px 8px;
   }
 }
+
 
 /* =========================================================
    FULLSCREEN
 ========================================================= */
 
 :fullscreen .bar{
+
   display:none;
 }
 
 :fullscreen .reader{
+
   min-height:100vh;
 }
 
 :fullscreen .page-scrubber{
+
   top:0;
 }
 
 :fullscreen .settings-panel{
+
   top:14px;
 }
+
+:fullscreen .settings-backdrop{
+
+  top:0;
+}
+
 </style>
 </head>
 
+
 <body>
+
+
+<!-- =======================================================
+     TOP BAR
+======================================================= -->
 
 <header class="bar">
 
-  <!-- على اليمين: زر العودة للصفحة الرئيسية -->
+
+  <!-- HOME -->
+
   <div class="bar-right">
-    <a href="index.html#chapters" aria-label="الرئيسية">
-      ‹ الرئيسية
+
+    <a
+      href="index.html#chapters"
+      class="home-btn"
+      aria-label="العودة إلى الرئيسية"
+    >
+
+      <span class="home-icon">⌂</span>
+
+      <span class="home-btn-text">
+        الرئيسية
+      </span>
+
     </a>
+
   </div>
+
+
+  <!-- TITLE -->
 
   <div class="title">
-    <span>بوروتو: دوامتان زرقاوتان</span>
-    <b id="chapterTitle">جاري التحميل...</b>
+
+    <span>
+      بوروتو: دوامتان زرقاوتان
+    </span>
+
+    <b id="chapterTitle">
+      جاري التحميل...
+    </b>
+
   </div>
 
-  <!-- بجانب بعضها: إعدادات التخصيص، قائمة الفصول، زر ملء الشاشة -->
+
+  <!-- READER CONTROLS -->
+
   <div class="bar-left">
-    <button id="settingsBtn" aria-label="إعدادات التخصيص">⚙️</button>
-    
-    <select id="chaptersSelect" aria-label="قائمة الفصول">
-      <option value="">الفصول...</option>
-    </select>
 
-    <button id="full" aria-label="ملء الشاشة">⛶</button>
+
+    <button
+      id="settingsBtn"
+      class="settings-btn"
+      aria-label="إعدادات القراءة"
+      title="إعدادات القراءة"
+    >
+      ⚙
+    </button>
+
+
+    <div class="chapter-select-wrap">
+
+      <select
+        id="chaptersSelect"
+        aria-label="اختيار الفصل"
+      >
+
+        <option value="">
+          الفصول
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button
+      id="full"
+      class="full-btn"
+      aria-label="ملء الشاشة"
+      title="ملء الشاشة"
+    >
+      ⛶
+    </button>
+
+
   </div>
+
 
 </header>
 
 
-<main id="reader" class="reader">
+
+<!-- =======================================================
+     READER
+======================================================= -->
+
+<main
+  id="reader"
+  class="reader"
+>
+
   <div class="status">
+
     جاري تحميل الصفحات...
+
   </div>
+
 </main>
 
 
+
 <!-- =======================================================
-     SIDE SCRUBBER
+     SCRUBBER
 ======================================================= -->
 
 <div class="page-scrubber">
-  <div id="scrubberHitbox" class="scrubber-hitbox">
-    <div id="scrubber" class="scrubber">
-      <div id="scrubberThumb" class="scrubber-thumb"></div>
+
+  <div
+    id="scrubberHitbox"
+    class="scrubber-hitbox"
+  >
+
+    <div
+      id="scrubber"
+      class="scrubber"
+    >
+
+      <div
+        id="scrubberThumb"
+        class="scrubber-thumb"
+      ></div>
+
     </div>
-    <button id="scrubberTop" class="scrubber-top" aria-label="أول صفحة">↑</button>
-    <button id="scrubberBottom" class="scrubber-bottom" aria-label="آخر صفحة">↓</button>
-    <div id="scrubberCounter" class="scrubber-counter">1 / 1</div>
+
+
+    <button
+      id="scrubberTop"
+      class="scrubber-top"
+      aria-label="العودة إلى أول صفحة"
+    >
+      ↑
+    </button>
+
+
+    <button
+      id="scrubberBottom"
+      class="scrubber-bottom"
+      aria-label="الانتقال إلى آخر صفحة"
+    >
+      ↓
+    </button>
+
+
+    <div
+      id="scrubberCounter"
+      class="scrubber-counter"
+    >
+      1 / 1
+    </div>
+
   </div>
+
 </div>
 
 
+
 <!-- =======================================================
-     COMPREHENSIVE READING SETTINGS PANEL
+     SETTINGS BACKDROP
 ======================================================= -->
 
-<div id="settingsPanel" class="settings-panel">
+<div
+  id="settingsBackdrop"
+  class="settings-backdrop"
+></div>
+
+
+
+<!-- =======================================================
+     SETTINGS PANEL
+======================================================= -->
+
+<div
+  id="settingsPanel"
+  class="settings-panel"
+>
+
+
+  <!-- HEADER -->
+
   <div class="settings-title">
-    <strong>إعدادات القراءة الشاملة</strong>
-    <button id="closeSettings">×</button>
+
+    <div class="settings-heading">
+
+      <div class="settings-heading-icon">
+        ⚙
+      </div>
+
+      <div>
+
+        <strong>
+          إعدادات القراءة
+        </strong>
+
+        <small>
+          خصّص تجربة القراءة كما تريد
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <button
+      id="closeSettings"
+      class="settings-close"
+      aria-label="إغلاق"
+    >
+      ×
+    </button>
+
   </div>
 
-  <div class="setting-row">
-    <span>طريقة العرض</span>
-    <div class="setting-actions">
-      <button id="verticalBtn" class="active">عمودي</button>
-      <button id="singleBtn">صفحة</button>
+
+
+  <!-- =====================================================
+       DISPLAY
+  ====================================================== -->
+
+  <div class="settings-section">
+
+    <div class="settings-section-title">
+      العرض
     </div>
+
+
+    <!-- MODE -->
+
+    <div class="setting-row">
+
+      <div class="setting-label">
+
+        <div class="setting-label-icon">
+          ▤
+        </div>
+
+        <span>
+          طريقة العرض
+        </span>
+
+      </div>
+
+
+      <div class="setting-actions">
+
+        <button
+          id="verticalBtn"
+          class="active"
+        >
+          عمودي
+        </button>
+
+        <button
+          id="singleBtn"
+        >
+          صفحة
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- WIDTH -->
+
+    <div class="setting-row">
+
+      <div class="setting-label">
+
+        <div class="setting-label-icon">
+          ↔
+        </div>
+
+        <span>
+          عرض الصفحة
+        </span>
+
+      </div>
+
+
+      <div class="setting-actions">
+
+        <button
+          id="fitBtn"
+          class="active"
+        >
+          مناسب
+        </button>
+
+        <button
+          id="originalBtn"
+        >
+          أصلي
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="setting-row">
-    <span>عرض الصفحة</span>
-    <div class="setting-actions">
-      <button id="fitBtn" class="active">مناسب</button>
-      <button id="originalBtn">أصلي</button>
+
+
+  <!-- =====================================================
+       PAGE APPEARANCE
+  ====================================================== -->
+
+  <div class="settings-section">
+
+    <div class="settings-section-title">
+      مظهر الصفحة
     </div>
+
+
+    <!-- BACKGROUND -->
+
+    <div class="setting-row">
+
+      <div class="setting-label">
+
+        <div class="setting-label-icon">
+          ◐
+        </div>
+
+        <span>
+          الخلفية
+        </span>
+
+      </div>
+
+
+      <div class="setting-actions">
+
+        <button
+          id="bgDark"
+          class="active"
+        >
+          داكن
+        </button>
+
+        <button
+          id="bgPure"
+        >
+          أسود
+        </button>
+
+        <button
+          id="bgDim"
+        >
+          رمادي
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- BRIGHTNESS -->
+
+    <div class="setting-row">
+
+      <div class="setting-label">
+
+        <div class="setting-label-icon">
+          ☼
+        </div>
+
+        <span>
+          سطوع الصفحات
+        </span>
+
+      </div>
+
+
+      <div class="setting-actions">
+
+        <button
+          id="bright100"
+          class="active"
+        >
+          100%
+        </button>
+
+        <button
+          id="bright90"
+        >
+          90%
+        </button>
+
+        <button
+          id="bright80"
+        >
+          80%
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- GAP -->
+
+    <div class="setting-row">
+
+      <div class="setting-label">
+
+        <div class="setting-label-icon">
+          ↕
+        </div>
+
+        <span>
+          المسافة بين الصفحات
+        </span>
+
+      </div>
+
+
+      <div class="setting-actions">
+
+        <button
+          id="gap0"
+          class="active"
+        >
+          بدون
+        </button>
+
+        <button
+          id="gap10"
+        >
+          صغيرة
+        </button>
+
+        <button
+          id="gap20"
+        >
+          كبيرة
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="setting-row">
-    <span>لون الخلفية</span>
-    <div class="setting-actions">
-      <button id="bgDark" class="active">داكن</button>
-      <button id="bgPure">أسود</button>
-      <button id="bgDim">رمادي</button>
-    </div>
-  </div>
 
-  <div class="setting-row">
-    <span>سطوع الصفحات</span>
-    <div class="setting-actions">
-      <button id="bright100" class="active">100%</button>
-      <button id="bright90">90%</button>
-      <button id="bright80">80%</button>
-    </div>
-  </div>
-
-  <div class="setting-row">
-    <span>المسافة بين الصفحات</span>
-    <div class="setting-actions">
-      <button id="gap0">بدون</button>
-      <button id="gap10" class="active">متوسطة</button>
-      <button id="gap20">كبيرة</button>
-    </div>
-  </div>
 </div>
+
 
 
 <!-- =======================================================
-     BOTTOM CONTROLS (Only visible in Single Page Mode)
+     SINGLE PAGE CONTROLS
 ======================================================= -->
 
-<div id="bottomControls" class="bottom">
-  <button id="prev">السابق</button>
-  <span id="counter">—</span>
-  <button id="next">التالي</button>
+<div
+  id="bottomControls"
+  class="bottom"
+>
+
+  <button
+    id="prev"
+    aria-label="الصفحة السابقة"
+    title="الصفحة السابقة"
+  >
+    ‹
+  </button>
+
+
+  <span id="counter">
+    —
+  </span>
+
+
+  <button
+    id="next"
+    aria-label="الصفحة التالية"
+    title="الصفحة التالية"
+  >
+    ›
+  </button>
+
 </div>
+
 
 
 <script>
@@ -711,42 +1920,119 @@ body.single .reader img.active{
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL = "https://smgvqaunvvkbwkkgmccx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+  "https://smgvqaunvvkbwkkgmccx.supabase.co";
 
-const requested = new URLSearchParams(location.search).get("chapter");
+const SUPABASE_KEY =
+  "sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   URL
+========================================================= */
+
+const requested =
+  new URLSearchParams(
+    location.search
+  ).get("chapter");
+
+
+/* =========================================================
+   STATE
+========================================================= */
 
 let images = [];
+
 let index = 0;
+
 let mode = "vertical";
+
 let scrubberDragging = false;
+
 let scrubberTimer = null;
+
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
 function escapeHtml(value){
-  return String(value ?? "").replace(/[&<>"']/g, m => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
-  }[m]));
+
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m])
+  );
+
 }
+
 
 function isUUID(value){
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || "").trim());
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    .test(
+      String(value || "").trim()
+    );
+
 }
 
-function safeNumber(value, index){
-  const n = Number(value);
-  if(Number.isFinite(n) && n > 0) return n;
+
+function safeNumber(
+  value,
+  index
+){
+
+  const n =
+    Number(value);
+
+  if(
+    Number.isFinite(n) &&
+    n > 0
+  ){
+
+    return n;
+
+  }
+
   return index + 1;
+
 }
+
 
 function publicUrl(path){
-  if(!path) return "";
-  const clean = String(path).split("/").filter(Boolean).map(encodeURIComponent).join("/");
-  return SUPABASE_URL + "/storage/v1/object/public/manga-pages/" + clean;
+
+  if(!path){
+    return "";
+  }
+
+  const clean =
+    String(path)
+      .split("/")
+      .filter(Boolean)
+      .map(
+        encodeURIComponent
+      )
+      .join("/");
+
+  return (
+    SUPABASE_URL +
+    "/storage/v1/object/public/manga-pages/" +
+    clean
+  );
+
 }
 
 
@@ -755,98 +2041,355 @@ function publicUrl(path){
 ========================================================= */
 
 async function init(){
-  const reader = document.getElementById("reader");
+
+  const reader =
+    document.getElementById(
+      "reader"
+    );
 
   try{
+
     if(!requested){
-      throw new Error("معرّف الفصل غير موجود في الرابط.");
+
+      throw new Error(
+        "معرّف الفصل غير موجود في الرابط."
+      );
+
     }
 
-    const chapterId = String(requested).trim();
+
+    const chapterId =
+      String(
+        requested
+      ).trim();
+
+
     let chapterResult;
 
+
     if(isUUID(chapterId)){
-      chapterResult = await db.from("chapters").select("id,number,title,published_at").eq("id", chapterId).maybeSingle();
+
+      chapterResult =
+        await db
+          .from("chapters")
+          .select(
+            "id,number,title,published_at"
+          )
+          .eq(
+            "id",
+            chapterId
+          )
+          .maybeSingle();
+
     }else{
-      const number = Number(chapterId);
-      if(!Number.isInteger(number) || number < 1) throw new Error("معرّف الفصل غير صالح.");
-      chapterResult = await db.from("chapters").select("id,number,title,published_at").eq("number", number).maybeSingle();
+
+      const number =
+        Number(
+          chapterId
+        );
+
+
+      if(
+        !Number.isInteger(number) ||
+        number < 1
+      ){
+
+        throw new Error(
+          "معرّف الفصل غير صالح."
+        );
+
+      }
+
+
+      chapterResult =
+        await db
+          .from("chapters")
+          .select(
+            "id,number,title,published_at"
+          )
+          .eq(
+            "number",
+            number
+          )
+          .maybeSingle();
+
     }
 
-    if(chapterResult.error) throw new Error("فشل قراءة الفصل: " + chapterResult.error.message);
-    if(!chapterResult.data) throw new Error("لم يتم العثور على الفصل المطلوب.");
 
-    const chapter = chapterResult.data;
-    const numberText = safeNumber(chapter.number, 0);
+    if(chapterResult.error){
 
-    document.getElementById("chapterTitle").textContent = `الفصل ${numberText} — ${chapter.title || ""}`;
+      throw new Error(
+        "فشل قراءة الفصل: " +
+        chapterResult.error.message
+      );
 
-    // Load all chapters for the dropdown select list
-    loadChaptersDropdown(chapter.id);
+    }
+
+
+    if(!chapterResult.data){
+
+      throw new Error(
+        "لم يتم العثور على الفصل المطلوب."
+      );
+
+    }
+
+
+    const chapter =
+      chapterResult.data;
+
+
+    const numberText =
+      safeNumber(
+        chapter.number,
+        0
+      );
+
+
+    document
+      .getElementById(
+        "chapterTitle"
+      )
+      .textContent =
+        `الفصل ${numberText} — ${chapter.title || ""}`;
+
+
+    await loadChaptersDropdown(
+      chapter.id
+    );
+
 
     /* =====================================================
        LOAD PAGES
     ===================================================== */
-    const pagesResult = await db.from("pages").select("id,page_number,storage_path").eq("chapter_id", chapter.id).order("page_number", { ascending: true });
 
-    if(pagesResult.error) throw new Error("تعذر قراءة الصفحات: " + pagesResult.error.message);
+    const pagesResult =
+      await db
+        .from("pages")
+        .select(
+          "id,page_number,storage_path"
+        )
+        .eq(
+          "chapter_id",
+          chapter.id
+        )
+        .order(
+          "page_number",
+          {
+            ascending:true
+          }
+        );
 
-    const pageRows = Array.isArray(pagesResult.data) ? pagesResult.data : [];
-    if(!pageRows.length) throw new Error("لا توجد صفحات مسجلة لهذا الفصل.");
 
-    images = pageRows.filter(p => p && p.storage_path).map((p, i) => ({
-      page: safeNumber(p.page_number, i),
-      path: String(p.storage_path),
-      url: publicUrl(p.storage_path)
-    }));
+    if(pagesResult.error){
 
-    if(!images.length) throw new Error("مسارات الصور فارغة.");
+      throw new Error(
+        "تعذر قراءة الصفحات: " +
+        pagesResult.error.message
+      );
 
-    images.sort((a, b) => a.page - b.page);
+    }
+
+
+    const pageRows =
+      Array.isArray(
+        pagesResult.data
+      )
+        ? pagesResult.data
+        : [];
+
+
+    if(!pageRows.length){
+
+      throw new Error(
+        "لا توجد صفحات مسجلة لهذا الفصل."
+      );
+
+    }
+
+
+    images =
+      pageRows
+        .filter(
+          p =>
+            p &&
+            p.storage_path
+        )
+        .map(
+          (p,i) => ({
+
+            page:
+              safeNumber(
+                p.page_number,
+                i
+              ),
+
+            path:
+              String(
+                p.storage_path
+              ),
+
+            url:
+              publicUrl(
+                p.storage_path
+              )
+
+          })
+        );
+
+
+    if(!images.length){
+
+      throw new Error(
+        "مسارات الصور فارغة."
+      );
+
+    }
+
+
+    images.sort(
+      (a,b) =>
+        a.page - b.page
+    );
+
 
     render();
+
     updateScrubber();
 
   }catch(error){
-    console.error("Reader error:", error);
+
+    console.error(
+      "Reader error:",
+      error
+    );
+
+
     reader.innerHTML = `
+
       <div class="status error">
-        <h3>تعذر تحميل الفصل</h3>
-        <div>${escapeHtml(error.message || String(error))}</div>
+
+        <h3>
+          تعذر تحميل الفصل
+        </h3>
+
+        <div>
+          ${escapeHtml(
+            error.message ||
+            String(error)
+          )}
+        </div>
+
       </div>
+
     `;
+
   }
+
 }
 
+
 /* =========================================================
-   CHAPTERS DROPDOWN LIST
+   CHAPTER DROPDOWN
 ========================================================= */
 
-async function loadChaptersDropdown(currentId){
-  try{
-    const { data } = await db.from("chapters").select("id, number, title").order("number", { ascending: true });
-    if(data){
-      const select = document.getElementById("chaptersSelect");
-      select.innerHTML = '<option value="">الفصول...</option>';
-      data.forEach(ch => {
-        const opt = document.createElement("option");
-        opt.value = ch.id;
-        opt.textContent = `الفصل ${ch.number}`;
-        if(ch.id === currentId){
-          opt.selected = true;
-        }
-        select.appendChild(opt);
-      });
+async function loadChaptersDropdown(
+  currentId
+){
 
-      select.onchange = (e) => {
-        if(e.target.value){
-          location.href = `?chapter=${e.target.value}`;
-        }
-      };
+  try{
+
+    const {
+      data
+    } =
+      await db
+        .from("chapters")
+        .select(
+          "id,number,title"
+        )
+        .order(
+          "number",
+          {
+            ascending:true
+          }
+        );
+
+
+    if(!data){
+      return;
     }
-  }catch(e){
-    console.error("Chapters list error:", e);
+
+
+    const select =
+      document.getElementById(
+        "chaptersSelect"
+      );
+
+
+    select.innerHTML =
+      '<option value="">الفصول</option>';
+
+
+    data.forEach(
+      ch => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          ch.id;
+
+
+        option.textContent =
+          `الفصل ${ch.number}`;
+
+
+        if(
+          ch.id === currentId
+        ){
+
+          option.selected =
+            true;
+
+        }
+
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+
+    select.onchange =
+      event => {
+
+        if(
+          event.target.value
+        ){
+
+          location.href =
+            `?chapter=${encodeURIComponent(
+              event.target.value
+            )}`;
+
+        }
+
+      };
+
+  }catch(error){
+
+    console.error(
+      "Chapters list error:",
+      error
+    );
+
   }
+
 }
 
 
@@ -855,60 +2398,198 @@ async function loadChaptersDropdown(currentId){
 ========================================================= */
 
 function render(){
-  const reader = document.getElementById("reader");
-  reader.innerHTML = "";
 
-  images.forEach((page, i) => {
-    const wrap = document.createElement("div");
-    wrap.className = "page-wrap";
+  const reader =
+    document.getElementById(
+      "reader"
+    );
 
-    const img = document.createElement("img");
-    img.className = "manga-page";
-    img.src = page.url;
-    img.alt = `صفحة ${page.page}`;
-    img.loading = i < 3 ? "eager" : "lazy";
-    img.decoding = "async";
-    img.referrerPolicy = "no-referrer";
-    img.dataset.pageIndex = String(i);
 
-    img.onerror = () => {
-      wrap.innerHTML = `
-        <div class="status error">
-          تعذر تحميل الصفحة ${escapeHtml(page.page)}<br>
-          <small>المسار: ${escapeHtml(page.path)}</small>
-        </div>
-      `;
-    };
+  reader.innerHTML =
+    "";
 
-    wrap.appendChild(img);
-    reader.appendChild(wrap);
-  });
 
-  const end = document.createElement("section");
-  end.className = "chapter-end";
+  images.forEach(
+    (page,i) => {
+
+      const wrap =
+        document.createElement(
+          "div"
+        );
+
+
+      wrap.className =
+        "page-wrap";
+
+
+      const img =
+        document.createElement(
+          "img"
+        );
+
+
+      img.className =
+        "manga-page";
+
+
+      img.src =
+        page.url;
+
+
+      img.alt =
+        `صفحة ${page.page}`;
+
+
+      img.loading =
+        i < 3
+          ? "eager"
+          : "lazy";
+
+
+      img.decoding =
+        "async";
+
+
+      img.referrerPolicy =
+        "no-referrer";
+
+
+      img.dataset.pageIndex =
+        String(i);
+
+
+      img.onerror =
+        () => {
+
+          wrap.innerHTML = `
+
+            <div class="status error">
+
+              تعذر تحميل الصفحة
+              ${escapeHtml(
+                page.page
+              )}
+
+              <br>
+
+              <small>
+                المسار:
+                ${escapeHtml(
+                  page.path
+                )}
+              </small>
+
+            </div>
+
+          `;
+
+        };
+
+
+      wrap.appendChild(
+        img
+      );
+
+
+      reader.appendChild(
+        wrap
+      );
+
+    }
+  );
+
+
+  /* =====================================================
+     CHAPTER END
+  ===================================================== */
+
+  const end =
+    document.createElement(
+      "section"
+    );
+
+
+  end.className =
+    "chapter-end";
+
+
   end.innerHTML = `
-    <h2>انتهى الفصل</h2>
-    <p>وصلت إلى نهاية الفصل الحالي.</p>
+
+    <h2>
+      انتهى الفصل
+    </h2>
+
+    <p>
+      وصلت إلى نهاية الفصل الحالي.
+    </p>
+
     <div class="chapter-end-actions">
-      <button id="endTop">العودة إلى البداية</button>
-      <button id="endChapters">قائمة الفصول</button>
+
+      <button id="endTop">
+        ↑ العودة للبداية
+      </button>
+
+      <button id="endChapters">
+        ☰ قائمة الفصول
+      </button>
+
     </div>
+
   `;
-  reader.appendChild(end);
 
-  document.getElementById("endTop").onclick = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
-  document.getElementById("endChapters").onclick = () => {
-    location.href = "index.html#chapters";
-  };
+  reader.appendChild(
+    end
+  );
 
-  document.getElementById("counter").textContent = `${images.length} صفحة`;
 
-  if(mode === "single"){
+  document
+    .getElementById(
+      "endTop"
+    )
+    .onclick =
+      () => {
+
+        window.scrollTo({
+
+          top:0,
+
+          behavior:"smooth"
+
+        });
+
+      };
+
+
+  document
+    .getElementById(
+      "endChapters"
+    )
+    .onclick =
+      () => {
+
+        location.href =
+          "index.html#chapters";
+
+      };
+
+
+  document
+    .getElementById(
+      "counter"
+    )
+    .textContent =
+      `${images.length} صفحة`;
+
+
+  if(
+    mode === "single"
+  ){
+
     setSingle(0);
+
   }
+
 }
 
 
@@ -917,15 +2598,48 @@ function render(){
 ========================================================= */
 
 function setSingle(i){
-  if(!images.length) return;
-  index = Math.max(0, Math.min(images.length - 1, i));
 
-  document.querySelectorAll(".reader img").forEach((img, n) => {
-    img.classList.toggle("active", n === index);
-  });
+  if(!images.length){
+    return;
+  }
 
-  document.getElementById("counter").textContent = `${index + 1} / ${images.length}`;
+
+  index =
+    Math.max(
+      0,
+      Math.min(
+        images.length - 1,
+        i
+      )
+    );
+
+
+  document
+    .querySelectorAll(
+      ".reader img"
+    )
+    .forEach(
+      (img,n) => {
+
+        img.classList.toggle(
+          "active",
+          n === index
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "counter"
+    )
+    .textContent =
+      `${index + 1} / ${images.length}`;
+
+
   updateScrubber();
+
 }
 
 
@@ -933,146 +2647,643 @@ function setSingle(i){
    NEXT / PREVIOUS
 ========================================================= */
 
-document.getElementById("next").onclick = () => {
-  if(mode === "single"){
-    if(index < images.length - 1){
-      setSingle(index + 1);
-    }else{
-      scrollToEnd();
-    }
-  }else{
-    window.scrollBy({ top: window.innerHeight * .85, behavior: "smooth" });
-  }
-};
+document
+  .getElementById(
+    "next"
+  )
+  .onclick =
+    () => {
 
-document.getElementById("prev").onclick = () => {
-  if(mode === "single"){
-    if(index > 0){
-      setSingle(index - 1);
-    }else{
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }else{
-    window.scrollBy({ top: -window.innerHeight * .85, behavior: "smooth" });
-  }
-};
+      if(
+        mode === "single"
+      ){
+
+        if(
+          index <
+          images.length - 1
+        ){
+
+          setSingle(
+            index + 1
+          );
+
+        }else{
+
+          scrollToEnd();
+
+        }
+
+      }
+
+    };
+
+
+document
+  .getElementById(
+    "prev"
+  )
+  .onclick =
+    () => {
+
+      if(
+        mode === "single"
+      ){
+
+        if(
+          index > 0
+        ){
+
+          setSingle(
+            index - 1
+          );
+
+        }else{
+
+          window.scrollTo({
+
+            top:0,
+
+            behavior:"smooth"
+
+          });
+
+        }
+
+      }
+
+    };
+
 
 function scrollToEnd(){
-  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+
+  window.scrollTo({
+
+    top:
+      document.documentElement
+        .scrollHeight,
+
+    behavior:"smooth"
+
+  });
+
 }
 
 
 /* =========================================================
-   SETTINGS PANEL & COMPREHENSIVE CONTROLS
+   SETTINGS
 ========================================================= */
 
-const settingsPanel = document.getElementById("settingsPanel");
-const bottomControls = document.getElementById("bottomControls");
+const settingsPanel =
+  document.getElementById(
+    "settingsPanel"
+  );
 
-document.getElementById("settingsBtn").onclick = () => {
-  settingsPanel.classList.toggle("open");
-};
 
-document.getElementById("closeSettings").onclick = () => {
-  settingsPanel.classList.remove("open");
-};
+const settingsBackdrop =
+  document.getElementById(
+    "settingsBackdrop"
+  );
 
-// Mode: Vertical vs Single
-document.getElementById("verticalBtn").onclick = () => {
-  mode = "vertical";
-  document.body.classList.remove("single");
-  document.getElementById("verticalBtn").classList.add("active");
-  document.getElementById("singleBtn").classList.remove("active");
-  bottomControls.classList.remove("visible"); // إخفاء النافذة السفلية في العمودي
-  render();
-};
 
-document.getElementById("singleBtn").onclick = () => {
-  mode = "single";
-  document.body.classList.add("single");
-  document.getElementById("singleBtn").classList.add("active");
-  document.getElementById("verticalBtn").classList.remove("active");
-  bottomControls.classList.add("visible"); // إظهار النافذة السفلية في صفحة واحدة
-  render();
-};
+const bottomControls =
+  document.getElementById(
+    "bottomControls"
+  );
 
-// Fit / Original Width
-document.getElementById("fitBtn").onclick = () => {
-  document.body.classList.remove("fit-original");
-  document.getElementById("fitBtn").classList.add("active");
-  document.getElementById("originalBtn").classList.remove("active");
-};
 
-document.getElementById("originalBtn").onclick = () => {
-  document.body.classList.add("fit-original");
-  document.getElementById("originalBtn").classList.add("active");
-  document.getElementById("fitBtn").classList.remove("active");
-};
+function openSettings(){
 
-// Background Colors
-document.getElementById("bgDark").onclick = () => {
-  document.documentElement.style.background = "#05080c";
-  document.body.style.background = "#05080c";
-  setActiveGroup("bgDark", ["bgDark", "bgPure", "bgDim"]);
-};
-document.getElementById("bgPure").onclick = () => {
-  document.documentElement.style.background = "#000000";
-  document.body.style.background = "#000000";
-  setActiveGroup("bgPure", ["bgDark", "bgPure", "bgDim"]);
-};
-document.getElementById("bgDim").onclick = () => {
-  document.documentElement.style.background = "#12161c";
-  document.body.style.background = "#12161c";
-  setActiveGroup("bgDim", ["bgDark", "bgPure", "bgDim"]);
-};
+  settingsPanel
+    .classList
+    .add("open");
 
-// Brightness Filter
-document.getElementById("bright100").onclick = () => {
-  setBrightness("1");
-  setActiveGroup("bright100", ["bright100", "bright90", "bright80"]);
-};
-document.getElementById("bright90").onclick = () => {
-  setBrightness("0.9");
-  setActiveGroup("bright90", ["bright100", "bright90", "bright80"]);
-};
-document.getElementById("bright80").onclick = () => {
-  setBrightness("0.8");
-  setActiveGroup("bright80", ["bright100", "bright90", "bright80"]);
-};
+  settingsBackdrop
+    .classList
+    .add("open");
 
-function setBrightness(val){
-  document.querySelectorAll(".reader img").forEach(img => {
-    img.style.filter = `brightness(${val})`;
-  });
 }
 
-// Page Gap
-document.getElementById("gap0").onclick = () => {
-  setGap("0px");
-  setActiveGroup("gap0", ["gap0", "gap10", "gap20"]);
-};
-document.getElementById("gap10").onclick = () => {
-  setGap("10px");
-  setActiveGroup("gap10", ["gap0", "gap10", "gap20"]);
-};
-document.getElementById("gap20").onclick = () => {
-  setGap("20px");
-  setActiveGroup("gap20", ["gap0", "gap10", "gap20"]);
-};
 
-function setGap(val){
-  document.querySelectorAll(".page-wrap").forEach(wrap => {
-    wrap.style.marginBottom = val;
-  });
+function closeSettings(){
+
+  settingsPanel
+    .classList
+    .remove("open");
+
+  settingsBackdrop
+    .classList
+    .remove("open");
+
 }
 
-function setActiveGroup(activeId, ids){
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.classList.remove("active");
-  });
-  const target = document.getElementById(activeId);
-  if(target) target.classList.add("active");
+
+document
+  .getElementById(
+    "settingsBtn"
+  )
+  .onclick =
+    () => {
+
+      if(
+        settingsPanel
+          .classList
+          .contains("open")
+      ){
+
+        closeSettings();
+
+      }else{
+
+        openSettings();
+
+      }
+
+    };
+
+
+document
+  .getElementById(
+    "closeSettings"
+  )
+  .onclick =
+    closeSettings;
+
+
+settingsBackdrop.onclick =
+  closeSettings;
+
+
+/* =========================================================
+   VIEW MODE
+========================================================= */
+
+document
+  .getElementById(
+    "verticalBtn"
+  )
+  .onclick =
+    () => {
+
+      mode =
+        "vertical";
+
+
+      document.body
+        .classList
+        .remove("single");
+
+
+      document
+        .getElementById(
+          "verticalBtn"
+        )
+        .classList
+        .add("active");
+
+
+      document
+        .getElementById(
+          "singleBtn"
+        )
+        .classList
+        .remove("active");
+
+
+      bottomControls
+        .classList
+        .remove("visible");
+
+
+      render();
+
+    };
+
+
+document
+  .getElementById(
+    "singleBtn"
+  )
+  .onclick =
+    () => {
+
+      mode =
+        "single";
+
+
+      document.body
+        .classList
+        .add("single");
+
+
+      document
+        .getElementById(
+          "singleBtn"
+        )
+        .classList
+        .add("active");
+
+
+      document
+        .getElementById(
+          "verticalBtn"
+        )
+        .classList
+        .remove("active");
+
+
+      bottomControls
+        .classList
+        .add("visible");
+
+
+      render();
+
+    };
+
+
+/* =========================================================
+   FIT / ORIGINAL
+========================================================= */
+
+document
+  .getElementById(
+    "fitBtn"
+  )
+  .onclick =
+    () => {
+
+      document.body
+        .classList
+        .remove("fit-original");
+
+
+      document
+        .getElementById(
+          "fitBtn"
+        )
+        .classList
+        .add("active");
+
+
+      document
+        .getElementById(
+          "originalBtn"
+        )
+        .classList
+        .remove("active");
+
+    };
+
+
+document
+  .getElementById(
+    "originalBtn"
+  )
+  .onclick =
+    () => {
+
+      document.body
+        .classList
+        .add("fit-original");
+
+
+      document
+        .getElementById(
+          "originalBtn"
+        )
+        .classList
+        .add("active");
+
+
+      document
+        .getElementById(
+          "fitBtn"
+        )
+        .classList
+        .remove("active");
+
+    };
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+document
+  .getElementById(
+    "bgDark"
+  )
+  .onclick =
+    () => {
+
+      setBackground(
+        "#05080c"
+      );
+
+      setActiveGroup(
+        "bgDark",
+        [
+          "bgDark",
+          "bgPure",
+          "bgDim"
+        ]
+      );
+
+    };
+
+
+document
+  .getElementById(
+    "bgPure"
+  )
+  .onclick =
+    () => {
+
+      setBackground(
+        "#000000"
+      );
+
+      setActiveGroup(
+        "bgPure",
+        [
+          "bgDark",
+          "bgPure",
+          "bgDim"
+        ]
+      );
+
+    };
+
+
+document
+  .getElementById(
+    "bgDim"
+  )
+  .onclick =
+    () => {
+
+      setBackground(
+        "#12161c"
+      );
+
+      setActiveGroup(
+        "bgDim",
+        [
+          "bgDark",
+          "bgPure",
+          "bgDim"
+        ]
+      );
+
+    };
+
+
+function setBackground(
+  color
+){
+
+  document.documentElement
+    .style
+    .background =
+      color;
+
+  document.body
+    .style
+    .background =
+      color;
+
+}
+
+
+/* =========================================================
+   BRIGHTNESS
+========================================================= */
+
+document
+  .getElementById(
+    "bright100"
+  )
+  .onclick =
+    () => {
+
+      setBrightness(
+        "1"
+      );
+
+      setActiveGroup(
+        "bright100",
+        [
+          "bright100",
+          "bright90",
+          "bright80"
+        ]
+      );
+
+    };
+
+
+document
+  .getElementById(
+    "bright90"
+  )
+  .onclick =
+    () => {
+
+      setBrightness(
+        ".9"
+      );
+
+      setActiveGroup(
+        "bright90",
+        [
+          "bright100",
+          "bright90",
+          "bright80"
+        ]
+      );
+
+    };
+
+
+document
+  .getElementById(
+    "bright80"
+  )
+  .onclick =
+    () => {
+
+      setBrightness(
+        ".8"
+      );
+
+      setActiveGroup(
+        "bright80",
+        [
+          "bright100",
+          "bright90",
+          "bright80"
+        ]
+      );
+
+    };
+
+
+function setBrightness(
+  value
+){
+
+  document
+    .querySelectorAll(
+      ".reader img"
+    )
+    .forEach(
+      img => {
+
+        img.style.filter =
+          `brightness(${value})`;
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   PAGE GAP
+========================================================= */
+
+document
+  .getElementById(
+    "gap0"
+  )
+  .onclick =
+    () => {
+
+      setGap(
+        "0px"
+      );
+
+      setActiveGroup(
+        "gap0",
+        [
+          "gap0",
+          "gap10",
+          "gap20"
+        ]
+      );
+
+    };
+
+
+document
+  .getElementById(
+    "gap10"
+  )
+  .onclick =
+    () => {
+
+      setGap(
+        "10px"
+      );
+
+      setActiveGroup(
+        "gap10",
+        [
+          "gap0",
+          "gap10",
+          "gap20"
+        ]
+      );
+
+    };
+
+
+document
+  .getElementById(
+    "gap20"
+  )
+  .onclick =
+    () => {
+
+      setGap(
+        "20px"
+      );
+
+      setActiveGroup(
+        "gap20",
+        [
+          "gap0",
+          "gap10",
+          "gap20"
+        ]
+      );
+
+    };
+
+
+function setGap(
+  value
+){
+
+  document
+    .querySelectorAll(
+      ".page-wrap"
+    )
+    .forEach(
+      wrap => {
+
+        wrap.style.marginBottom =
+          value;
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   ACTIVE GROUP
+========================================================= */
+
+function setActiveGroup(
+  activeId,
+  ids
+){
+
+  ids.forEach(
+    id => {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+      if(element){
+
+        element
+          .classList
+          .remove("active");
+
+      }
+
+    }
+  );
+
+
+  const active =
+    document.getElementById(
+      activeId
+    );
+
+
+  if(active){
+
+    active
+      .classList
+      .add("active");
+
+  }
+
 }
 
 
@@ -1080,145 +3291,519 @@ function setActiveGroup(activeId, ids){
    FULLSCREEN
 ========================================================= */
 
-document.getElementById("full").onclick = async () => {
-  try{
-    if(!document.fullscreenElement){
-      await document.documentElement.requestFullscreen();
-    }else{
-      await document.exitFullscreen();
-    }
-  }catch(error){
-    console.error("Fullscreen error:", error);
-  }
-};
+document
+  .getElementById(
+    "full"
+  )
+  .onclick =
+    async () => {
+
+      try{
+
+        if(
+          !document.fullscreenElement
+        ){
+
+          await document
+            .documentElement
+            .requestFullscreen();
+
+        }else{
+
+          await document
+            .exitFullscreen();
+
+        }
+
+      }catch(error){
+
+        console.error(
+          "Fullscreen error:",
+          error
+        );
+
+      }
+
+    };
 
 
 /* =========================================================
    SIDE SCRUBBER
 ========================================================= */
 
-const scrubber = document.getElementById("scrubber");
-const scrubberHitbox = document.getElementById("scrubberHitbox");
-const scrubberThumb = document.getElementById("scrubberThumb");
-const scrubberCounter = document.getElementById("scrubberCounter");
+const scrubber =
+  document.getElementById(
+    "scrubber"
+  );
+
+
+const scrubberHitbox =
+  document.getElementById(
+    "scrubberHitbox"
+  );
+
+
+const scrubberThumb =
+  document.getElementById(
+    "scrubberThumb"
+  );
+
+
+const scrubberCounter =
+  document.getElementById(
+    "scrubberCounter"
+  );
+
 
 function updateScrubber(){
-  if(!images.length) return;
-  let currentIndex = index;
 
-  if(mode === "vertical"){
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    if(maxScroll > 0){
-      const ratio = window.scrollY / maxScroll;
-      currentIndex = Math.round(ratio * (images.length - 1));
-    }else{
-      currentIndex = 0;
-    }
+  if(!images.length){
+    return;
   }
 
-  const ratio = images.length <= 1 ? 0 : currentIndex / (images.length - 1);
-  const trackHeight = scrubber.clientHeight;
-  const thumbHeight = scrubberThumb.offsetHeight;
-  const maxTop = Math.max(0, trackHeight - thumbHeight);
 
-  scrubberThumb.style.top = `${ratio * maxTop}px`;
-  scrubberCounter.textContent = `${currentIndex + 1} / ${images.length}`;
+  let currentIndex =
+    index;
+
+
+  if(
+    mode === "vertical"
+  ){
+
+    const maxScroll =
+      document.documentElement
+        .scrollHeight -
+      window.innerHeight;
+
+
+    if(
+      maxScroll > 0
+    ){
+
+      const ratio =
+        window.scrollY /
+        maxScroll;
+
+
+      currentIndex =
+        Math.round(
+          ratio *
+          (images.length - 1)
+        );
+
+    }else{
+
+      currentIndex =
+        0;
+
+    }
+
+  }
+
+
+  const ratio =
+    images.length <= 1
+
+      ? 0
+
+      : currentIndex /
+        (images.length - 1);
+
+
+  const trackHeight =
+    scrubber.clientHeight;
+
+
+  const thumbHeight =
+    scrubberThumb.offsetHeight;
+
+
+  const maxTop =
+    Math.max(
+      0,
+      trackHeight -
+      thumbHeight
+    );
+
+
+  scrubberThumb.style.top =
+    `${ratio * maxTop}px`;
+
+
+  scrubberCounter.textContent =
+    `${currentIndex + 1} / ${images.length}`;
+
 }
+
 
 function activateScrubber(){
-  scrubber.classList.add("active");
-  clearTimeout(scrubberTimer);
-  scrubberTimer = setTimeout(() => {
-    if(!scrubberDragging){
-      scrubber.classList.remove("active");
-    }
-  }, 1800);
+
+  scrubber
+    .classList
+    .add("active");
+
+
+  clearTimeout(
+    scrubberTimer
+  );
+
+
+  scrubberTimer =
+    setTimeout(
+      () => {
+
+        if(
+          !scrubberDragging
+        ){
+
+          scrubber
+            .classList
+            .remove("active");
+
+        }
+
+      },
+      1800
+    );
+
 }
 
-function seekFromPointer(clientY){
-  const rect = scrubber.getBoundingClientRect();
-  const thumbHeight = scrubberThumb.offsetHeight;
-  const usable = Math.max(1, rect.height - thumbHeight);
-  let y = clientY - rect.top - thumbHeight / 2;
-  y = Math.max(0, Math.min(usable, y));
-  const ratio = y / usable;
-  const target = Math.round(ratio * (images.length - 1));
 
-  if(mode === "single"){
-    setSingle(target);
+function seekFromPointer(
+  clientY
+){
+
+  const rect =
+    scrubber
+      .getBoundingClientRect();
+
+
+  const thumbHeight =
+    scrubberThumb.offsetHeight;
+
+
+  const usable =
+    Math.max(
+      1,
+      rect.height -
+      thumbHeight
+    );
+
+
+  let y =
+    clientY -
+    rect.top -
+    thumbHeight / 2;
+
+
+  y =
+    Math.max(
+      0,
+      Math.min(
+        usable,
+        y
+      )
+    );
+
+
+  const ratio =
+    y /
+    usable;
+
+
+  const target =
+    Math.round(
+      ratio *
+      (images.length - 1)
+    );
+
+
+  if(
+    mode === "single"
+  ){
+
+    setSingle(
+      target
+    );
+
   }else{
-    const targetPage = document.querySelectorAll(".page-wrap")[target];
+
+    const targetPage =
+      document
+        .querySelectorAll(
+          ".page-wrap"
+        )[target];
+
+
     if(targetPage){
-      targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      targetPage.scrollIntoView({
+
+        behavior:"smooth",
+
+        block:"start"
+
+      });
+
     }
+
   }
+
+
   updateScrubber();
+
 }
 
-scrubberHitbox.addEventListener("pointerdown", event => {
-  if(event.target === document.getElementById("scrubberTop") || event.target === document.getElementById("scrubberBottom")) return;
-  scrubberDragging = true;
-  scrubber.setPointerCapture?.(event.pointerId);
-  activateScrubber();
-  seekFromPointer(event.clientY);
-});
 
-scrubberHitbox.addEventListener("pointermove", event => {
-  if(!scrubberDragging) return;
-  seekFromPointer(event.clientY);
-});
+/* =========================================================
+   SCRUBBER POINTER
+========================================================= */
 
-scrubberHitbox.addEventListener("pointerup", () => {
-  scrubberDragging = false;
-  activateScrubber();
-});
+scrubberHitbox.addEventListener(
+  "pointerdown",
+  event => {
 
-scrubberHitbox.addEventListener("pointercancel", () => {
-  scrubberDragging = false;
-});
+    if(
+      event.target ===
+        document.getElementById(
+          "scrubberTop"
+        ) ||
 
-document.getElementById("scrubberTop").onclick = event => {
-  event.stopPropagation();
-  if(mode === "single"){
-    setSingle(0);
-  }else{
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  activateScrubber();
-};
+      event.target ===
+        document.getElementById(
+          "scrubberBottom"
+        )
+    ){
 
-document.getElementById("scrubberBottom").onclick = event => {
-  event.stopPropagation();
-  if(mode === "single"){
-    setSingle(images.length - 1);
-  }else{
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
-  }
-  activateScrubber();
-};
+      return;
 
-let scrollTimer = null;
-window.addEventListener("scroll", () => {
-  if(mode === "vertical"){
-    updateScrubber();
-  }
-  clearTimeout(scrollTimer);
-  scrollTimer = setTimeout(() => {
-    scrubber.classList.remove("active");
-  }, 1200);
-}, { passive: true });
+    }
 
-window.addEventListener("resize", updateScrubber);
 
-document.addEventListener("pointermove", event => {
-  if(event.clientX > window.innerWidth - 55){
+    scrubberDragging =
+      true;
+
+
+    scrubber.setPointerCapture?.(
+      event.pointerId
+    );
+
+
     activateScrubber();
-  }
-}, { passive: true });
 
-// Start
+
+    seekFromPointer(
+      event.clientY
+    );
+
+  }
+);
+
+
+scrubberHitbox.addEventListener(
+  "pointermove",
+  event => {
+
+    if(
+      !scrubberDragging
+    ){
+
+      return;
+
+    }
+
+
+    seekFromPointer(
+      event.clientY
+    );
+
+  }
+);
+
+
+scrubberHitbox.addEventListener(
+  "pointerup",
+  () => {
+
+    scrubberDragging =
+      false;
+
+    activateScrubber();
+
+  }
+);
+
+
+scrubberHitbox.addEventListener(
+  "pointercancel",
+  () => {
+
+    scrubberDragging =
+      false;
+
+  }
+);
+
+
+/* =========================================================
+   SCRUBBER TOP / BOTTOM
+========================================================= */
+
+document
+  .getElementById(
+    "scrubberTop"
+  )
+  .onclick =
+    event => {
+
+      event.stopPropagation();
+
+
+      if(
+        mode === "single"
+      ){
+
+        setSingle(0);
+
+      }else{
+
+        window.scrollTo({
+
+          top:0,
+
+          behavior:"smooth"
+
+        });
+
+      }
+
+
+      activateScrubber();
+
+    };
+
+
+document
+  .getElementById(
+    "scrubberBottom"
+  )
+  .onclick =
+    event => {
+
+      event.stopPropagation();
+
+
+      if(
+        mode === "single"
+      ){
+
+        setSingle(
+          images.length - 1
+        );
+
+      }else{
+
+        window.scrollTo({
+
+          top:
+            document
+              .documentElement
+              .scrollHeight,
+
+          behavior:"smooth"
+
+        });
+
+      }
+
+
+      activateScrubber();
+
+    };
+
+
+/* =========================================================
+   SCROLL TRACKING
+========================================================= */
+
+let scrollTimer =
+  null;
+
+
+window.addEventListener(
+  "scroll",
+  () => {
+
+    if(
+      mode === "vertical"
+    ){
+
+      updateScrubber();
+
+    }
+
+
+    clearTimeout(
+      scrollTimer
+    );
+
+
+    scrollTimer =
+      setTimeout(
+        () => {
+
+          scrubber
+            .classList
+            .remove("active");
+
+        },
+        1200
+      );
+
+  },
+  {
+    passive:true
+  }
+);
+
+
+window.addEventListener(
+  "resize",
+  updateScrubber
+);
+
+
+/* =========================================================
+   EDGE ACTIVATION
+========================================================= */
+
+document.addEventListener(
+  "pointermove",
+  event => {
+
+    if(
+      event.clientX >
+      window.innerWidth - 55
+    ){
+
+      activateScrubber();
+
+    }
+
+  },
+  {
+    passive:true
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
 init();
 
 </script>
+
 </body>
-</html>
+  </html>
