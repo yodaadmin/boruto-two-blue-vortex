@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050708">
+<title>VORTEX — قارئ الفصل</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#050708;--bar:#070a0cf2;--surface:#0b1013;--surface2:#10171a;
+  --line:#202b30;--line2:#2a3940;--text:#f5f8f9;--muted:#8e9ba1;
+  --cyan:#13abd2;--cyan2:#76e5fd;--danger:#ff8795;--reader-width:100%;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(circle at 50% -15%,#13abd214,transparent 38%),linear-gradient(120deg,transparent 0 37%,#ffffff07 37.15% 37.3%,transparent 37.45% 100%)}
+button,select{font:inherit}
+button{cursor:pointer}
+.bar{position:sticky;top:0;z-index:100;height:68px;display:grid;grid-template-columns:1fr minmax(180px,1.6fr) 1fr;align-items:center;gap:12px;padding:8px 14px;background:var(--bar);border-bottom:1px solid #1c262a;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.brand-back{justify-self:start;display:flex;align-items:center;gap:9px;color:#dfe7e9;text-decoration:none;font-size:13px;font-weight:850;padding:8px 11px;border:1px solid #263136;border-radius:11px;background:#0b0f11;transition:.2s}.brand-back:hover{border-color:#13abd277;color:var(--cyan2);transform:translateY(-1px)}
+.brand-mark{width:28px;height:28px;object-fit:contain;border-radius:50%;background:#050505}
+.title{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;line-height:1.15}.title span{font-size:8px;letter-spacing:.22em;color:#728087;font-weight:850}.title b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:3px}
+.controls{justify-self:end;display:flex;gap:7px}.icon-btn{width:40px;height:40px;border:1px solid #263136;border-radius:11px;background:#0b0f11;color:#eaf1f3;font-size:18px;transition:.2s}.icon-btn:hover,.icon-btn:focus-visible{border-color:#13abd277;color:var(--cyan2);box-shadow:0 0 24px #13abd214;outline:none}
+.progress{position:absolute;inset:auto 0 0 0;height:2px;background:transparent;overflow:hidden}.progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--cyan),var(--cyan2));box-shadow:0 0 12px #13abd288;transition:width .12s linear}
+.reader{width:100%;min-height:calc(100vh - 68px);padding-bottom:92px}
+.page-wrap{width:100%;line-height:0;text-align:center;margin:0;padding:0;background:#000}
+.reader img{display:block;width:var(--reader-width);max-width:100%;height:auto;margin:0 auto;padding:0;border:0;box-shadow:none;user-select:none;-webkit-user-drag:none;line-height:0}
+body.single .page-wrap{display:none}body.single .page-wrap.active{display:block;padding:12px 10px;background:transparent}.single .reader img{width:auto;max-width:100%;max-height:calc(100vh - 130px);object-fit:contain;margin:0 auto;border-radius:6px;box-shadow:0 24px 80px #000b}
+.status{padding:80px 20px;text-align:center;color:var(--muted);max-width:760px;margin:auto;line-height:1.9}.status::before{content:"";display:block;width:58px;height:58px;margin:0 auto 20px;background:url('assets/vortex-mark-cyan.png') center/contain no-repeat;filter:drop-shadow(0 0 18px #13abd244);animation:spin 5s linear infinite}.status.error{color:#ffb0b9}.status h3{margin:0 0 8px;color:#fff}
+.bottom{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:7px;padding:7px;background:#090d0fea;border:1px solid #29353a;border-radius:15px;backdrop-filter:blur(20px);box-shadow:0 18px 60px #000b;transition:opacity .2s}.bottom button{min-width:92px;border:1px solid #283338;background:#101619;color:#edf4f6;border-radius:10px;padding:9px 11px;font-weight:800;transition:.2s}.bottom button:hover:not(:disabled){border-color:#13abd277;color:var(--cyan2);background:#111c20}.bottom button:disabled{opacity:.42;cursor:default}.bottom span{min-width:105px;text-align:center;font-size:11px;color:#aebbc0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chapter-jump{position:fixed;left:50%;bottom:78px;transform:translate(-50%,12px);z-index:85;width:min(420px,calc(100vw - 24px));opacity:0;pointer-events:none;transition:.2s}.chapter-jump.open{opacity:1;transform:translate(-50%,0);pointer-events:auto}.chapter-jump select{width:100%;padding:13px 14px;border:1px solid #2b3940;border-radius:13px;background:#0a0f11f5;color:#f2f6f7;outline:none;box-shadow:0 18px 60px #000b}.chapter-jump small{display:block;margin-top:6px;text-align:center;color:#7d8b91;font-size:10px}
+.settings-backdrop{position:fixed;inset:0;z-index:120;background:#0009;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:.2s}.settings-backdrop.open{opacity:1;pointer-events:auto}
+.settings{position:fixed;z-index:130;top:50%;left:50%;width:min(430px,calc(100vw - 24px));max-height:min(680px,calc(100vh - 32px));overflow:auto;transform:translate(-50%,calc(-50% + 16px));opacity:0;pointer-events:none;background:linear-gradient(145deg,#0c1215,#080c0e);border:1px solid #2b3940;border-radius:20px;box-shadow:0 30px 100px #000d;padding:18px;transition:.22s}.settings.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}.settings-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.settings-head h2{font-size:20px;margin:0}.settings-head p{margin:4px 0 0;color:#78878d;font-size:11px}.close{width:36px;height:36px;border:1px solid #29353a;border-radius:10px;background:#0b1012;color:#dfe7e9;font-size:18px}.setting{padding:14px 0;border-top:1px solid #1c282d}.setting:first-of-type{border-top:0}.setting label{display:block;color:#dfe7e9;font-size:13px;font-weight:850;margin-bottom:10px}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.choice{border:1px solid #26343a;background:#0b1012;color:#aebbc0;border-radius:11px;padding:11px 9px;text-align:center;transition:.2s}.choice.active{border-color:#13abd2aa;background:#0d2026;color:#76e5fd;box-shadow:inset 0 0 0 1px #13abd233}.setting-note{font-size:10px;color:#6f7d83;line-height:1.7;margin:8px 0 0}.range-row{display:flex;gap:8px;align-items:center}.range-row input{width:100%;accent-color:var(--cyan)}.range-value{min-width:45px;text-align:center;color:var(--cyan2);font-size:12px;font-weight:850}.setting-actions{display:flex;gap:8px;margin-top:6px}.setting-actions button{flex:1;border:1px solid #28363b;border-radius:11px;padding:11px;background:#101619;color:#edf4f6;font-weight:800}.setting-actions button.primary{background:var(--cyan);border-color:transparent;color:#031015}
+.chapter-end{width:min(760px,calc(100% - 24px));margin:34px auto 0;padding:28px 18px;border:1px solid #202d32;border-radius:18px;background:linear-gradient(145deg,#0b1012,#080b0d);text-align:center}.chapter-end .eyebrow{color:var(--cyan2);font-size:9px;font-weight:900;letter-spacing:.2em}.chapter-end h3{margin:8px 0 4px;font-size:18px}.chapter-end p{margin:0 0 18px;color:#7e8c92;font-size:11px}.chapter-end-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.chapter-end button{border:1px solid #2b383d;background:#101619;color:#e8eff1;border-radius:11px;padding:10px 14px;font-weight:800}.chapter-end button.primary{background:var(--cyan);border-color:transparent;color:#031015}.chapter-end button:disabled{opacity:.45}
+
+/* The reader toolbar is intentionally permanent. Legacy hide-toolbar states are neutralized. */
+body.toolbar-hidden .bar{display:grid!important;visibility:visible!important;opacity:1!important;transform:none!important;pointer-events:auto!important}
+body.toolbar-hidden .bottom{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+.toolbar-recovery{display:none;position:fixed;top:10px;right:10px;z-index:9999;border:1px solid #2b3940;background:#0a0f11ee;color:#76e5fd;border-radius:11px;padding:9px 12px;font-weight:800;box-shadow:0 15px 45px #000b}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:650px){.bar{grid-template-columns:auto 1fr auto;height:62px;padding:7px 9px}.brand-back{padding:7px 8px}.brand-back span{display:none}.brand-mark{width:27px;height:27px}.title span{font-size:7px}.title b{font-size:12px;max-width:52vw}.icon-btn{width:38px;height:38px}.reader{min-height:calc(100vh - 62px);padding-bottom:82px}.bottom{width:calc(100% - 18px);bottom:max(8px,env(safe-area-inset-bottom));justify-content:space-between}.bottom button{flex:1;min-width:0;padding:9px 7px}.bottom span{min-width:72px;font-size:10px}.chapter-jump{bottom:73px}.settings{border-radius:18px;padding:15px}.settings-head h2{font-size:18px}}
+@media(min-width:651px){.reader{padding-bottom:110px}.bottom{bottom:18px}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand-back" href="index.html#chapters" aria-label="العودة إلى الفصول"><img class="brand-mark" src="assets/vortex-mark-white.png" alt=""><span>الفصول</span><b>‹</b></a>
+  <div class="title"><span>VORTEX READER</span><b id="chapterTitle">جاري تحميل الفصل...</b></div>
+  <div class="controls">
+    <button class="icon-btn" id="chapterMenu" title="اختيار فصل" aria-label="اختيار فصل">☰</button>
+    <button class="icon-btn" id="settingsBtn" title="إعدادات القراءة" aria-label="إعدادات القراءة">⚙</button>
+    <button class="icon-btn" id="full" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+  </div>
+  <div class="progress"><i id="progressBar"></i></div>
+</header>
+<button id="toolbarRecovery" class="toolbar-recovery" type="button">إظهار أدوات القراءة</button>
+
+<main id="reader" class="reader"><div class="status">جاري تحميل الصفحات...</div></main>
+
+<div id="chapterJump" class="chapter-jump" aria-hidden="true">
+  <select id="chapterSelect" aria-label="اختر فصلًا"></select>
+  <small>اختر فصلًا للانتقال إليه مباشرة</small>
+</div>
+
+<div class="bottom">
+  <button id="prev" type="button">‹ السابق</button>
+  <span id="counter">—</span>
+  <button id="next" type="button">التالي ›</button>
+</div>
+
+<div id="settingsBackdrop" class="settings-backdrop"></div>
+<section id="settings" class="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="settings-head">
+    <div><h2 id="settingsTitle">إعدادات القراءة</h2><p>تحكم بسيط بالمظهر وطريقة عرض الصفحات.</p></div>
+    <button class="close" id="closeSettings" aria-label="إغلاق">×</button>
+  </div>
+
+  <div class="setting">
+    <label>طريقة القراءة</label>
+    <div class="choices">
+      <button class="choice active" data-mode="vertical" type="button">عمودي<br><small>مثل المانهوا</small></button>
+      <button class="choice" data-mode="single" type="button">صفحة واحدة<br><small>تنقل يدوي</small></button>
+    </div>
+    <p class="setting-note">الوضع العمودي هو الوضع الأساسي: الصفحات متصلة بلا أي فواصل أو مسافات.</p>
+  </div>
+
+  <div class="setting">
+    <label>عرض الصفحات في الوضع العمودي</label>
+    <div class="range-row"><input id="widthRange" type="range" min="70" max="100" step="5" value="100"><span id="widthValue" class="range-value">100%</span></div>
+    <p class="setting-note">100% يعرض الصفحة بعرض الشاشة الكامل، ويمكن تقليله لمن يفضل ترك حواف جانبية.</p>
+  </div>
+
+  <div class="setting">
+    <label>خلفية القراءة</label>
+    <div class="choices">
+      <button class="choice active" data-bg="black" type="button">أسود عميق</button>
+      <button class="choice" data-bg="dark" type="button">داكن ناعم</button>
+    </div>
+  </div>
+
+  <div class="setting-actions"><button id="resetSettings" type="button">إعادة الافتراضي</button><button id="doneSettings" class="primary" type="button">تم</button></div>
+</section>
+
+<script>
+const SUPABASE_URL='https://smgvqaunvvkbwkkgmccx.supabase.co';
+const SUPABASE_KEY='sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const requested=new URLSearchParams(location.search).get('chapter');
+let images=[],chapters=[],currentChapter=null,currentChapterIndex=-1,index=0,mode='vertical';
+const SETTINGS_KEY='vortex-reader-settings-v2';
+const $=id=>document.getElementById(id);
+
+// Remove legacy states from earlier reader versions. The toolbar must never be permanently hidden.
+(function resetLegacyToolbarState(){
+  const legacyKeys=['vortex-reader-toolbar-hidden','vortex-reader-controls-hidden','vortex-reader-ui-hidden','reader-toolbar-hidden'];
+  legacyKeys.forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+  document.body.classList.remove('toolbar-hidden','controls-hidden','reader-hidden');
+})();
+function forceToolbarVisible(){
+  document.body.classList.remove('toolbar-hidden','controls-hidden','reader-hidden');
+  const bar=$('toolbarRecovery');
+  if(bar)bar.style.display='none';
+}
+
+
+function publicUrl(path){if(!path)return '';const clean=String(path).split('/').filter(Boolean).map(encodeURIComponent).join('/');return `${SUPABASE_URL}/storage/v1/object/public/manga-pages/${clean}`}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function saveSettings(){localStorage.setItem(SETTINGS_KEY,JSON.stringify({mode,width:$('widthRange').value,bg:document.body.dataset.bg||'black'}))}
+function loadSettings(){forceToolbarVisible();try{const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');setMode(s.mode==='single'?'single':'vertical',false);setWidth(Number(s.width)||100,false);setBg(s.bg==='dark'?'dark':'black',false)}catch{setMode('vertical',false);setWidth(100,false);setBg('black',false)}}
+function setWidth(v,save=true){v=Math.max(70,Math.min(100,Number(v)||100));$('widthRange').value=v;$('widthValue').textContent=v+'%';document.documentElement.style.setProperty('--reader-width',v+'%');if(save)saveSettings()}
+function setBg(v,save=true){document.body.dataset.bg=v;document.documentElement.style.setProperty('--bg',v==='dark'?'#090d0f':'#050708');document.querySelectorAll('[data-bg]').forEach(b=>b.classList.toggle('active',b.dataset.bg===v));if(save)saveSettings()}
+function setMode(v,save=true){mode=v==='single'?'single':'vertical';document.body.classList.toggle('single',mode==='single');document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));render(false);if(save)saveSettings()}
+function updateNavButtons(){
+  const prev=$('prev'),next=$('next');
+  const hasPrev=currentChapterIndex>0,hasNext=currentChapterIndex>=0&&currentChapterIndex<chapters.length-1;
+  prev.disabled=!hasPrev;next.disabled=!hasNext;
+  prev.textContent=hasPrev?'‹ السابق':'لا يوجد فصل سابق';next.textContent=hasNext?'التالي ›':'لا يوجد فصل تالي';
+}
+function populateChapterSelect(){
+  const select=$('chapterSelect');select.innerHTML='';
+  chapters.forEach((ch,i)=>{const o=document.createElement('option');o.value=ch.number;o.textContent=`الفصل ${ch.number}${ch.title?' — '+ch.title:''}`;if(i===currentChapterIndex)o.selected=true;select.appendChild(o)});
+  updateNavButtons();
+}
+function goToChapter(number){if(number==null)return;location.href=`reader.html?chapter=${encodeURIComponent(number)}`}
+async function loadChapters(){
+  const q=await db.from('chapters').select('id,number,title,published_at').order('number',{ascending:true});
+  if(q.error)throw new Error('تعذر تحميل قائمة الفصول: '+q.error.message);
+  chapters=q.data||[];currentChapterIndex=chapters.findIndex(c=>Number(c.number)===Number(requested));populateChapterSelect();
+}
+async function init(){
+  const reader=$('reader');loadSettings();
+  try{
+    if(!requested)throw new Error('رقم الفصل غير موجود في الرابط. افتح الفصل من قائمة الفصول.');
+    const n=Number(requested);if(!Number.isInteger(n)||n<1)throw new Error('رقم الفصل غير صالح: '+escapeHtml(requested));
+    const [chapterQuery]=await Promise.all([
+      db.from('chapters').select('id,number,title,published_at').eq('number',n).maybeSingle(),
+      loadChapters()
+    ]);
+    if(chapterQuery.error)throw new Error('فشل قراءة الفصل: '+chapterQuery.error.message);
+    if(!chapterQuery.data)throw new Error('لم يتم العثور على الفصل رقم '+n+'.');
+    currentChapter=chapterQuery.data;
+    currentChapterIndex=chapters.findIndex(c=>Number(c.number)===Number(n));
+    $('chapterTitle').textContent=`الفصل ${currentChapter.number}${currentChapter.title?' — '+currentChapter.title:''}`;
+    populateChapterSelect();
+    const pg=await db.from('pages').select('id,page_number,storage_path').eq('chapter_id',currentChapter.id).order('page_number',{ascending:true});
+    if(pg.error)throw new Error('تم العثور على الفصل، لكن تعذر قراءة جدول الصفحات: '+pg.error.message);
+    if(!pg.data?.length)throw new Error('الفصل موجود، لكن لا توجد صفحات مسجلة له.');
+    images=pg.data.map(p=>({page:p.page_number,path:p.storage_path,url:publicUrl(p.storage_path)}));
+    render(true);updateProgress();window.addEventListener('scroll',updateProgress,{passive:true});
+  }catch(e){reader.innerHTML=`<div class="status error"><h3>تعذر تحميل الفصل</h3><div>${escapeHtml(e.message||String(e))}</div></div>`}
+}
+function render(resetIndex=true){
+  const reader=$('reader');if(!images.length)return;reader.innerHTML='';
+  images.forEach((p,i)=>{
+    const wrap=document.createElement('div');wrap.className='page-wrap';wrap.dataset.index=i;
+    const img=document.createElement('img');img.src=p.url;img.alt=`صفحة ${p.page}`;img.loading=i<2?'eager':'lazy';img.decoding='async';img.referrerPolicy='no-referrer';
+    img.onerror=()=>{wrap.innerHTML=`<div class="status error">تعذر تحميل الصفحة ${escapeHtml(p.page)}<br><small>المسار: ${escapeHtml(p.path)}</small></div>`};wrap.appendChild(img);reader.appendChild(wrap);
+  });
+  if(mode==='single'){index=resetIndex?0:Math.min(index,images.length-1);setSingle(index)}
+  else $('counter').textContent=`${images.length} صفحة`;
+  addChapterEnd();updateProgress();
+}
+function setSingle(i){index=Math.max(0,Math.min(images.length-1,i));document.querySelectorAll('.page-wrap').forEach((x,n)=>x.classList.toggle('active',n===index));$('counter').textContent=`${index+1} / ${images.length}`;window.scrollTo({top:0,behavior:'smooth'})}
+function addChapterEnd(){
+  const end=document.createElement('section');end.className='chapter-end';
+  const prevOk=currentChapterIndex>0,nextOk=currentChapterIndex>=0&&currentChapterIndex<chapters.length-1;
+  end.innerHTML=`<div class="eyebrow">END OF CHAPTER</div><h3>نهاية الفصل ${escapeHtml(currentChapter?.number??'')}</h3><p>يمكنك متابعة القراءة مباشرة من الفصل التالي أو العودة للفصل السابق.</p><div class="chapter-end-actions"><button id="endPrev" ${prevOk?'':'disabled'}>${prevOk?'‹ الفصل السابق':'لا يوجد فصل سابق'}</button><button id="endList" class="primary">قائمة الفصول</button><button id="endNext" class="primary" ${nextOk?'':'disabled'}>${nextOk?'الفصل التالي ›':'لا يوجد فصل تالي'}</button></div>`;
+  $('reader').appendChild(end);
+  $('endPrev').onclick=()=>{if(prevOk)goToChapter(chapters[currentChapterIndex-1].number)};$('endNext').onclick=()=>{if(nextOk)goToChapter(chapters[currentChapterIndex+1].number)};$('endList').onclick=openChapterMenu;
+}
+function updateProgress(){
+  if(mode==='single'){const pct=((index+1)/Math.max(images.length,1))*100;$('progressBar').style.width=pct+'%';return}
+  const doc=document.documentElement;const max=doc.scrollHeight-window.innerHeight;const pct=max>0?(window.scrollY/max)*100:0;$('progressBar').style.width=Math.max(0,Math.min(100,pct))+'%';
+}
+function openChapterMenu(){
+  $('chapterJump').classList.toggle('open');$('chapterJump').setAttribute('aria-hidden',String(!$('chapterJump').classList.contains('open')));
+}
+function closeSettings(){$('settings').classList.remove('open');$('settingsBackdrop').classList.remove('open')}
+function openSettings(){$('settings').classList.add('open');$('settingsBackdrop').classList.add('open')}
+
+$('chapterMenu').onclick=openChapterMenu;$('chapterSelect').onchange=e=>goToChapter(e.target.value);
+$('settingsBtn').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('doneSettings').onclick=()=>{saveSettings();closeSettings()};$('settingsBackdrop').onclick=closeSettings;
+$('widthRange').oninput=e=>setWidth(e.target.value);
+$('resetSettings').onclick=()=>{setMode('vertical',false);setWidth(100,false);setBg('black',false);saveSettings()};
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));document.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>setBg(b.dataset.bg));
+$('full').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.()};
+$('next').onclick=()=>{if(mode==='single'){if(index<images.length-1)setSingle(index+1);else if(currentChapterIndex<chapters.length-1)goToChapter(chapters[currentChapterIndex+1].number)}else if(currentChapterIndex<chapters.length-1)goToChapter(chapters[currentChapterIndex+1].number)};
+$('prev').onclick=()=>{if(mode==='single'){if(index>0)setSingle(index-1);else if(currentChapterIndex>0)goToChapter(chapters[currentChapterIndex-1].number)}else if(currentChapterIndex>0)goToChapter(chapters[currentChapterIndex-1].number)};
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSettings();$('chapterJump').classList.remove('open')}if(e.key==='ArrowRight')$('prev').click();if(e.key==='ArrowLeft')$('next').click()});
+document.addEventListener('click',e=>{const menu=$('chapterJump');if(menu.classList.contains('open')&&!menu.contains(e.target)&&e.target!==$('chapterMenu'))menu.classList.remove('open')});
+$('toolbarRecovery').onclick=forceToolbarVisible;
+document.addEventListener('fullscreenchange',()=>{forceToolbarVisible();});
+forceToolbarVisible();
+init();
+</script>
+</body>
+</html>
