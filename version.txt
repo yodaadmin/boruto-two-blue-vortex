@@ -1,0 +1,4 @@
+VORTEX Manga Reader V2
+Build: 2026-09-26
+Frontend: redesigned home + advanced reader + local reading history
+Database: existing Supabase schema preserved
