@@ -2,74 +2,38 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050708">
-<title>VORTEX — قارئ الفصل</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05080c">
+<title>قارئ الفصل — دوامتان زرقاوتان</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root{
-  --bg:#050708;
-  --bar:#070a0cf2;
-  --surface:#0b1013;
-  --surface2:#10171a;
-  --line:#202b30;
-  --line2:#2a3940;
-  --text:#f5f8f9;
-  --muted:#8e9ba1;
-  --cyan:#13abd2;
-  --cyan2:#76e5fd;
-  --danger:#ff8795;
-  --reader-width:100%;
+*{
+  box-sizing:border-box;
 }
 
-*{
-  box-sizing:border-box
+html,
+body{
+  margin:0;
+  padding:0;
+  background:#05080c;
+  color:#fff;
+  font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
 }
 
 html{
   scroll-behavior:smooth;
-  background:var(--bg)
 }
 
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
-  overflow-x:hidden
+  overflow-x:hidden;
 }
 
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:-1;
-  background:
-    radial-gradient(
-      circle at 50% -15%,
-      #13abd214,
-      transparent 38%
-    ),
-    linear-gradient(
-      120deg,
-      transparent 0 37%,
-      #ffffff07 37.15% 37.3%,
-      transparent 37.45% 100%
-    )
-}
-
-button,
-select{
-  font:inherit
-}
-
+a,
 button{
-  cursor:pointer
+  font:inherit;
 }
-
 
 /* =========================================================
    TOP BAR
@@ -79,154 +43,79 @@ button{
   position:sticky;
   top:0;
   z-index:100;
-  height:68px;
-
-  display:grid;
-  grid-template-columns:
-    1fr
-    minmax(180px,1.6fr)
-    1fr;
-
-  align-items:center;
-  gap:12px;
-
-  padding:8px 14px;
-
-  background:var(--bar);
-  border-bottom:1px solid #1c262a;
-
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px)
-}
-
-.brand-back{
-  justify-self:start;
+  height:60px;
 
   display:flex;
   align-items:center;
-  gap:9px;
+  justify-content:space-between;
+  gap:10px;
 
-  color:#dfe7e9;
+  padding:8px 14px;
+
+  background:rgba(7,17,27,.92);
+  border-bottom:1px solid #233746;
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+.bar a,
+.bar button{
+  color:#fff;
   text-decoration:none;
 
-  font-size:13px;
-  font-weight:850;
+  background:#142532;
+  border:1px solid rgba(255,255,255,.04);
 
-  padding:8px 11px;
+  border-radius:10px;
+  padding:8px 12px;
 
-  border:1px solid #263136;
-  border-radius:11px;
+  cursor:pointer;
 
-  background:#0b0f11;
-
-  transition:.2s
+  transition:.2s ease;
 }
 
-.brand-back:hover{
-  border-color:#13abd277;
-  color:var(--cyan2);
-  transform:translateY(-1px)
-}
-
-.brand-mark{
-  width:28px;
-  height:28px;
-
-  object-fit:contain;
-  border-radius:50%;
-
-  background:#050505
+.bar a:hover,
+.bar button:hover{
+  background:#1a3444;
 }
 
 .title{
   min-width:0;
-  text-align:center;
 
   display:flex;
   flex-direction:column;
   align-items:center;
 
-  line-height:1.15
+  gap:1px;
+
+  text-align:center;
 }
 
 .title span{
-  font-size:8px;
-  letter-spacing:.22em;
-  color:#728087;
-  font-weight:850
+  font-size:11px;
+  color:#8fa4b1;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:42vw;
 }
 
 .title b{
   font-size:14px;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  max-width:100%;
-  margin-top:3px
+
+  max-width:42vw;
 }
 
 .controls{
-  justify-self:end;
   display:flex;
-  gap:7px
+  gap:6px;
 }
-
-.icon-btn{
-  width:40px;
-  height:40px;
-
-  border:1px solid #263136;
-  border-radius:11px;
-
-  background:#0b0f11;
-  color:#eaf1f3;
-
-  font-size:18px;
-
-  transition:.2s
-}
-
-.icon-btn:hover,
-.icon-btn:focus-visible{
-  border-color:#13abd277;
-  color:var(--cyan2);
-  box-shadow:0 0 24px #13abd214;
-  outline:none
-}
-
-
-/* =========================================================
-   PROGRESS
-========================================================= */
-
-.progress{
-  position:absolute;
-  inset:auto 0 0 0;
-
-  height:2px;
-
-  background:transparent;
-  overflow:hidden
-}
-
-.progress i{
-  display:block;
-
-  width:0;
-  height:100%;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--cyan),
-      var(--cyan2)
-    );
-
-  box-shadow:0 0 12px #13abd288;
-
-  transition:width .12s linear
-}
-
 
 /* =========================================================
    READER
@@ -234,889 +123,620 @@ button{
 
 .reader{
   width:100%;
-  min-height:calc(100vh - 68px);
-  padding-bottom:24px
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  min-height:calc(100vh - 60px);
+
+  padding:0 0 90px;
 }
 
 .page-wrap{
   width:100%;
 
-  line-height:0;
-  text-align:center;
-
   margin:0;
   padding:0;
 
-  background:#000
+  text-align:center;
+  line-height:0;
+
+  background:#05080c;
 }
 
 .reader img{
   display:block;
 
-  width:var(--reader-width);
+  width:auto;
   max-width:100%;
-
   height:auto;
 
   margin:0 auto;
   padding:0;
 
-  border:0;
-
-  box-shadow:none;
-
   user-select:none;
   -webkit-user-drag:none;
 
-  line-height:0
+  line-height:0;
 }
 
+body.fit-original .reader img{
+  max-width:none;
+}
 
 /* =========================================================
    SINGLE PAGE MODE
 ========================================================= */
 
-body.single .page-wrap{
-  display:none
+body.single .reader img{
+  display:none;
 }
 
-body.single .page-wrap.active{
+body.single .reader img.active{
   display:block;
 
-  padding:12px 10px;
-
-  background:transparent
-}
-
-.single .reader img{
   width:auto;
-
   max-width:100%;
-  max-height:calc(100vh - 130px);
+  max-height:calc(100vh - 70px);
 
   object-fit:contain;
-
-  margin:0 auto;
-
-  border-radius:6px;
-
-  box-shadow:0 24px 80px #000b
 }
-
 
 /* =========================================================
    STATUS
 ========================================================= */
 
 .status{
-  padding:80px 20px;
+  padding:40px 18px;
 
   text-align:center;
 
-  color:var(--muted);
+  color:#9fb2bf;
 
-  max-width:760px;
-
-  margin:auto;
-
-  line-height:1.9
-}
-
-.status::before{
-  content:"";
-
-  display:block;
-
-  width:58px;
-  height:58px;
-
-  margin:0 auto 20px;
-
-  background:
-    url("assets/vortex-mark-cyan.png")
-    center/contain
-    no-repeat;
-
-  filter:drop-shadow(
-    0 0 18px #13abd244
-  );
-
-  animation:spin 5s linear infinite
+  max-width:900px;
 }
 
 .status.error{
-  color:#ffb0b9
+  color:#ff9da8;
 }
 
 .status h3{
-  margin:0 0 8px;
-  color:#fff
+  margin:0 0 12px;
 }
 
+.status small{
+  color:#8296a4;
 
-/* =========================================================
-   OLD BOTTOM NAVIGATION
-   REMOVED COMPLETELY
-========================================================= */
-
-.bottom{
-  display:none!important
+  word-break:break-all;
 }
 
-
 /* =========================================================
-   CHAPTER SELECT MENU
-   يظهر فقط عند الضغط على زر الفصول
+   READING SETTINGS
 ========================================================= */
 
-.chapter-jump{
+.settings-panel{
   position:fixed;
 
-  left:50%;
-  bottom:78px;
-
-  transform:
-    translate(-50%,12px);
-
-  z-index:85;
-
-  width:min(
-    420px,
-    calc(100vw - 24px)
-  );
-
-  opacity:0;
-
-  pointer-events:none;
-
-  transition:.2s
-}
-
-.chapter-jump.open{
-  opacity:1;
-
-  transform:
-    translate(-50%,0);
-
-  pointer-events:auto
-}
-
-.chapter-jump select{
-  width:100%;
-
-  padding:13px 14px;
-
-  border:1px solid #2b3940;
-  border-radius:13px;
-
-  background:#0a0f11f5;
-
-  color:#f2f6f7;
-
-  outline:none;
-
-  box-shadow:0 18px 60px #000b
-}
-
-.chapter-jump small{
-  display:block;
-
-  margin-top:6px;
-
-  text-align:center;
-
-  color:#7d8b91;
-
-  font-size:10px
-}
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-.settings-backdrop{
-  position:fixed;
-  inset:0;
+  top:68px;
+  right:14px;
 
   z-index:120;
 
-  background:#0009;
+  width:min(330px,calc(100vw - 28px));
 
-  backdrop-filter:blur(8px);
+  padding:16px;
 
-  opacity:0;
+  border:1px solid #294352;
+  border-radius:18px;
 
-  pointer-events:none;
-
-  transition:.2s
-}
-
-.settings-backdrop.open{
-  opacity:1;
-  pointer-events:auto
-}
-
-.settings{
-  position:fixed;
-
-  z-index:130;
-
-  top:50%;
-  left:50%;
-
-  width:min(
-    430px,
-    calc(100vw - 24px)
-  );
-
-  max-height:
-    min(
-      680px,
-      calc(100vh - 32px)
-    );
-
-  overflow:auto;
-
-  transform:
-    translate(
-      -50%,
-      calc(-50% + 16px)
-    );
-
-  opacity:0;
-
-  pointer-events:none;
-
-  background:
-    linear-gradient(
-      145deg,
-      #0c1215,
-      #080c0e
-    );
-
-  border:1px solid #2b3940;
-
-  border-radius:20px;
+  background:rgba(8,18,27,.96);
 
   box-shadow:
-    0 30px 100px #000d;
+    0 25px 80px rgba(0,0,0,.55),
+    0 0 30px rgba(19,171,210,.05);
 
-  padding:18px;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
 
-  transition:.22s
+  opacity:0;
+  visibility:hidden;
+
+  transform:translateY(-8px) scale(.98);
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease,
+    visibility .2s ease;
 }
 
-.settings.open{
+.settings-panel.open{
   opacity:1;
+  visibility:visible;
 
-  transform:
-    translate(
-      -50%,
-      -50%
-    );
-
-  pointer-events:auto
+  transform:translateY(0) scale(1);
 }
 
-.settings-head{
+.settings-title{
   display:flex;
+  justify-content:space-between;
+  align-items:center;
 
+  margin-bottom:14px;
+}
+
+.settings-title strong{
+  font-size:14px;
+}
+
+.settings-title button{
+  width:30px;
+  height:30px;
+
+  border:0;
+  border-radius:9px;
+
+  color:#fff;
+  background:#142532;
+
+  cursor:pointer;
+}
+
+.setting-row{
+  display:flex;
   align-items:center;
   justify-content:space-between;
 
   gap:12px;
 
-  margin-bottom:18px
+  padding:11px 0;
+
+  border-top:1px solid rgba(255,255,255,.06);
 }
 
-.settings-head h2{
-  font-size:20px;
-  margin:0
+.setting-row:first-of-type{
+  border-top:0;
 }
 
-.settings-head p{
-  margin:4px 0 0;
-
-  color:#78878d;
-
-  font-size:11px
-}
-
-.close{
-  width:36px;
-  height:36px;
-
-  border:1px solid #29353a;
-
-  border-radius:10px;
-
-  background:#0b1012;
-
-  color:#dfe7e9;
-
-  font-size:18px
-}
-
-.setting{
-  padding:14px 0;
-
-  border-top:1px solid #1c282d
-}
-
-.setting:first-of-type{
-  border-top:0
-}
-
-.setting label{
-  display:block;
-
-  color:#dfe7e9;
-
-  font-size:13px;
-
-  font-weight:850;
-
-  margin-bottom:10px
-}
-
-.choices{
-  display:grid;
-
-  grid-template-columns:
-    repeat(2,1fr);
-
-  gap:8px
-}
-
-.choice{
-  border:1px solid #26343a;
-
-  background:#0b1012;
-
-  color:#aebbc0;
-
-  border-radius:11px;
-
-  padding:11px 9px;
-
-  text-align:center;
-
-  transition:.2s
-}
-
-.choice.active{
-  border-color:#13abd2aa;
-
-  background:#0d2026;
-
-  color:#76e5fd;
-
-  box-shadow:
-    inset 0 0 0 1px #13abd233
-}
-
-.setting-note{
-  font-size:10px;
-
-  color:#6f7d83;
-
-  line-height:1.7;
-
-  margin:8px 0 0
-}
-
-.range-row{
-  display:flex;
-
-  gap:8px;
-
-  align-items:center
-}
-
-.range-row input{
-  width:100%;
-
-  accent-color:var(--cyan)
-}
-
-.range-value{
-  min-width:45px;
-
-  text-align:center;
-
-  color:var(--cyan2);
-
+.setting-row span{
   font-size:12px;
-
-  font-weight:850
+  color:#aebec7;
 }
 
 .setting-actions{
   display:flex;
-
-  gap:8px;
-
-  margin-top:6px
+  gap:5px;
 }
 
 .setting-actions button{
-  flex:1;
+  border:1px solid #263c49;
 
-  border:1px solid #28363b;
+  background:#101f29;
+  color:#dce8ed;
 
-  border-radius:11px;
+  border-radius:9px;
 
-  padding:11px;
+  padding:7px 10px;
 
-  background:#101619;
+  font-size:11px;
 
-  color:#edf4f6;
-
-  font-weight:800
+  cursor:pointer;
 }
 
-.setting-actions button.primary{
-  background:var(--cyan);
-
-  border-color:transparent;
-
-  color:#031015
+.setting-actions button.active{
+  background:#13abd2;
+  color:#031015;
+  border-color:#13abd2;
 }
 
+/* =========================================================
+   SIDE SCRUBBER
+========================================================= */
+
+/*
+  العجلة ليست جزءًا من تخطيط الصفحة.
+  هي Overlay فوق الصفحة بالكامل.
+*/
+
+.page-scrubber{
+  position:fixed;
+
+  top:60px;
+  right:0;
+  bottom:0;
+
+  z-index:90;
+
+  width:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  pointer-events:none;
+}
+
+/*
+  المنطقة الحساسة على الحافة.
+  تجعل الوصول للعجلة سهلًا دون أن تظهر بشكل مزعج.
+*/
+
+.scrubber-hitbox{
+  position:absolute;
+
+  top:0;
+  right:0;
+  bottom:0;
+
+  width:38px;
+
+  pointer-events:auto;
+}
+
+/*
+  العجلة نفسها.
+*/
+
+.scrubber{
+  position:absolute;
+
+  right:5px;
+
+  width:8px;
+  height:62vh;
+
+  min-height:190px;
+  max-height:680px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.055);
+
+  border:1px solid rgba(255,255,255,.035);
+
+  opacity:.16;
+
+  transition:
+    opacity .2s ease,
+    width .2s ease,
+    background .2s ease;
+
+  pointer-events:auto;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 0 15px rgba(0,0,0,.25);
+}
+
+.scrubber-hitbox:hover .scrubber,
+.scrubber:hover,
+.scrubber.active{
+  opacity:.72;
+  width:10px;
+
+  background:rgba(19,171,210,.42);
+}
+
+/*
+  المقبض.
+*/
+
+.scrubber-thumb{
+  position:absolute;
+
+  left:50%;
+
+  width:8px;
+  height:44px;
+
+  transform:translateX(-50%);
+
+  border-radius:999px;
+
+  background:#76e5fd;
+
+  box-shadow:
+    0 0 12px rgba(118,229,253,.4);
+
+  transition:top .08s linear;
+
+  pointer-events:none;
+}
+
+/*
+  أزرار البداية والنهاية.
+*/
+
+.scrubber-top,
+.scrubber-bottom{
+  position:absolute;
+
+  right:-1px;
+
+  width:28px;
+  height:28px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:50%;
+
+  background:rgba(9,20,29,.88);
+  border:1px solid rgba(118,229,253,.18);
+
+  color:#76e5fd;
+
+  font-size:13px;
+
+  opacity:0;
+
+  transform:translateX(5px);
+
+  transition:.2s ease;
+
+  cursor:pointer;
+
+  pointer-events:auto;
+}
+
+.scrubber-top{
+  top:-40px;
+}
+
+.scrubber-bottom{
+  bottom:-40px;
+}
+
+.scrubber-hitbox:hover .scrubber-top,
+.scrubber-hitbox:hover .scrubber-bottom,
+.scrubber.active ~ .scrubber-top,
+.scrubber.active ~ .scrubber-bottom{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/*
+  رقم الصفحة يظهر بجانب العجلة
+  فقط أثناء التفاعل.
+*/
+
+.scrubber-counter{
+  position:absolute;
+
+  right:18px;
+
+  top:50%;
+
+  transform:translateY(-50%);
+
+  padding:6px 9px;
+
+  border-radius:8px;
+
+  background:rgba(5,10,15,.9);
+  border:1px solid rgba(118,229,253,.15);
+
+  color:#dff8ff;
+
+  font-size:10px;
+
+  white-space:nowrap;
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:.2s ease;
+}
+
+.scrubber-hitbox:hover .scrubber-counter,
+.scrubber.active ~ .scrubber-counter{
+  opacity:1;
+}
 
 /* =========================================================
    END OF CHAPTER
-   يظهر فقط أسفل الفصل
 ========================================================= */
 
 .chapter-end{
-  width:min(
-    760px,
-    calc(100% - 24px)
-  );
+  width:min(700px,calc(100% - 28px));
 
-  margin:34px auto 0;
+  margin:70px auto 20px;
 
-  padding:28px 18px;
+  padding:35px 22px;
 
-  border:1px solid #202d32;
+  text-align:center;
 
-  border-radius:18px;
+  border:1px solid #243943;
+  border-radius:22px;
 
   background:
-    linear-gradient(
-      145deg,
-      #0b1012,
-      #080b0d
-    );
+    radial-gradient(
+      circle at 50% 0,
+      rgba(19,171,210,.12),
+      transparent 65%
+    ),
+    #09131b;
 
-  text-align:center
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.35);
 }
 
-.chapter-end .eyebrow{
-  color:var(--cyan2);
+.chapter-end h2{
+  margin:0 0 8px;
 
-  font-size:9px;
-
-  font-weight:900;
-
-  letter-spacing:.2em
-}
-
-.chapter-end h3{
-  margin:8px 0 4px;
-
-  font-size:18px
+  font-size:22px;
 }
 
 .chapter-end p{
-  margin:0 0 18px;
+  margin:0 0 22px;
 
-  color:#7e8c92;
+  color:#91a5af;
 
-  font-size:11px
+  font-size:13px;
 }
 
 .chapter-end-actions{
   display:flex;
-
-  gap:8px;
-
   justify-content:center;
 
-  flex-wrap:wrap
+  gap:8px;
+  flex-wrap:wrap;
 }
 
-.chapter-end button{
-  border:1px solid #2b383d;
+.chapter-end-actions button{
+  border:1px solid #29414e;
 
-  background:#101619;
+  background:#122632;
 
-  color:#e8eff1;
+  color:#fff;
 
   border-radius:11px;
 
-  padding:10px 14px;
-
-  font-weight:800
-}
-
-.chapter-end button.primary{
-  background:var(--cyan);
-
-  border-color:transparent;
-
-  color:#031015
-}
-
-.chapter-end button:disabled{
-  opacity:.45
-}
-
-
-/* =========================================================
-   TOOLBAR
-   PERMANENT — NO HIDE FEATURE
-========================================================= */
-
-body.toolbar-hidden .bar{
-  display:grid!important;
-  visibility:visible!important;
-  opacity:1!important;
-  transform:none!important;
-  pointer-events:auto!important
-}
-
-.toolbar-recovery{
-  display:none;
-
-  position:fixed;
-
-  top:10px;
-  right:10px;
-
-  z-index:9999;
-
-  border:1px solid #2b3940;
-
-  background:#0a0f11ee;
-
-  color:#76e5fd;
-
-  border-radius:11px;
-
-  padding:9px 12px;
-
-  font-weight:800;
-
-  box-shadow:0 15px 45px #000b
-}
-
-
-/* =========================================================
-   PAGE WHEEL
-========================================================= */
-
-.page-wheel{
-  position:fixed;
-
-  right:10px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  z-index:95;
-
-  width:34px;
-
-  height:min(46vh,430px);
-
-  min-height:220px;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  padding:7px 0;
-
-  border:1px solid #26363c;
-
-  border-radius:18px;
-
-  background:#080d0ff0;
-
-  backdrop-filter:blur(16px);
-
-  -webkit-backdrop-filter:blur(16px);
-
-  box-shadow:0 18px 55px #000a
-}
-
-.wheel-btn{
-  width:27px;
-  height:27px;
-
-  border:1px solid #26363c;
-
-  border-radius:50%;
-
-  background:#0d1417;
-
-  color:#dfe9ec;
-
-  font-size:13px;
-
-  line-height:1;
-
-  display:grid;
-
-  place-items:center;
-
-  padding:0;
-
-  transition:.18s
-}
-
-.wheel-btn:hover,
-.wheel-btn:focus-visible{
-  border-color:#13abd277;
-
-  color:var(--cyan2);
-
-  outline:none;
-
-  box-shadow:0 0 18px #13abd222
-}
-
-.wheel-track{
-  position:relative;
-
-  flex:1;
-
-  width:12px;
-
-  margin:6px 0;
+  padding:10px 15px;
 
   cursor:pointer;
 
-  border:1px solid #223238;
-
-  border-radius:999px;
-
-  background:#0c1316;
-
-  box-shadow:
-    inset 0 0 0 1px #0008;
-
-  touch-action:none
+  transition:.2s ease;
 }
 
-.wheel-fill{
-  position:absolute;
-
-  left:2px;
-  right:2px;
-
-  bottom:2px;
-
-  height:0;
-
-  border-radius:999px;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(--cyan2),
-      var(--cyan)
-    );
-
-  box-shadow:0 0 12px #13abd255;
-
-  pointer-events:none
+.chapter-end-actions button:hover{
+  background:#13abd2;
+  color:#031015;
+  border-color:#13abd2;
 }
-
-.wheel-thumb{
-  position:absolute;
-
-  left:50%;
-  top:2px;
-
-  transform:
-    translate(-50%,-50%);
-
-  width:22px;
-  height:22px;
-
-  border-radius:50%;
-
-  border:2px solid #76e5fd;
-
-  background:#081014;
-
-  box-shadow:
-    0 0 0 4px #13abd21c,
-    0 4px 18px #000b;
-
-  cursor:grab;
-
-  touch-action:none;
-
-  z-index:2
-}
-
-.wheel-thumb:active{
-  cursor:grabbing;
-
-  transform:
-    translate(-50%,-50%)
-    scale(1.08)
-}
-
-.wheel-percent{
-  position:absolute;
-
-  right:40px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  min-width:48px;
-
-  padding:5px 7px;
-
-  border:1px solid #26363c;
-
-  border-radius:8px;
-
-  background:#080d0ff5;
-
-  color:#76e5fd;
-
-  font-size:10px;
-
-  font-weight:900;
-
-  text-align:center;
-
-  opacity:0;
-
-  pointer-events:none;
-
-  transition:.15s
-}
-
-.page-wheel:hover .wheel-percent,
-.page-wheel.dragging .wheel-percent{
-  opacity:1
-}
-
 
 /* =========================================================
-   ANIMATIONS / MOBILE
+   BOTTOM CONTROL
 ========================================================= */
 
-@keyframes spin{
-  to{
-    transform:rotate(360deg)
-  }
+.bottom{
+  position:fixed;
+
+  bottom:14px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  z-index:110;
+
+  background:rgba(12,26,37,.92);
+
+  border:1px solid #28404f;
+
+  border-radius:16px;
+
+  padding:7px;
+
+  display:flex;
+  gap:7px;
+  align-items:center;
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 
-@media(max-width:650px){
+.bottom button{
+  background:#18303f;
+
+  color:#fff;
+
+  border:0;
+
+  border-radius:10px;
+
+  padding:8px 12px;
+
+  cursor:pointer;
+}
+
+.bottom span{
+  font-size:11px;
+
+  color:#b9cbd5;
+
+  min-width:90px;
+
+  text-align:center;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:700px){
 
   .bar{
-    grid-template-columns:auto 1fr auto;
-
-    height:62px;
-
-    padding:7px 9px
+    height:56px;
+    padding:7px 9px;
   }
 
-  .brand-back{
-    padding:7px 8px
-  }
-
-  .brand-back span{
-    display:none
-  }
-
-  .brand-mark{
-    width:27px;
-    height:27px
+  .bar a,
+  .bar button{
+    padding:7px 9px;
   }
 
   .title span{
-    font-size:7px
+    max-width:30vw;
+    font-size:9px;
   }
 
   .title b{
+    max-width:30vw;
     font-size:12px;
-    max-width:52vw
   }
 
-  .icon-btn{
+  .page-scrubber{
+    top:56px;
     width:38px;
-    height:38px
   }
 
-  .reader{
-    min-height:calc(100vh - 62px);
-
-    padding-bottom:24px
+  .scrubber{
+    right:3px;
+    width:7px;
+    height:55vh;
   }
 
-  .chapter-jump{
-    bottom:73px
+  .scrubber-thumb{
+    width:7px;
+    height:38px;
   }
 
-  .settings{
-    border-radius:18px;
-
-    padding:15px
+  .scrubber-counter{
+    right:15px;
   }
 
-  .settings-head h2{
-    font-size:18px
+  .bottom{
+    bottom:9px;
+    padding:6px;
   }
 
-  .page-wheel{
-    right:5px;
-
-    width:30px;
-
-    height:36vh;
-
-    min-height:190px
+  .bottom button{
+    padding:7px 10px;
   }
 
-  .wheel-btn{
-    width:24px;
-    height:24px;
-
-    font-size:12px
-  }
-
-  .wheel-thumb{
-    width:20px;
-    height:20px
-  }
-
-  .wheel-percent{
-    right:35px
-  }
-
-  .chapter-end{
-    width:
-      calc(100% - 18px);
-
-    padding:
-      24px 12px
-  }
 }
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+:fullscreen .bar{
+  display:none;
+}
+
+:fullscreen .reader{
+  min-height:100vh;
+}
+
+:fullscreen .page-scrubber{
+  top:0;
+}
+
+:fullscreen .settings-panel{
+  top:14px;
+}
+
 </style>
 </head>
 
@@ -1124,165 +744,115 @@ body.toolbar-hidden .bar{
 
 <header class="bar">
 
-  <a
-    class="brand-back"
-    href="index.html#chapters"
-  >
-    <img
-      class="brand-mark"
-      src="assets/vortex-mark-white.png"
-      alt=""
-    >
-
-    <span>الفصول</span>
+  <a href="index.html#chapters">
+    ‹ الفصول
   </a>
 
-
   <div class="title">
-
-    <span>
-      BORUTO — TWO BLUE VORTEX
-    </span>
-
-    <b id="chapterTitle">
-      جاري التحميل...
-    </b>
-
+    <span>بوروتو: دوامتان زرقاوتان</span>
+    <b id="chapterTitle">جاري التحميل...</b>
   </div>
-
 
   <div class="controls">
-
-    <button
-      class="icon-btn"
-      id="chapterMenu"
-      aria-label="قائمة الفصول"
-      title="قائمة الفصول"
-    >
-      ☷
-    </button>
-
-    <button
-      class="icon-btn"
-      id="settingsBtn"
-      aria-label="إعدادات القراءة"
-      title="إعدادات القراءة"
-    >
-      ⚙
-    </button>
-
-    <button
-      class="icon-btn"
-      id="full"
-      aria-label="ملء الشاشة"
-      title="ملء الشاشة"
-    >
-      ⛶
-    </button>
-
-  </div>
-
-
-  <div class="progress">
-    <i id="progressBar"></i>
+    <button id="settingsBtn" aria-label="إعدادات القراءة">⚙</button>
+    <button id="full" aria-label="ملء الشاشة">⛶</button>
   </div>
 
 </header>
 
 
-<main
-  id="reader"
-  class="reader"
->
+<main id="reader" class="reader">
+
   <div class="status">
     جاري تحميل الصفحات...
   </div>
+
 </main>
 
 
-<!-- ======================================================
-     CHAPTER SELECT
+<!-- =======================================================
+     SIDE SCRUBBER
 ======================================================= -->
 
-<div
-  id="chapterJump"
-  class="chapter-jump"
-  aria-hidden="true"
->
+<div class="page-scrubber">
 
-  <select
-    id="chapterSelect"
-    aria-label="اختيار الفصل"
-  ></select>
+  <div id="scrubberHitbox" class="scrubber-hitbox">
 
-  <small>
-    اختر فصلًا للانتقال إليه مباشرة
-  </small>
+    <div id="scrubber" class="scrubber">
 
-</div>
-
-
-<!-- ======================================================
-     SETTINGS
-======================================================= -->
-
-<div
-  id="settingsBackdrop"
-  class="settings-backdrop"
-></div>
-
-
-<section
-  id="settings"
-  class="settings"
-  aria-label="إعدادات القراءة"
->
-
-  <div class="settings-head">
-
-    <div>
-
-      <h2>
-        إعدادات القراءة
-      </h2>
-
-      <p>
-        خصص طريقة عرض الفصل كما تريد.
-      </p>
+      <div id="scrubberThumb" class="scrubber-thumb"></div>
 
     </div>
 
     <button
-      id="closeSettings"
-      class="close"
-      aria-label="إغلاق"
+      id="scrubberTop"
+      class="scrubber-top"
+      aria-label="العودة إلى أول صفحة"
     >
+      ↑
+    </button>
+
+    <button
+      id="scrubberBottom"
+      class="scrubber-bottom"
+      aria-label="الانتقال إلى آخر صفحة"
+    >
+      ↓
+    </button>
+
+    <div
+      id="scrubberCounter"
+      class="scrubber-counter"
+    >
+      1 / 1
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =======================================================
+     READING SETTINGS
+======================================================= -->
+
+<div
+  id="settingsPanel"
+  class="settings-panel"
+>
+
+  <div class="settings-title">
+
+    <strong>
+      إعدادات القراءة
+    </strong>
+
+    <button id="closeSettings">
       ×
     </button>
 
   </div>
 
 
-  <div class="setting">
+  <div class="setting-row">
 
-    <label>
-      طريقة القراءة
-    </label>
+    <span>
+      طريقة العرض
+    </span>
 
-    <div class="choices">
+    <div class="setting-actions">
 
       <button
-        class="choice active"
-        data-mode="vertical"
+        id="verticalBtn"
+        class="active"
       >
         عمودي
       </button>
 
       <button
-        class="choice"
-        data-mode="single"
+        id="singleBtn"
       >
-        صفحة واحدة
+        صفحة
       </button>
 
     </div>
@@ -1290,158 +860,48 @@ body.toolbar-hidden .bar{
   </div>
 
 
-  <div class="setting">
+  <div class="setting-row">
 
-    <label>
+    <span>
       عرض الصفحة
-    </label>
-
-    <div class="range-row">
-
-      <input
-        id="widthRange"
-        type="range"
-        min="70"
-        max="100"
-        value="100"
-      >
-
-      <span
-        id="widthValue"
-        class="range-value"
-      >
-        100%
-      </span>
-
-    </div>
-
-    <p class="setting-note">
-      يمكنك تقليل عرض الصفحات إذا أردت مساحة أكبر حولها.
-    </p>
-
-  </div>
-
-
-  <div class="setting">
-
-    <label>
-      الخلفية
-    </label>
-
-    <div class="choices">
-
-      <button
-        class="choice active"
-        data-bg="black"
-      >
-        سوداء
-      </button>
-
-      <button
-        class="choice"
-        data-bg="dark"
-      >
-        داكنة
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div class="setting">
+    </span>
 
     <div class="setting-actions">
 
-      <button
-        id="resetSettings"
-      >
-        إعادة الضبط
+      <button id="fitBtn">
+        مناسب
       </button>
 
-      <button
-        id="doneSettings"
-        class="primary"
-      >
-        تم
+      <button id="originalBtn">
+        أصلي
       </button>
 
     </div>
 
   </div>
 
-</section>
+</div>
 
 
-<!-- ======================================================
-     PAGE WHEEL
+<!-- =======================================================
+     BOTTOM CONTROLS
 ======================================================= -->
 
-<aside
-  id="pageWheel"
-  class="page-wheel"
-  aria-label="التنقل السريع بين صفحات الفصل"
->
+<div class="bottom">
 
-  <button
-    id="wheelTop"
-    class="wheel-btn"
-    title="أول صفحة"
-    aria-label="أول صفحة"
-  >
-    ↑
+  <button id="prev">
+    السابق
   </button>
 
+  <span id="counter">
+    —
+  </span>
 
-  <div
-    id="wheelTrack"
-    class="wheel-track"
-    role="slider"
-    tabindex="0"
-    aria-label="التنقل بين صفحات الفصل"
-    aria-valuemin="1"
-    aria-valuemax="1"
-    aria-valuenow="1"
-  >
-
-    <div
-      id="wheelFill"
-      class="wheel-fill"
-    ></div>
-
-    <div
-      id="wheelThumb"
-      class="wheel-thumb"
-    ></div>
-
-    <span
-      id="wheelPercent"
-      class="wheel-percent"
-    >
-      0%
-    </span>
-
-  </div>
-
-
-  <button
-    id="wheelBottom"
-    class="wheel-btn"
-    title="آخر صفحة"
-    aria-label="آخر صفحة"
-  >
-    ↓
+  <button id="next">
+    التالي
   </button>
 
-</aside>
-
-
-<button
-  id="toolbarRecovery"
-  class="toolbar-recovery"
->
-  إظهار شريط القراءة
-</button>
+</div>
 
 
 <script>
@@ -1464,32 +924,6 @@ const db =
 
 
 /* =========================================================
-   HELPERS
-========================================================= */
-
-const $ =
-  id =>
-    document.getElementById(id);
-
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(
-      /[&<>"']/g,
-      m => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[m])
-    );
-
-}
-
-
-/* =========================================================
    URL
 ========================================================= */
 
@@ -1509,16 +943,60 @@ let index = 0;
 
 let mode = "vertical";
 
-let chapters = [];
+let scrubberDragging = false;
 
-let currentChapter = null;
-
-let currentChapterIndex = -1;
+let scrubberTimer = null;
 
 
 /* =========================================================
-   STORAGE URL
+   HELPERS
 ========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      m => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[m])
+    );
+
+}
+
+
+function isUUID(value){
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    .test(
+      String(value || "").trim()
+    );
+
+}
+
+
+function safeNumber(value,index){
+
+  const n =
+    Number(value);
+
+  if(
+    Number.isFinite(n) &&
+    n > 0
+  ){
+
+    return n;
+
+  }
+
+  return index + 1;
+
+}
+
 
 function publicUrl(path){
 
@@ -1545,360 +1023,72 @@ function publicUrl(path){
 
 
 /* =========================================================
-   SETTINGS
-========================================================= */
-
-function saveSettings(){
-
-  localStorage.setItem(
-    "vortexReaderSettings",
-    JSON.stringify({
-
-      mode,
-
-      width:
-        Number(
-          $("widthRange").value
-        ) || 100,
-
-      bg:
-        document.body.dataset.bg ||
-        "black"
-
-    })
-  );
-
-}
-
-
-function loadSettings(){
-
-  try{
-
-    const saved =
-      JSON.parse(
-        localStorage.getItem(
-          "vortexReaderSettings"
-        ) || "{}"
-      );
-
-
-    setWidth(
-      saved.width ?? 100,
-      false
-    );
-
-
-    setBg(
-      saved.bg || "black",
-      false
-    );
-
-
-    setMode(
-      saved.mode || "vertical",
-      false
-    );
-
-
-  }catch{
-
-    setMode(
-      "vertical",
-      false
-    );
-
-    setWidth(
-      100,
-      false
-    );
-
-    setBg(
-      "black",
-      false
-    );
-
-  }
-
-}
-
-
-function setWidth(
-  value,
-  save = true
-){
-
-  value =
-    Math.max(
-      70,
-      Math.min(
-        100,
-        Number(value) || 100
-      )
-    );
-
-
-  $("widthRange").value =
-    value;
-
-
-  $("widthValue").textContent =
-    value + "%";
-
-
-  document.documentElement.style
-    .setProperty(
-      "--reader-width",
-      value + "%"
-    );
-
-
-  if(save){
-    saveSettings();
-  }
-
-}
-
-
-function setBg(
-  value,
-  save = true
-){
-
-  document.body.dataset.bg =
-    value;
-
-
-  document.documentElement.style
-    .setProperty(
-      "--bg",
-      value === "dark"
-        ? "#090d0f"
-        : "#050708"
-    );
-
-
-  document
-    .querySelectorAll(
-      "[data-bg]"
-    )
-    .forEach(
-      button =>
-        button.classList.toggle(
-          "active",
-          button.dataset.bg === value
-        )
-    );
-
-
-  if(save){
-    saveSettings();
-  }
-
-}
-
-
-function setMode(
-  value,
-  save = true
-){
-
-  mode =
-    value === "single"
-      ? "single"
-      : "vertical";
-
-
-  document.body.classList.toggle(
-    "single",
-    mode === "single"
-  );
-
-
-  document
-    .querySelectorAll(
-      "[data-mode]"
-    )
-    .forEach(
-      button =>
-        button.classList.toggle(
-          "active",
-          button.dataset.mode === mode
-        )
-    );
-
-
-  render(false);
-
-
-  if(save){
-    saveSettings();
-  }
-
-}
-
-
-/* =========================================================
-   CHAPTER LIST
-========================================================= */
-
-function populateChapterSelect(){
-
-  const select =
-    $("chapterSelect");
-
-  select.innerHTML = "";
-
-
-  chapters.forEach(
-    (chapter, i) => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-
-      option.value =
-        chapter.number;
-
-
-      option.textContent =
-        `الفصل ${chapter.number}${
-          chapter.title
-            ? " — " + chapter.title
-            : ""
-        }`;
-
-
-      if(
-        i ===
-        currentChapterIndex
-      ){
-
-        option.selected =
-          true;
-
-      }
-
-
-      select.appendChild(
-        option
-      );
-
-    }
-  );
-
-}
-
-
-function goToChapter(
-  number
-){
-
-  if(number == null){
-    return;
-  }
-
-
-  location.href =
-    `reader.html?chapter=${
-      encodeURIComponent(number)
-    }`;
-
-}
-
-
-async function loadChapters(){
-
-  const result =
-    await db
-      .from("chapters")
-      .select(
-        "id,number,title,published_at"
-      )
-      .order(
-        "number",
-        {
-          ascending:true
-        }
-      );
-
-
-  if(result.error){
-
-    throw new Error(
-      "تعذر تحميل قائمة الفصول: " +
-      result.error.message
-    );
-
-  }
-
-
-  chapters =
-    result.data || [];
-
-
-  currentChapterIndex =
-    chapters.findIndex(
-      chapter =>
-        Number(chapter.number) ===
-        Number(requested)
-    );
-
-
-  populateChapterSelect();
-
-}
-
-
-/* =========================================================
    INIT
 ========================================================= */
 
 async function init(){
 
   const reader =
-    $("reader");
-
-
-  loadSettings();
-
+    document.getElementById(
+      "reader"
+    );
 
   try{
 
     if(!requested){
 
       throw new Error(
-        "رقم الفصل غير موجود في الرابط. افتح الفصل من قائمة الفصول."
+        "معرّف الفصل غير موجود في الرابط."
       );
 
     }
 
 
-    const number =
-      Number(requested);
+    const chapterId =
+      String(
+        requested
+      ).trim();
 
 
-    if(
-      !Number.isInteger(number) ||
-      number < 1
-    ){
-
-      throw new Error(
-        "رقم الفصل غير صالح: " +
-        escapeHtml(requested)
-      );
-
-    }
+    let chapterResult;
 
 
-    const [
-      chapterQuery
-    ] =
-      await Promise.all([
+    if(isUUID(chapterId)){
 
-        db
+      chapterResult =
+        await db
+          .from("chapters")
+          .select(
+            "id,number,title,published_at"
+          )
+          .eq(
+            "id",
+            chapterId
+          )
+          .maybeSingle();
+
+    }else{
+
+      const number =
+        Number(
+          chapterId
+        );
+
+
+      if(
+        !Number.isInteger(number) ||
+        number < 1
+      ){
+
+        throw new Error(
+          "معرّف الفصل غير صالح."
+        );
+
+      }
+
+
+      chapterResult =
+        await db
           .from("chapters")
           .select(
             "id,number,title,published_at"
@@ -1907,64 +1097,54 @@ async function init(){
             "number",
             number
           )
-          .maybeSingle(),
+          .maybeSingle();
 
-        loadChapters()
-
-      ]);
+    }
 
 
-    if(
-      chapterQuery.error
-    ){
+    if(chapterResult.error){
 
       throw new Error(
         "فشل قراءة الفصل: " +
-        chapterQuery.error.message
+        chapterResult.error.message
       );
 
     }
 
 
-    if(
-      !chapterQuery.data
-    ){
+    if(!chapterResult.data){
 
       throw new Error(
-        "لم يتم العثور على الفصل رقم " +
-        number +
-        "."
+        "لم يتم العثور على الفصل المطلوب."
       );
 
     }
 
 
-    currentChapter =
-      chapterQuery.data;
+    const chapter =
+      chapterResult.data;
 
 
-    currentChapterIndex =
-      chapters.findIndex(
-        chapter =>
-          Number(chapter.number) ===
-          Number(number)
+    const numberText =
+      safeNumber(
+        chapter.number,
+        0
       );
 
 
-    $("chapterTitle")
+    document
+      .getElementById(
+        "chapterTitle"
+      )
       .textContent =
-        `الفصل ${currentChapter.number}${
-          currentChapter.title
-            ? " — " +
-              currentChapter.title
-            : ""
-        }`;
+        `الفصل ${numberText} — ${chapter.title || ""}`;
 
 
-    populateChapterSelect();
+    /* =====================================================
+       LOAD PAGES
+    ===================================================== */
 
-
-    const pages =
+    const pagesResult =
       await db
         .from("pages")
         .select(
@@ -1972,7 +1152,7 @@ async function init(){
         )
         .eq(
           "chapter_id",
-          currentChapter.id
+          chapter.id
         )
         .order(
           "page_number",
@@ -1982,19 +1162,25 @@ async function init(){
         );
 
 
-    if(pages.error){
+    if(pagesResult.error){
 
       throw new Error(
-        "تم العثور على الفصل، لكن تعذر قراءة جدول الصفحات: " +
-        pages.error.message
+        "تم العثور على الفصل، لكن تعذر قراءة الصفحات: " +
+        pagesResult.error.message
       );
 
     }
 
 
-    if(
-      !pages.data?.length
-    ){
+    const pageRows =
+      Array.isArray(
+        pagesResult.data
+      )
+        ? pagesResult.data
+        : [];
+
+
+    if(!pageRows.length){
 
       throw new Error(
         "الفصل موجود، لكن لا توجد صفحات مسجلة له."
@@ -2004,39 +1190,61 @@ async function init(){
 
 
     images =
-      pages.data.map(
-        page => ({
+      pageRows
+        .filter(
+          p =>
+            p &&
+            p.storage_path
+        )
+        .map(
+          (p,i) => ({
 
-          page:
-            page.page_number,
+            page:
+              safeNumber(
+                p.page_number,
+                i
+              ),
 
-          path:
-            page.storage_path,
+            path:
+              String(
+                p.storage_path
+              ),
 
-          url:
-            publicUrl(
-              page.storage_path
-            )
+            url:
+              publicUrl(
+                p.storage_path
+              )
 
-        })
+          })
+        );
+
+
+    if(!images.length){
+
+      throw new Error(
+        "تم العثور على الصفحات، لكن مسارات الصور فارغة."
       );
 
-
-    render(true);
-
-    updateProgress();
+    }
 
 
-    window.addEventListener(
-      "scroll",
-      updateProgress,
-      {
-        passive:true
-      }
+    images.sort(
+      (a,b) =>
+        a.page - b.page
     );
 
 
+    render();
+
+    updateScrubber();
+
   }catch(error){
+
+    console.error(
+      "Reader error:",
+      error
+    );
+
 
     reader.innerHTML = `
 
@@ -2066,24 +1274,18 @@ async function init(){
    RENDER
 ========================================================= */
 
-function render(
-  resetIndex = true
-){
+function render(){
 
   const reader =
-    $("reader");
-
-
-  if(!images.length){
-    return;
-  }
-
+    document.getElementById(
+      "reader"
+    );
 
   reader.innerHTML = "";
 
 
   images.forEach(
-    (page, i) => {
+    (page,i) => {
 
       const wrap =
         document.createElement(
@@ -2095,14 +1297,14 @@ function render(
         "page-wrap";
 
 
-      wrap.dataset.index =
-        i;
-
-
       const img =
         document.createElement(
           "img"
         );
+
+
+      img.className =
+        "manga-page";
 
 
       img.src =
@@ -2114,7 +1316,7 @@ function render(
 
 
       img.loading =
-        i < 2
+        i < 3
           ? "eager"
           : "lazy";
 
@@ -2127,6 +1329,10 @@ function render(
         "no-referrer";
 
 
+      img.dataset.pageIndex =
+        String(i);
+
+
       img.onerror =
         () => {
 
@@ -2135,13 +1341,17 @@ function render(
             <div class="status error">
 
               تعذر تحميل الصفحة
-              ${escapeHtml(page.page)}
+              ${escapeHtml(
+                page.page
+              )}
 
               <br>
 
               <small>
                 المسار:
-                ${escapeHtml(page.path)}
+                ${escapeHtml(
+                  page.path
+                )}
               </small>
 
             </div>
@@ -2155,7 +1365,6 @@ function render(
         img
       );
 
-
       reader.appendChild(
         wrap
       );
@@ -2164,31 +1373,92 @@ function render(
   );
 
 
-  if(
-    mode === "single"
-  ){
+  /*
+   * نهاية الفصل
+   */
 
-    index =
-      resetIndex
-        ? 0
-        : Math.min(
-            index,
-            images.length - 1
-          );
+  const end =
+    document.createElement(
+      "section"
+    );
 
+  end.className =
+    "chapter-end";
+
+  end.innerHTML = `
+
+    <h2>
+      انتهى الفصل
+    </h2>
+
+    <p>
+      وصلت إلى نهاية الفصل الحالي.
+    </p>
+
+    <div class="chapter-end-actions">
+
+      <button
+        id="endTop"
+      >
+        العودة إلى البداية
+      </button>
+
+      <button
+        id="endChapters"
+      >
+        قائمة الفصول
+      </button>
+
+    </div>
+
+  `;
+
+  reader.appendChild(
+    end
+  );
+
+
+  document
+    .getElementById(
+      "endTop"
+    )
+    .onclick = () => {
+
+      window.scrollTo({
+        top:0,
+        behavior:"smooth"
+      });
+
+    };
+
+
+  document
+    .getElementById(
+      "endChapters"
+    )
+    .onclick = () => {
+
+      location.href =
+        "index.html#chapters";
+
+    };
+
+
+  document
+    .getElementById(
+      "counter"
+    )
+    .textContent =
+      `${images.length} صفحة`;
+
+
+  if(mode === "single"){
 
     setSingle(
-      index
+      0
     );
 
   }
-
-
-  addChapterEnd();
-
-  updateProgress();
-
-  updatePageWheel();
 
 }
 
@@ -2197,761 +1467,138 @@ function render(
    SINGLE PAGE
 ========================================================= */
 
-function setSingle(
-  value
-){
+function setSingle(i){
+
+  if(!images.length){
+    return;
+  }
+
 
   index =
     Math.max(
       0,
       Math.min(
         images.length - 1,
-        value
+        i
       )
     );
 
 
   document
     .querySelectorAll(
-      ".page-wrap"
+      ".reader img"
     )
     .forEach(
-      (element, number) => {
+      (img,n) => {
 
-        element.classList.toggle(
+        img.classList.toggle(
           "active",
-          number === index
+          n === index
         );
 
       }
     );
 
+
+  document
+    .getElementById(
+      "counter"
+    )
+    .textContent =
+      `${index + 1} / ${images.length}`;
+
+
+  updateScrubber();
+
+}
+
+
+/* =========================================================
+   NEXT / PREVIOUS
+========================================================= */
+
+document
+  .getElementById(
+    "next"
+  )
+  .onclick = () => {
+
+    if(mode === "single"){
+
+      if(
+        index <
+        images.length - 1
+      ){
+
+        setSingle(
+          index + 1
+        );
+
+      }else{
+
+        scrollToEnd();
+
+      }
+
+    }else{
+
+      window.scrollBy({
+        top:
+          window.innerHeight * .85,
+        behavior:
+          "smooth"
+      });
+
+    }
+
+  };
+
+
+document
+  .getElementById(
+    "prev"
+  )
+  .onclick = () => {
+
+    if(mode === "single"){
+
+      if(index > 0){
+
+        setSingle(
+          index - 1
+        );
+
+      }else{
+
+        window.scrollTo({
+          top:0,
+          behavior:"smooth"
+        });
+
+      }
+
+    }else{
+
+      window.scrollBy({
+        top:
+          -window.innerHeight * .85,
+        behavior:
+          "smooth"
+      });
+
+    }
+
+  };
+
+
+function scrollToEnd(){
 
   window.scrollTo({
-    top:0,
-    behavior:"smooth"
+    top:
+      document.documentElement.scrollHeight,
+    behavior:
+      "smooth"
   });
-
-
-  updateProgress();
-
-  updatePageWheel();
-
-}
-
-
-/* =========================================================
-   END OF CHAPTER
-========================================================= */
-
-function addChapterEnd(){
-
-  const end =
-    document.createElement(
-      "section"
-    );
-
-
-  end.className =
-    "chapter-end";
-
-
-  const previousExists =
-    currentChapterIndex > 0;
-
-
-  const nextExists =
-    currentChapterIndex >= 0 &&
-    currentChapterIndex <
-      chapters.length - 1;
-
-
-  end.innerHTML = `
-
-    <div class="eyebrow">
-      END OF CHAPTER
-    </div>
-
-    <h3>
-      نهاية الفصل
-      ${escapeHtml(
-        currentChapter?.number ?? ""
-      )}
-    </h3>
-
-    <p>
-      يمكنك متابعة القراءة مباشرة من هنا.
-    </p>
-
-    <div class="chapter-end-actions">
-
-      <button
-        id="endPrev"
-        ${
-          previousExists
-            ? ""
-            : "disabled"
-        }
-      >
-        ${
-          previousExists
-            ? "‹ الفصل السابق"
-            : "لا يوجد فصل سابق"
-        }
-      </button>
-
-
-      <button
-        id="endList"
-        class="primary"
-      >
-        قائمة الفصول
-      </button>
-
-
-      <button
-        id="endNext"
-        class="primary"
-        ${
-          nextExists
-            ? ""
-            : "disabled"
-        }
-      >
-        ${
-          nextExists
-            ? "الفصل التالي ›"
-            : "لا يوجد فصل تالي"
-        }
-      </button>
-
-    </div>
-
-  `;
-
-
-  $("reader")
-    .appendChild(
-      end
-    );
-
-
-  $("endPrev").onclick =
-    () => {
-
-      if(
-        previousExists
-      ){
-
-        goToChapter(
-          chapters[
-            currentChapterIndex - 1
-          ].number
-        );
-
-      }
-
-    };
-
-
-  $("endNext").onclick =
-    () => {
-
-      if(
-        nextExists
-      ){
-
-        goToChapter(
-          chapters[
-            currentChapterIndex + 1
-          ].number
-        );
-
-      }
-
-    };
-
-
-  $("endList").onclick =
-    openChapterMenu;
-
-}
-
-
-/* =========================================================
-   PAGE WHEEL
-========================================================= */
-
-function updatePageWheel(){
-
-  const track =
-    $("wheelTrack");
-
-  const thumb =
-    $("wheelThumb");
-
-  const fill =
-    $("wheelFill");
-
-  const percent =
-    $("wheelPercent");
-
-
-  if(
-    !track ||
-    !thumb ||
-    !fill
-  ){
-
-    return;
-
-  }
-
-
-  let value = 0;
-
-
-  if(
-    mode === "single"
-  ){
-
-    value =
-      images.length > 1
-        ? (
-            index /
-            (images.length - 1)
-          ) * 100
-        : 0;
-
-
-    track.setAttribute(
-      "aria-valuemax",
-      String(
-        Math.max(
-          images.length,
-          1
-        )
-      )
-    );
-
-
-    track.setAttribute(
-      "aria-valuenow",
-      String(
-        Math.min(
-          index + 1,
-          Math.max(
-            images.length,
-            1
-          )
-        )
-      )
-    );
-
-  }else{
-
-    const max =
-      document.documentElement
-        .scrollHeight -
-      window.innerHeight;
-
-
-    value =
-      max > 0
-        ? (
-            window.scrollY /
-            max
-          ) * 100
-        : 0;
-
-
-    const page =
-      Math.min(
-        images.length,
-        Math.max(
-          1,
-          Math.round(
-            (
-              value / 100
-            ) *
-            Math.max(
-              images.length - 1,
-              0
-            )
-          ) + 1
-        )
-      );
-
-
-    track.setAttribute(
-      "aria-valuemax",
-      String(
-        Math.max(
-          images.length,
-          1
-        )
-      )
-    );
-
-
-    track.setAttribute(
-      "aria-valuenow",
-      String(page)
-    );
-
-  }
-
-
-  value =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        value
-      )
-    );
-
-
-  const usable =
-    track.clientHeight - 4;
-
-
-  thumb.style.top =
-    (
-      usable *
-      (value / 100)
-      + 2
-    ) + "px";
-
-
-  fill.style.height =
-    Math.max(
-      0,
-      usable *
-      (value / 100)
-    ) + "px";
-
-
-  if(percent){
-
-    percent.textContent =
-      Math.round(value) +
-      "%";
-
-  }
-
-}
-
-
-function wheelScrollToPercent(
-  value
-){
-
-  value =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        Number(value) || 0
-      )
-    );
-
-
-  if(
-    mode === "single"
-  ){
-
-    setSingle(
-      Math.round(
-        (
-          value / 100
-        ) *
-        Math.max(
-          images.length - 1,
-          0
-        )
-      )
-    );
-
-  }else{
-
-    const max =
-      document.documentElement
-        .scrollHeight -
-      window.innerHeight;
-
-
-    window.scrollTo({
-      top:
-        max *
-        (value / 100),
-
-      behavior:
-        "smooth"
-    });
-
-  }
-
-
-  updatePageWheel();
-
-}
-
-
-function wheelPercentFromClientY(
-  clientY
-){
-
-  const track =
-    $("wheelTrack");
-
-
-  if(!track){
-    return 0;
-  }
-
-
-  const rect =
-    track.getBoundingClientRect();
-
-
-  return (
-    (
-      clientY -
-      rect.top
-    ) /
-    Math.max(
-      rect.height,
-      1
-    )
-  ) * 100;
-
-}
-
-
-function startWheelDrag(
-  event
-){
-
-  event.preventDefault();
-
-
-  $("pageWheel")
-    .classList.add(
-      "dragging"
-    );
-
-
-  const move =
-    event => {
-
-      const point =
-        event.touches?.[0] ||
-        event;
-
-
-      wheelScrollToPercent(
-        wheelPercentFromClientY(
-          point.clientY
-        )
-      );
-
-    };
-
-
-  const end =
-    () => {
-
-      $("pageWheel")
-        .classList.remove(
-          "dragging"
-        );
-
-
-      window.removeEventListener(
-        "pointermove",
-        move
-      );
-
-
-      window.removeEventListener(
-        "touchmove",
-        move
-      );
-
-    };
-
-
-  window.addEventListener(
-    "pointermove",
-    move,
-    {
-      passive:false
-    }
-  );
-
-
-  window.addEventListener(
-    "pointerup",
-    end,
-    {
-      once:true
-    }
-  );
-
-
-  window.addEventListener(
-    "touchmove",
-    move,
-    {
-      passive:false
-    }
-  );
-
-
-  window.addEventListener(
-    "touchend",
-    end,
-    {
-      once:true
-    }
-  );
-
-
-  const point =
-    event.touches?.[0] ||
-    event;
-
-
-  wheelScrollToPercent(
-    wheelPercentFromClientY(
-      point.clientY
-    )
-  );
-
-}
-
-
-function setupPageWheel(){
-
-  const track =
-    $("wheelTrack");
-
-  const thumb =
-    $("wheelThumb");
-
-
-  if(
-    !track ||
-    !thumb
-  ){
-
-    return;
-
-  }
-
-
-  track.addEventListener(
-    "pointerdown",
-    startWheelDrag
-  );
-
-
-  thumb.addEventListener(
-    "pointerdown",
-    startWheelDrag
-  );
-
-
-  track.addEventListener(
-    "keydown",
-    event => {
-
-      if(
-        event.key === "Home"
-      ){
-
-        event.preventDefault();
-
-        wheelScrollToPercent(
-          0
-        );
-
-      }else if(
-        event.key === "End"
-      ){
-
-        event.preventDefault();
-
-        wheelScrollToPercent(
-          100
-        );
-
-      }else if(
-        event.key === "ArrowUp" ||
-        event.key === "ArrowLeft"
-      ){
-
-        event.preventDefault();
-
-        wheelScrollToPercent(
-          currentWheelPercent() - 5
-        );
-
-      }else if(
-        event.key === "ArrowDown" ||
-        event.key === "ArrowRight"
-      ){
-
-        event.preventDefault();
-
-        wheelScrollToPercent(
-          currentWheelPercent() + 5
-        );
-
-      }
-
-    }
-  );
-
-
-  $("wheelTop").onclick =
-    () =>
-      wheelScrollToPercent(
-        0
-      );
-
-
-  $("wheelBottom").onclick =
-    () =>
-      wheelScrollToPercent(
-        100
-      );
-
-}
-
-
-function currentWheelPercent(){
-
-  if(
-    mode === "single"
-  ){
-
-    return images.length > 1
-      ? (
-          index /
-          (images.length - 1)
-        ) * 100
-      : 0;
-
-  }
-
-
-  const max =
-    document.documentElement
-      .scrollHeight -
-    window.innerHeight;
-
-
-  return max > 0
-    ? (
-        window.scrollY /
-        max
-      ) * 100
-    : 0;
-
-}
-
-
-/* =========================================================
-   PROGRESS
-========================================================= */
-
-function updateProgress(){
-
-  if(
-    mode === "single"
-  ){
-
-    const value =
-      (
-        (index + 1) /
-        Math.max(
-          images.length,
-          1
-        )
-      ) * 100;
-
-
-    $("progressBar")
-      .style.width =
-        value + "%";
-
-
-    updatePageWheel();
-
-    return;
-
-  }
-
-
-  const documentElement =
-    document.documentElement;
-
-
-  const max =
-    documentElement.scrollHeight -
-    window.innerHeight;
-
-
-  const value =
-    max > 0
-      ? (
-          window.scrollY /
-          max
-        ) * 100
-      : 0;
-
-
-  $("progressBar")
-    .style.width =
-      Math.max(
-        0,
-        Math.min(
-          100,
-          value
-        )
-      ) + "%";
-
-
-  updatePageWheel();
-
-}
-
-
-/* =========================================================
-   CHAPTER MENU
-========================================================= */
-
-function openChapterMenu(){
-
-  const menu =
-    $("chapterJump");
-
-
-  menu.classList.toggle(
-    "open"
-  );
-
-
-  menu.setAttribute(
-    "aria-hidden",
-    String(
-      !menu.classList.contains(
-        "open"
-      )
-    )
-  );
 
 }
 
@@ -2960,241 +1607,582 @@ function openChapterMenu(){
    SETTINGS
 ========================================================= */
 
-function closeSettings(){
-
-  $("settings")
-    .classList.remove(
-      "open"
-    );
-
-
-  $("settingsBackdrop")
-    .classList.remove(
-      "open"
-    );
-
-}
-
-
-function openSettings(){
-
-  $("settings")
-    .classList.add(
-      "open"
-    );
-
-
-  $("settingsBackdrop")
-    .classList.add(
-      "open"
-    );
-
-}
-
-
-/* =========================================================
-   TOOLBAR
-========================================================= */
-
-function forceToolbarVisible(){
-
-  document.body.classList.remove(
-    "toolbar-hidden"
+const settingsPanel =
+  document.getElementById(
+    "settingsPanel"
   );
 
-}
+document
+  .getElementById(
+    "settingsBtn"
+  )
+  .onclick = () => {
 
-
-/* =========================================================
-   EVENTS
-========================================================= */
-
-$("chapterMenu").onclick =
-  openChapterMenu;
-
-
-$("chapterSelect").onchange =
-  event =>
-    goToChapter(
-      event.target.value
+    settingsPanel.classList.toggle(
+      "open"
     );
-
-
-$("settingsBtn").onclick =
-  openSettings;
-
-
-$("closeSettings").onclick =
-  closeSettings;
-
-
-$("doneSettings").onclick =
-  () => {
-
-    saveSettings();
-
-    closeSettings();
-
-  };
-
-
-$("settingsBackdrop").onclick =
-  closeSettings;
-
-
-$("widthRange").oninput =
-  event =>
-    setWidth(
-      event.target.value
-    );
-
-
-$("resetSettings").onclick =
-  () => {
-
-    setMode(
-      "vertical",
-      false
-    );
-
-    setWidth(
-      100,
-      false
-    );
-
-    setBg(
-      "black",
-      false
-    );
-
-    saveSettings();
 
   };
 
 
 document
-  .querySelectorAll(
-    "[data-mode]"
+  .getElementById(
+    "closeSettings"
   )
-  .forEach(
-    button =>
-      button.onclick =
-        () =>
-          setMode(
-            button.dataset.mode
-          )
-  );
+  .onclick = () => {
 
-
-document
-  .querySelectorAll(
-    "[data-bg]"
-  )
-  .forEach(
-    button =>
-      button.onclick =
-        () =>
-          setBg(
-            button.dataset.bg
-          )
-  );
-
-
-$("full").onclick =
-  () => {
-
-    if(
-      document.fullscreenElement
-    ){
-
-      document.exitFullscreen?.();
-
-    }else{
-
-      document
-        .documentElement
-        .requestFullscreen?.();
-
-    }
+    settingsPanel.classList.remove(
+      "open"
+    );
 
   };
 
 
-/*
- * لا يوجد هنا أي زر أو وظيفة
- * للتنقل بين الفصول أثناء القراءة.
- *
- * الأسهم تعمل فقط مع عجلة الصفحات
- * من خلال واجهة التنقل الجانبية.
- */
+document
+  .getElementById(
+    "verticalBtn"
+  )
+  .onclick = () => {
 
-window.addEventListener(
-  "keydown",
-  event => {
+    mode =
+      "vertical";
 
-    if(
-      event.key === "Escape"
-    ){
+    document.body.classList.remove(
+      "single"
+    );
 
-      closeSettings();
+    document
+      .getElementById(
+        "verticalBtn"
+      )
+      .classList.add(
+        "active"
+      );
 
-      $("chapterJump")
-        .classList.remove(
-          "open"
-        );
+    document
+      .getElementById(
+        "singleBtn"
+      )
+      .classList.remove(
+        "active"
+      );
 
-    }
+    render();
 
-  }
-);
-
-
-document.addEventListener(
-  "click",
-  event => {
-
-    const menu =
-      $("chapterJump");
+  };
 
 
-    if(
-      menu.classList.contains(
-        "open"
-      ) &&
-      !menu.contains(
-        event.target
-      ) &&
-      event.target !==
-        $("chapterMenu")
-    ){
+document
+  .getElementById(
+    "singleBtn"
+  )
+  .onclick = () => {
 
-      menu.classList.remove(
-        "open"
+    mode =
+      "single";
+
+    document.body.classList.add(
+      "single"
+    );
+
+    document
+      .getElementById(
+        "singleBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "verticalBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+    render();
+
+  };
+
+
+/* =========================================================
+   FIT / ORIGINAL
+========================================================= */
+
+document
+  .getElementById(
+    "fitBtn"
+  )
+  .onclick = () => {
+
+    document.body.classList.remove(
+      "fit-original"
+    );
+
+  };
+
+
+document
+  .getElementById(
+    "originalBtn"
+  )
+  .onclick = () => {
+
+    document.body.classList.add(
+      "fit-original"
+    );
+
+  };
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+document
+  .getElementById(
+    "full"
+  )
+  .onclick = async () => {
+
+    try{
+
+      if(
+        !document.fullscreenElement
+      ){
+
+        await document.documentElement
+          .requestFullscreen();
+
+      }else{
+
+        await document.exitFullscreen();
+
+      }
+
+    }catch(error){
+
+      console.error(
+        "Fullscreen error:",
+        error
       );
 
     }
 
+  };
+
+
+/* =========================================================
+   SIDE SCRUBBER
+========================================================= */
+
+const scrubber =
+  document.getElementById(
+    "scrubber"
+  );
+
+const scrubberHitbox =
+  document.getElementById(
+    "scrubberHitbox"
+  );
+
+const scrubberThumb =
+  document.getElementById(
+    "scrubberThumb"
+  );
+
+const scrubberCounter =
+  document.getElementById(
+    "scrubberCounter"
+  );
+
+
+function updateScrubber(){
+
+  if(!images.length){
+    return;
+  }
+
+
+  let currentIndex =
+    index;
+
+
+  if(mode === "vertical"){
+
+    const maxScroll =
+      document.documentElement
+        .scrollHeight -
+      window.innerHeight;
+
+
+    if(maxScroll > 0){
+
+      const ratio =
+        window.scrollY /
+        maxScroll;
+
+      currentIndex =
+        Math.round(
+          ratio *
+          (images.length - 1)
+        );
+
+    }else{
+
+      currentIndex = 0;
+
+    }
+
+  }
+
+
+  const ratio =
+    images.length <= 1
+      ? 0
+      : currentIndex /
+        (images.length - 1);
+
+
+  const trackHeight =
+    scrubber.clientHeight;
+
+
+  const thumbHeight =
+    scrubberThumb.offsetHeight;
+
+
+  const maxTop =
+    Math.max(
+      0,
+      trackHeight -
+      thumbHeight
+    );
+
+
+  scrubberThumb.style.top =
+    `${ratio * maxTop}px`;
+
+
+  scrubberCounter.textContent =
+    `${currentIndex + 1} / ${images.length}`;
+
+}
+
+
+function activateScrubber(){
+
+  scrubber.classList.add(
+    "active"
+  );
+
+  clearTimeout(
+    scrubberTimer
+  );
+
+  scrubberTimer =
+    setTimeout(
+      () => {
+
+        if(!scrubberDragging){
+
+          scrubber.classList.remove(
+            "active"
+          );
+
+        }
+
+      },
+      1800
+    );
+
+}
+
+
+function seekFromPointer(clientY){
+
+  const rect =
+    scrubber.getBoundingClientRect();
+
+
+  const thumbHeight =
+    scrubberThumb.offsetHeight;
+
+
+  const usable =
+    Math.max(
+      1,
+      rect.height -
+      thumbHeight
+    );
+
+
+  let y =
+    clientY -
+    rect.top -
+    thumbHeight / 2;
+
+
+  y =
+    Math.max(
+      0,
+      Math.min(
+        usable,
+        y
+      )
+    );
+
+
+  const ratio =
+    y /
+    usable;
+
+
+  const target =
+    Math.round(
+      ratio *
+      (images.length - 1)
+    );
+
+
+  if(mode === "single"){
+
+    setSingle(
+      target
+    );
+
+  }else{
+
+    const targetPage =
+      document.querySelectorAll(
+        ".page-wrap"
+      )[target];
+
+
+    if(targetPage){
+
+      targetPage.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+
+    }
+
+  }
+
+
+  updateScrubber();
+
+}
+
+
+/*
+ * Click
+ */
+
+scrubberHitbox.addEventListener(
+  "pointerdown",
+  event => {
+
+    if(
+      event.target ===
+        document.getElementById(
+          "scrubberTop"
+        ) ||
+      event.target ===
+        document.getElementById(
+          "scrubberBottom"
+        )
+    ){
+
+      return;
+
+    }
+
+
+    scrubberDragging =
+      true;
+
+    scrubber.setPointerCapture?.(
+      event.pointerId
+    );
+
+    activateScrubber();
+
+    seekFromPointer(
+      event.clientY
+    );
+
   }
 );
 
 
-$("toolbarRecovery").onclick =
-  forceToolbarVisible;
+scrubberHitbox.addEventListener(
+  "pointermove",
+  event => {
+
+    if(!scrubberDragging){
+      return;
+    }
+
+    seekFromPointer(
+      event.clientY
+    );
+
+  }
+);
 
 
-document.addEventListener(
-  "fullscreenchange",
+scrubberHitbox.addEventListener(
+  "pointerup",
   () => {
 
-    forceToolbarVisible();
+    scrubberDragging =
+      false;
 
+    activateScrubber();
+
+  }
+);
+
+
+scrubberHitbox.addEventListener(
+  "pointercancel",
+  () => {
+
+    scrubberDragging =
+      false;
+
+  }
+);
+
+
+/* =========================================================
+   TOP / BOTTOM
+========================================================= */
+
+document
+  .getElementById(
+    "scrubberTop"
+  )
+  .onclick = event => {
+
+    event.stopPropagation();
+
+    if(mode === "single"){
+
+      setSingle(
+        0
+      );
+
+    }else{
+
+      window.scrollTo({
+        top:0,
+        behavior:"smooth"
+      });
+
+    }
+
+    activateScrubber();
+
+  };
+
+
+document
+  .getElementById(
+    "scrubberBottom"
+  )
+  .onclick = event => {
+
+    event.stopPropagation();
+
+    if(mode === "single"){
+
+      setSingle(
+        images.length - 1
+      );
+
+    }else{
+
+      window.scrollTo({
+        top:
+          document.documentElement
+            .scrollHeight,
+        behavior:"smooth"
+      });
+
+    }
+
+    activateScrubber();
+
+  };
+
+
+/* =========================================================
+   SCROLL TRACKING
+========================================================= */
+
+let scrollTimer = null;
+
+window.addEventListener(
+  "scroll",
+  () => {
+
+    if(mode === "vertical"){
+
+      updateScrubber();
+
+    }
+
+    clearTimeout(
+      scrollTimer
+    );
+
+    scrollTimer =
+      setTimeout(
+        () => {
+
+          scrubber.classList.remove(
+            "active"
+          );
+
+        },
+        1200
+      );
+
+  },
+  {
+    passive:true
   }
 );
 
 
 window.addEventListener(
   "resize",
-  updatePageWheel,
+  updateScrubber
+);
+
+
+/* =========================================================
+   EDGE ACTIVATION
+========================================================= */
+
+document.addEventListener(
+  "pointermove",
+  event => {
+
+    if(
+      event.clientX >
+      window.innerWidth - 55
+    ){
+
+      activateScrubber();
+
+    }
+
+  },
   {
     passive:true
   }
@@ -3205,13 +2193,9 @@ window.addEventListener(
    START
 ========================================================= */
 
-setupPageWheel();
-
-forceToolbarVisible();
-
 init();
 
 </script>
 
 </body>
-  </html>
+        </html>
