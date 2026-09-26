@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050505">
+<title>VORTEX — قارئ الفصل</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#050505;--bar:#080a0bd9;--line:#24282b;--surface:#0d1012;--cyan:#13abd2;--cyan2:#76e5fd;--muted:#98a4aa}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}body{overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% -10%,#13abd20d,transparent 35%);z-index:-1}
+.bar{position:sticky;top:0;z-index:20;height:64px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;padding:8px 14px;background:var(--bar);border-bottom:1px solid #1f2528;backdrop-filter:blur(18px)}
+.brand-back{justify-self:start;display:flex;align-items:center;gap:9px;color:#dfe7e9;text-decoration:none;font-size:13px;font-weight:800;padding:8px 11px;border:1px solid #252b2e;border-radius:10px;background:#0c0f10;transition:.2s}.brand-back:hover{border-color:#13abd277;color:var(--cyan2)}
+.brand-mark{width:28px;height:28px;object-fit:cover;border-radius:50%;background:#050505}
+.title{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;line-height:1.1}.title span{font-size:9px;letter-spacing:.2em;color:#718087;font-weight:800}.title b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55vw}
+.controls{justify-self:end;display:flex;gap:6px}.icon-btn{width:39px;height:39px;border:1px solid #252b2e;border-radius:10px;background:#0c0f10;color:#eaf1f3;cursor:pointer;font-size:18px;transition:.2s}.icon-btn:hover{border-color:#13abd277;color:var(--cyan2);box-shadow:0 0 22px #13abd214}
+.reader{display:flex;flex-direction:column;align-items:center;min-height:calc(100vh - 64px);padding-bottom:100px}.page-wrap{width:100%;text-align:center;line-height:0;position:relative}.reader img{display:block;max-width:100%;height:auto;margin:0 auto;user-select:none;-webkit-user-drag:none;box-shadow:0 0 0 1px #080909}
+body.single .reader img{display:none}body.single .reader img.active{display:block;max-height:calc(100vh - 90px);width:auto;max-width:calc(100vw - 24px);object-fit:contain;margin-top:14px;box-shadow:0 20px 70px #000}
+.status{padding:70px 20px;text-align:center;color:var(--muted);max-width:760px;line-height:1.8}.status:before{content:"";display:block;width:54px;height:54px;margin:0 auto 20px;background:url('assets/vortex-mark-cyan.png') center/contain no-repeat;filter:drop-shadow(0 0 18px #13abd244);animation:spin 5s linear infinite}.status.error{color:#ff9da8}.status h3{margin:0 0 8px;color:#fff}
+.bottom{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);z-index:30;display:flex;gap:7px;align-items:center;padding:7px;background:#090b0de8;border:1px solid #293034;border-radius:15px;backdrop-filter:blur(18px);box-shadow:0 15px 50px #0009}.bottom button{border:1px solid #252c30;background:#101416;color:#edf4f6;border-radius:10px;padding:9px 13px;cursor:pointer;font-weight:800;transition:.2s}.bottom button:hover{border-color:#13abd277;color:var(--cyan2)}.bottom span{min-width:95px;text-align:center;font-size:12px;color:#aebbc0;font-variant-numeric:tabular-nums}
+.reader::after{content:"VORTEX";position:fixed;bottom:17px;right:18px;color:#ffffff09;font-size:9px;letter-spacing:.3em;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:600px){.bar{grid-template-columns:1fr auto 1fr}.brand-back span{display:none}.title b{font-size:12px;max-width:45vw}.bottom{bottom:10px;width:calc(100% - 20px);justify-content:center}.bottom span{flex:1}}
+</style></head>
+<body>
+<header class="bar">
+<a class="brand-back" href="index.html#chapters"><img class="brand-mark" src="assets/vortex-mark-white.png" alt=""><span>الفصول</span>‹</a>
+<div class="title"><span>VORTEX MANGA GROUP</span><b id="chapterTitle">جاري التحميل...</b></div>
+<div class="controls"><button class="icon-btn" id="mode" title="تبديل وضع القراءة">↔</button><button class="icon-btn" id="full" title="ملء الشاشة">⛶</button></div>
+</header>
+<main id="reader" class="reader"><div class="status">جاري تحميل الصفحات...</div></main>
+<div class="bottom"><button id="prev">‹ السابق</button><span id="counter">—</span><button id="next">التالي ›</button></div>
+<script>
+const SUPABASE_URL='https://smgvqaunvvkbwkkgmccx.supabase.co';
+const SUPABASE_KEY='sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const requested=new URLSearchParams(location.search).get("chapter");
+let images=[],index=0,mode="vertical";
+
+function publicUrl(path){
+  if(!path)return "";
+  const clean=String(path).split("/").filter(Boolean).map(encodeURIComponent).join("/");
+  return `${SUPABASE_URL}/storage/v1/object/public/manga-pages/${clean}`;
+}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function init(){
+  const reader=document.getElementById("reader");
+  try{
+    if(!requested)throw new Error("رقم الفصل غير موجود في الرابط. افتح الفصل من قائمة الفصول.");
+    const n=Number(requested);
+    if(!Number.isInteger(n)||n<1)throw new Error("رقم الفصل غير صالح: "+escapeHtml(requested));
+
+    // نجلب الفصل أولاً.
+    const ch=await db.from("chapters")
+      .select("id,number,title,published_at")
+      .eq("number",n)
+      .maybeSingle();
+    if(ch.error)throw new Error("فشل قراءة الفصل: "+ch.error.message);
+    if(!ch.data)throw new Error("لم يتم العثور على الفصل رقم "+n+".");
+
+    document.getElementById("chapterTitle").textContent=`الفصل ${ch.data.number} — ${ch.data.title||""}`;
+
+    // ثم الصفحات بشكل منفصل، حتى لا تعتمد القراءة على nested relation.
+    const pg=await db.from("pages")
+      .select("id,page_number,storage_path")
+      .eq("chapter_id",ch.data.id)
+      .order("page_number",{ascending:true});
+
+    if(pg.error)throw new Error("تم العثور على الفصل، لكن تعذر قراءة جدول الصفحات: "+pg.error.message);
+    if(!pg.data?.length)throw new Error("الفصل موجود، لكن لا توجد صفحات مسجلة له.");
+
+    images=pg.data.map(p=>({
+      page:p.page_number,
+      path:p.storage_path,
+      url:publicUrl(p.storage_path)
+    }));
+
+    render();
+  }catch(e){
+    reader.innerHTML=`<div class="status error"><h3>تعذر تحميل الفصل</h3><div>${escapeHtml(e.message||String(e))}</div></div>`;
+  }
+}
+
+function render(){
+  const reader=document.getElementById("reader");
+  reader.innerHTML="";
+  images.forEach((p,i)=>{
+    const wrap=document.createElement("div");
+    wrap.style.width="100%";
+    wrap.style.textAlign="center";
+    const img=document.createElement("img");
+    img.src=p.url;
+    img.alt=`صفحة ${p.page}`;
+    img.loading=i<2?"eager":"lazy";
+    img.referrerPolicy="no-referrer";
+    img.onerror=()=>{
+      wrap.innerHTML=`<div class="status error">تعذر تحميل الصفحة ${escapeHtml(p.page)}<br><small>المسار: ${escapeHtml(p.path)}</small></div>`;
+    };
+    wrap.appendChild(img);
+    reader.appendChild(wrap);
+  });
+  document.getElementById("counter").textContent=`${images.length} صفحة`;
+  if(mode==="single")setSingle(0);
+}
+function setSingle(i){
+  index=Math.max(0,Math.min(images.length-1,i));
+  [...document.querySelectorAll(".reader img")].forEach((x,n)=>x.classList.toggle("active",n===index));
+  document.getElementById("counter").textContent=`${index+1} / ${images.length}`;
+}
+document.getElementById("next").onclick=()=>{
+ if(mode==="single")setSingle(index+1);else window.scrollBy({top:window.innerHeight*.85,behavior:"smooth"});
+};
+document.getElementById("prev").onclick=()=>{
+ if(mode==="single")setSingle(index-1);else window.scrollBy({top:-window.innerHeight*.85,behavior:"smooth"});
+};
+document.getElementById("mode").onclick=()=>{
+ mode=mode==="vertical"?"single":"vertical";
+ document.body.classList.toggle("single",mode==="single");
+ render();
+};
+document.getElementById("full").onclick=()=>document.documentElement.requestFullscreen?.();
+init();
+</script>
+</body></html>
