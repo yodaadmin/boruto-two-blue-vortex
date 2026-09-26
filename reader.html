@@ -28,11 +28,48 @@ html{
 
 body{
   overflow-x:hidden;
+  transition:
+    background .25s ease,
+    color .25s ease;
 }
 
 a,
-button{
+button,
+input,
+select{
   font:inherit;
+}
+
+/* =========================================================
+   READING THEMES
+========================================================= */
+
+body.theme-black{
+  --reader-bg:#05080c;
+  --reader-panel:#09131b;
+  --reader-border:#243943;
+  --reader-text:#fff;
+  --reader-muted:#91a5af;
+}
+
+body.theme-dark{
+  --reader-bg:#101214;
+  --reader-panel:#181b1e;
+  --reader-border:#30363a;
+  --reader-text:#f4f5f5;
+  --reader-muted:#a5adb1;
+}
+
+body.theme-gray{
+  --reader-bg:#202225;
+  --reader-panel:#292c30;
+  --reader-border:#42474b;
+  --reader-text:#f7f7f7;
+  --reader-muted:#b8bec2;
+}
+
+body{
+  background:var(--reader-bg,#05080c);
 }
 
 /* =========================================================
@@ -43,6 +80,7 @@ button{
   position:sticky;
   top:0;
   z-index:100;
+
   height:60px;
 
   display:flex;
@@ -68,6 +106,7 @@ button{
   border:1px solid rgba(255,255,255,.04);
 
   border-radius:10px;
+
   padding:8px 12px;
 
   cursor:pointer;
@@ -99,6 +138,7 @@ button{
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+
   max-width:42vw;
 }
 
@@ -118,6 +158,50 @@ button{
 }
 
 /* =========================================================
+   FLOATING SETTINGS BUTTON
+========================================================= */
+
+.floating-settings{
+  position:fixed;
+
+  left:16px;
+  bottom:18px;
+
+  z-index:150;
+
+  width:44px;
+  height:44px;
+
+  display:grid;
+  place-items:center;
+
+  border:1px solid rgba(118,229,253,.18);
+  border-radius:14px;
+
+  color:#dff8ff;
+  background:rgba(8,20,29,.9);
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.35),
+    0 0 25px rgba(19,171,210,.05);
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  cursor:pointer;
+
+  font-size:19px;
+
+  transition:.2s ease;
+}
+
+.floating-settings:hover{
+  background:#142d3a;
+  border-color:rgba(118,229,253,.4);
+  transform:translateY(-2px);
+}
+
+/* =========================================================
    READER
 ========================================================= */
 
@@ -130,7 +214,7 @@ button{
 
   min-height:calc(100vh - 60px);
 
-  padding:0 0 90px;
+  padding:0;
 }
 
 .page-wrap{
@@ -142,7 +226,7 @@ button{
   text-align:center;
   line-height:0;
 
-  background:#05080c;
+  background:var(--reader-bg,#05080c);
 }
 
 .reader img{
@@ -159,6 +243,19 @@ button{
   -webkit-user-drag:none;
 
   line-height:0;
+
+  transition:
+    filter .2s ease,
+    width .2s ease;
+}
+
+/*
+  القراءة العمودية:
+  الصفحات ملتصقة تمامًا.
+*/
+.reader .page-wrap + .page-wrap{
+  margin-top:0;
+  padding-top:0;
 }
 
 body.fit-original .reader img{
@@ -166,7 +263,7 @@ body.fit-original .reader img{
 }
 
 /* =========================================================
-   SINGLE PAGE MODE
+   SINGLE PAGE
 ========================================================= */
 
 body.single .reader img{
@@ -181,6 +278,67 @@ body.single .reader img.active{
   max-height:calc(100vh - 70px);
 
   object-fit:contain;
+
+  margin:auto;
+}
+
+/* =========================================================
+   PAGE SCALE
+========================================================= */
+
+body.scale-75 .reader img{
+  width:75%;
+}
+
+body.scale-85 .reader img{
+  width:85%;
+}
+
+body.scale-100 .reader img{
+  width:100%;
+}
+
+body.scale-110 .reader img{
+  width:110%;
+  max-width:none;
+}
+
+body.scale-125 .reader img{
+  width:125%;
+  max-width:none;
+}
+
+body.single.scale-75 .reader img.active,
+body.single.scale-85 .reader img.active,
+body.single.scale-100 .reader img.active,
+body.single.scale-110 .reader img.active,
+body.single.scale-125 .reader img.active{
+  width:auto;
+  max-width:100%;
+}
+
+/* =========================================================
+   IMAGE BRIGHTNESS
+========================================================= */
+
+body.brightness-80 .reader img{
+  filter:brightness(.8);
+}
+
+body.brightness-90 .reader img{
+  filter:brightness(.9);
+}
+
+body.brightness-100 .reader img{
+  filter:brightness(1);
+}
+
+body.brightness-110 .reader img{
+  filter:brightness(1.1);
+}
+
+body.brightness-120 .reader img{
+  filter:brightness(1.2);
 }
 
 /* =========================================================
@@ -207,12 +365,34 @@ body.single .reader img.active{
 
 .status small{
   color:#8296a4;
-
   word-break:break-all;
 }
 
 /* =========================================================
-   READING SETTINGS
+   SETTINGS OVERLAY
+========================================================= */
+
+.settings-overlay{
+  position:fixed;
+  inset:0;
+
+  z-index:119;
+
+  background:rgba(0,0,0,.38);
+
+  opacity:0;
+  visibility:hidden;
+
+  transition:.2s ease;
+}
+
+.settings-overlay.open{
+  opacity:1;
+  visibility:visible;
+}
+
+/* =========================================================
+   SETTINGS PANEL
 ========================================================= */
 
 .settings-panel{
@@ -223,21 +403,25 @@ body.single .reader img.active{
 
   z-index:120;
 
-  width:min(330px,calc(100vw - 28px));
+  width:min(390px,calc(100vw - 28px));
 
-  padding:16px;
+  max-height:calc(100vh - 90px);
+
+  overflow:auto;
+
+  padding:17px;
 
   border:1px solid #294352;
-  border-radius:18px;
+  border-radius:20px;
 
-  background:rgba(8,18,27,.96);
+  background:rgba(8,18,27,.97);
 
   box-shadow:
-    0 25px 80px rgba(0,0,0,.55),
-    0 0 30px rgba(19,171,210,.05);
+    0 25px 80px rgba(0,0,0,.6),
+    0 0 30px rgba(19,171,210,.06);
 
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
 
   opacity:0;
   visibility:hidden;
@@ -262,16 +446,24 @@ body.single .reader img.active{
   justify-content:space-between;
   align-items:center;
 
-  margin-bottom:14px;
+  margin-bottom:8px;
 }
 
 .settings-title strong{
-  font-size:14px;
+  font-size:15px;
+}
+
+.settings-title small{
+  display:block;
+  margin-top:3px;
+
+  color:#718793;
+  font-size:10px;
 }
 
 .settings-title button{
-  width:30px;
-  height:30px;
+  width:31px;
+  height:31px;
 
   border:0;
   border-radius:9px;
@@ -282,6 +474,28 @@ body.single .reader img.active{
   cursor:pointer;
 }
 
+/* =========================================================
+   SETTING SECTION
+========================================================= */
+
+.settings-section{
+  padding-top:13px;
+  margin-top:11px;
+
+  border-top:1px solid rgba(255,255,255,.07);
+}
+
+.settings-section-title{
+  color:#76e5fd;
+
+  font-size:10px;
+  font-weight:800;
+
+  letter-spacing:.08em;
+
+  margin-bottom:9px;
+}
+
 .setting-row{
   display:flex;
   align-items:center;
@@ -289,23 +503,19 @@ body.single .reader img.active{
 
   gap:12px;
 
-  padding:11px 0;
-
-  border-top:1px solid rgba(255,255,255,.06);
+  padding:10px 0;
 }
 
-.setting-row:first-of-type{
-  border-top:0;
-}
-
-.setting-row span{
+.setting-row > span{
   font-size:12px;
-  color:#aebec7;
+  color:#b9c8cf;
 }
 
 .setting-actions{
   display:flex;
   gap:5px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .setting-actions button{
@@ -316,11 +526,17 @@ body.single .reader img.active{
 
   border-radius:9px;
 
-  padding:7px 10px;
+  padding:7px 9px;
 
-  font-size:11px;
+  font-size:10px;
 
   cursor:pointer;
+
+  transition:.18s ease;
+}
+
+.setting-actions button:hover{
+  border-color:#397083;
 }
 
 .setting-actions button.active{
@@ -330,13 +546,65 @@ body.single .reader img.active{
 }
 
 /* =========================================================
-   SIDE SCRUBBER
+   RANGE
 ========================================================= */
 
-/*
-  العجلة ليست جزءًا من تخطيط الصفحة.
-  هي Overlay فوق الصفحة بالكامل.
-*/
+.range-wrap{
+  display:flex;
+  align-items:center;
+  gap:9px;
+
+  width:170px;
+}
+
+.range-wrap output{
+  min-width:34px;
+
+  color:#76e5fd;
+
+  font-size:10px;
+  text-align:center;
+}
+
+.range-wrap input{
+  width:100%;
+  accent-color:#13abd2;
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+.reset-settings{
+  width:100%;
+
+  margin-top:14px;
+
+  border:1px solid #334a56;
+
+  background:#0e1d26;
+  color:#cbd9de;
+
+  border-radius:11px;
+
+  padding:10px;
+
+  cursor:pointer;
+
+  font-size:11px;
+
+  transition:.2s ease;
+}
+
+.reset-settings:hover{
+  background:#152c38;
+  border-color:#13abd2;
+  color:#fff;
+}
+
+/* =========================================================
+   SIDE SCRUBBER
+========================================================= */
 
 .page-scrubber{
   position:fixed;
@@ -356,11 +624,6 @@ body.single .reader img.active{
   pointer-events:none;
 }
 
-/*
-  المنطقة الحساسة على الحافة.
-  تجعل الوصول للعجلة سهلًا دون أن تظهر بشكل مزعج.
-*/
-
 .scrubber-hitbox{
   position:absolute;
 
@@ -372,10 +635,6 @@ body.single .reader img.active{
 
   pointer-events:auto;
 }
-
-/*
-  العجلة نفسها.
-*/
 
 .scrubber{
   position:absolute;
@@ -394,7 +653,7 @@ body.single .reader img.active{
 
   border:1px solid rgba(255,255,255,.035);
 
-  opacity:.16;
+  opacity:.14;
 
   transition:
     opacity .2s ease,
@@ -418,10 +677,6 @@ body.single .reader img.active{
   background:rgba(19,171,210,.42);
 }
 
-/*
-  المقبض.
-*/
-
 .scrubber-thumb{
   position:absolute;
 
@@ -443,10 +698,6 @@ body.single .reader img.active{
 
   pointer-events:none;
 }
-
-/*
-  أزرار البداية والنهاية.
-*/
 
 .scrubber-top,
 .scrubber-bottom{
@@ -496,11 +747,6 @@ body.single .reader img.active{
   transform:translateX(0);
 }
 
-/*
-  رقم الصفحة يظهر بجانب العجلة
-  فقط أثناء التفاعل.
-*/
-
 .scrubber-counter{
   position:absolute;
 
@@ -535,15 +781,15 @@ body.single .reader img.active{
 }
 
 /* =========================================================
-   END OF CHAPTER
+   CHAPTER END
 ========================================================= */
 
 .chapter-end{
-  width:min(700px,calc(100% - 28px));
+  width:min(760px,calc(100% - 28px));
 
-  margin:70px auto 20px;
+  margin:55px auto 30px;
 
-  padding:35px 22px;
+  padding:38px 24px;
 
   text-align:center;
 
@@ -556,7 +802,7 @@ body.single .reader img.active{
       rgba(19,171,210,.12),
       transparent 65%
     ),
-    #09131b;
+    var(--reader-panel,#09131b);
 
   box-shadow:
     0 25px 80px rgba(0,0,0,.35);
@@ -565,99 +811,84 @@ body.single .reader img.active{
 .chapter-end h2{
   margin:0 0 8px;
 
-  font-size:22px;
+  font-size:23px;
 }
 
 .chapter-end p{
-  margin:0 0 22px;
+  margin:0 0 23px;
 
-  color:#91a5af;
+  color:var(--reader-muted,#91a5af);
 
   font-size:13px;
 }
 
-.chapter-end-actions{
-  display:flex;
-  justify-content:center;
+.chapter-navigation{
+  display:grid;
 
-  gap:8px;
-  flex-wrap:wrap;
+  grid-template-columns:1fr auto 1fr;
+
+  gap:9px;
+
+  align-items:stretch;
 }
 
-.chapter-end-actions button{
+.chapter-nav-btn{
+  min-height:58px;
+
   border:1px solid #29414e;
 
   background:#122632;
 
   color:#fff;
 
-  border-radius:11px;
+  border-radius:12px;
 
-  padding:10px 15px;
+  padding:9px 13px;
 
   cursor:pointer;
 
   transition:.2s ease;
 }
 
-.chapter-end-actions button:hover{
+.chapter-nav-btn:hover:not(:disabled){
   background:#13abd2;
   color:#031015;
   border-color:#13abd2;
 }
 
-/* =========================================================
-   BOTTOM CONTROL
-========================================================= */
-
-.bottom{
-  position:fixed;
-
-  bottom:14px;
-  left:50%;
-
-  transform:translateX(-50%);
-
-  z-index:110;
-
-  background:rgba(12,26,37,.92);
-
-  border:1px solid #28404f;
-
-  border-radius:16px;
-
-  padding:7px;
-
-  display:flex;
-  gap:7px;
-  align-items:center;
-
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
+.chapter-nav-btn:disabled{
+  opacity:.4;
+  cursor:default;
 }
 
-.bottom button{
-  background:#18303f;
+.chapter-nav-btn span{
+  display:block;
 
-  color:#fff;
+  font-size:9px;
 
-  border:0;
+  color:#8fa7b2;
 
-  border-radius:10px;
+  margin-bottom:4px;
+}
 
-  padding:8px 12px;
+.chapter-nav-btn:hover:not(:disabled) span{
+  color:#31515e;
+}
+
+.chapter-list-btn{
+  min-height:58px;
+
+  border:1px solid #29414e;
+
+  background:#0d1d27;
+
+  color:#dbe8ed;
+
+  border-radius:12px;
+
+  padding:9px 15px;
 
   cursor:pointer;
-}
-
-.bottom span{
-  font-size:11px;
-
-  color:#b9cbd5;
-
-  min-width:90px;
-
-  text-align:center;
 }
 
 /* =========================================================
@@ -706,13 +937,25 @@ body.single .reader img.active{
     right:15px;
   }
 
-  .bottom{
-    bottom:9px;
-    padding:6px;
+  .settings-panel{
+    top:64px;
+    right:8px;
+
+    width:calc(100vw - 16px);
+
+    max-height:calc(100vh - 76px);
   }
 
-  .bottom button{
-    padding:7px 10px;
+  .floating-settings{
+    left:10px;
+    bottom:10px;
+
+    width:42px;
+    height:42px;
+  }
+
+  .chapter-navigation{
+    grid-template-columns:1fr;
   }
 
 }
@@ -720,6 +963,11 @@ body.single .reader img.active{
 /* =========================================================
    FULLSCREEN
 ========================================================= */
+
+/*
+  الشريط العلوي يختفي في Full Screen،
+  لكن زر الإعدادات العائم يبقى موجودًا.
+*/
 
 :fullscreen .bar{
   display:none;
@@ -737,10 +985,29 @@ body.single .reader img.active{
   top:14px;
 }
 
+:fullscreen .floating-settings{
+  left:16px;
+  bottom:18px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto!important;
+    transition:none!important;
+  }
+
+}
 </style>
 </head>
 
-<body>
+<body class="theme-black scale-100 brightness-100">
 
 <header class="bar">
 
@@ -754,14 +1021,43 @@ body.single .reader img.active{
   </div>
 
   <div class="controls">
-    <button id="settingsBtn" aria-label="إعدادات القراءة">⚙</button>
-    <button id="full" aria-label="ملء الشاشة">⛶</button>
+
+    <button
+      id="settingsBtn"
+      aria-label="إعدادات القراءة"
+    >
+      ⚙
+    </button>
+
+    <button
+      id="full"
+      aria-label="ملء الشاشة"
+    >
+      ⛶
+    </button>
+
   </div>
 
 </header>
 
 
-<main id="reader" class="reader">
+<!-- =======================================================
+     FLOATING SETTINGS
+======================================================= -->
+
+<button
+  id="floatingSettings"
+  class="floating-settings"
+  aria-label="فتح إعدادات القراءة"
+>
+  ⚙
+</button>
+
+
+<main
+  id="reader"
+  class="reader"
+>
 
   <div class="status">
     جاري تحميل الصفحات...
@@ -776,11 +1072,20 @@ body.single .reader img.active{
 
 <div class="page-scrubber">
 
-  <div id="scrubberHitbox" class="scrubber-hitbox">
+  <div
+    id="scrubberHitbox"
+    class="scrubber-hitbox"
+  >
 
-    <div id="scrubber" class="scrubber">
+    <div
+      id="scrubber"
+      class="scrubber"
+    >
 
-      <div id="scrubberThumb" class="scrubber-thumb"></div>
+      <div
+        id="scrubberThumb"
+        class="scrubber-thumb"
+      ></div>
 
     </div>
 
@@ -813,6 +1118,16 @@ body.single .reader img.active{
 
 
 <!-- =======================================================
+     SETTINGS OVERLAY
+======================================================= -->
+
+<div
+  id="settingsOverlay"
+  class="settings-overlay"
+></div>
+
+
+<!-- =======================================================
      READING SETTINGS
 ======================================================= -->
 
@@ -823,82 +1138,227 @@ body.single .reader img.active{
 
   <div class="settings-title">
 
-    <strong>
-      إعدادات القراءة
-    </strong>
+    <div>
+      <strong>
+        إعدادات القراءة
+      </strong>
 
-    <button id="closeSettings">
+      <small>
+        خصص تجربة القراءة كما تريد
+      </small>
+    </div>
+
+    <button
+      id="closeSettings"
+      aria-label="إغلاق الإعدادات"
+    >
       ×
     </button>
 
   </div>
 
 
-  <div class="setting-row">
+  <!-- طريقة العرض -->
 
-    <span>
+  <div class="settings-section">
+
+    <div class="settings-section-title">
       طريقة العرض
-    </span>
+    </div>
 
-    <div class="setting-actions">
+    <div class="setting-row">
 
-      <button
-        id="verticalBtn"
-        class="active"
-      >
-        عمودي
-      </button>
+      <span>
+        نمط القراءة
+      </span>
 
-      <button
-        id="singleBtn"
-      >
-        صفحة
-      </button>
+      <div class="setting-actions">
+
+        <button
+          id="verticalBtn"
+          class="active"
+        >
+          عمودي
+        </button>
+
+        <button
+          id="singleBtn"
+        >
+          صفحة واحدة
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
 
-  <div class="setting-row">
+  <!-- الصفحة -->
 
-    <span>
-      عرض الصفحة
-    </span>
+  <div class="settings-section">
 
-    <div class="setting-actions">
+    <div class="settings-section-title">
+      الصفحة
+    </div>
 
-      <button id="fitBtn">
-        مناسب
-      </button>
+    <div class="setting-row">
 
-      <button id="originalBtn">
-        أصلي
-      </button>
+      <span>
+        ملاءمة الصفحة
+      </span>
+
+      <div class="setting-actions">
+
+        <button
+          id="fitBtn"
+          class="active"
+        >
+          ملائم
+        </button>
+
+        <button
+          id="originalBtn"
+        >
+          أصلي
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="setting-row">
+
+      <span>
+        حجم الصفحة
+      </span>
+
+      <div class="setting-actions">
+
+        <button data-scale="75">
+          75%
+        </button>
+
+        <button data-scale="85">
+          85%
+        </button>
+
+        <button
+          data-scale="100"
+          class="active"
+        >
+          100%
+        </button>
+
+        <button data-scale="110">
+          110%
+        </button>
+
+        <button data-scale="125">
+          125%
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
-</div>
+
+  <!-- السطوع -->
+
+  <div class="settings-section">
+
+    <div class="settings-section-title">
+      الصورة
+    </div>
+
+    <div class="setting-row">
+
+      <span>
+        السطوع
+      </span>
+
+      <div class="setting-actions">
+
+        <button data-brightness="80">
+          80%
+        </button>
+
+        <button data-brightness="90">
+          90%
+        </button>
+
+        <button
+          data-brightness="100"
+          class="active"
+        >
+          100%
+        </button>
+
+        <button data-brightness="110">
+          110%
+        </button>
+
+        <button data-brightness="120">
+          120%
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
 
 
-<!-- =======================================================
-     BOTTOM CONTROLS
-======================================================= -->
+  <!-- الخلفية -->
 
-<div class="bottom">
+  <div class="settings-section">
 
-  <button id="prev">
-    السابق
-  </button>
+    <div class="settings-section-title">
+      مظهر القارئ
+    </div>
 
-  <span id="counter">
-    —
-  </span>
+    <div class="setting-row">
 
-  <button id="next">
-    التالي
+      <span>
+        خلفية القراءة
+      </span>
+
+      <div class="setting-actions">
+
+        <button
+          data-theme="black"
+          class="active"
+        >
+          أسود
+        </button>
+
+        <button
+          data-theme="dark"
+        >
+          داكن
+        </button>
+
+        <button
+          data-theme="gray"
+        >
+          رمادي
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <button
+    id="resetSettings"
+    class="reset-settings"
+  >
+    إعادة جميع إعدادات القراءة للوضع الافتراضي
   </button>
 
 </div>
@@ -946,6 +1406,29 @@ let mode = "vertical";
 let scrubberDragging = false;
 
 let scrubberTimer = null;
+
+let scrollTimer = null;
+
+let currentChapter = null;
+
+
+/* =========================================================
+   DEFAULT SETTINGS
+========================================================= */
+
+const DEFAULT_SETTINGS = {
+
+  mode:"vertical",
+
+  fit:"fit",
+
+  scale:"100",
+
+  brightness:"100",
+
+  theme:"black"
+
+};
 
 
 /* =========================================================
@@ -1018,6 +1501,349 @@ function publicUrl(path){
     "/storage/v1/object/public/manga-pages/" +
     clean
   );
+
+}
+
+
+/* =========================================================
+   SETTINGS STORAGE
+========================================================= */
+
+function loadSettings(){
+
+  try{
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(
+          "vortexReaderSettings"
+        ) || "{}"
+      );
+
+    return {
+      ...DEFAULT_SETTINGS,
+      ...saved
+    };
+
+  }catch{
+
+    return {
+      ...DEFAULT_SETTINGS
+    };
+
+  }
+
+}
+
+
+function saveSettings(){
+
+  try{
+
+    localStorage.setItem(
+      "vortexReaderSettings",
+      JSON.stringify({
+
+        mode,
+        fit:
+          document.body.classList.contains(
+            "fit-original"
+          )
+            ? "original"
+            : "fit",
+
+        scale:
+          getCurrentScale(),
+
+        brightness:
+          getCurrentBrightness(),
+
+        theme:
+          getCurrentTheme()
+
+      })
+    );
+
+  }catch{}
+
+}
+
+
+/* =========================================================
+   SETTINGS UI HELPERS
+========================================================= */
+
+function getCurrentScale(){
+
+  const classes = [
+    "75",
+    "85",
+    "100",
+    "110",
+    "125"
+  ];
+
+  for(const value of classes){
+
+    if(
+      document.body.classList.contains(
+        `scale-${value}`
+      )
+    ){
+
+      return value;
+
+    }
+
+  }
+
+  return "100";
+
+}
+
+
+function getCurrentBrightness(){
+
+  const values = [
+    "80",
+    "90",
+    "100",
+    "110",
+    "120"
+  ];
+
+  for(const value of values){
+
+    if(
+      document.body.classList.contains(
+        `brightness-${value}`
+      )
+    ){
+
+      return value;
+
+    }
+
+  }
+
+  return "100";
+
+}
+
+
+function getCurrentTheme(){
+
+  const themes = [
+    "black",
+    "dark",
+    "gray"
+  ];
+
+  for(const theme of themes){
+
+    if(
+      document.body.classList.contains(
+        `theme-${theme}`
+      )
+    ){
+
+      return theme;
+
+    }
+
+  }
+
+  return "black";
+
+}
+
+
+function setActiveButtons(
+  selector,
+  attribute,
+  value
+){
+
+  document
+    .querySelectorAll(
+      selector
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset[attribute] ===
+            String(value)
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   APPLY SETTINGS
+========================================================= */
+
+function applyScale(value){
+
+  document.body.classList.remove(
+    "scale-75",
+    "scale-85",
+    "scale-100",
+    "scale-110",
+    "scale-125"
+  );
+
+  document.body.classList.add(
+    `scale-${value}`
+  );
+
+  setActiveButtons(
+    "[data-scale]",
+    "scale",
+    value
+  );
+
+  saveSettings();
+
+}
+
+
+function applyBrightness(value){
+
+  document.body.classList.remove(
+    "brightness-80",
+    "brightness-90",
+    "brightness-100",
+    "brightness-110",
+    "brightness-120"
+  );
+
+  document.body.classList.add(
+    `brightness-${value}`
+  );
+
+  setActiveButtons(
+    "[data-brightness]",
+    "brightness",
+    value
+  );
+
+  saveSettings();
+
+}
+
+
+function applyTheme(theme){
+
+  document.body.classList.remove(
+    "theme-black",
+    "theme-dark",
+    "theme-gray"
+  );
+
+  document.body.classList.add(
+    `theme-${theme}`
+  );
+
+  setActiveButtons(
+    "[data-theme]",
+    "theme",
+    theme
+  );
+
+  saveSettings();
+
+}
+
+
+/* =========================================================
+   INIT SETTINGS
+========================================================= */
+
+function initializeSettings(){
+
+  const settings =
+    loadSettings();
+
+
+  applyScale(
+    settings.scale ||
+    DEFAULT_SETTINGS.scale
+  );
+
+
+  applyBrightness(
+    settings.brightness ||
+    DEFAULT_SETTINGS.brightness
+  );
+
+
+  applyTheme(
+    settings.theme ||
+    DEFAULT_SETTINGS.theme
+  );
+
+
+  mode =
+    settings.mode === "single"
+      ? "single"
+      : "vertical";
+
+
+  if(mode === "single"){
+
+    document.body.classList.add(
+      "single"
+    );
+
+    document
+      .getElementById(
+        "singleBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "verticalBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+  }
+
+
+  if(
+    settings.fit === "original"
+  ){
+
+    document.body.classList.add(
+      "fit-original"
+    );
+
+    document
+      .getElementById(
+        "originalBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "fitBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+  }
 
 }
 
@@ -1121,13 +1947,13 @@ async function init(){
     }
 
 
-    const chapter =
+    currentChapter =
       chapterResult.data;
 
 
     const numberText =
       safeNumber(
-        chapter.number,
+        currentChapter.number,
         0
       );
 
@@ -1137,7 +1963,7 @@ async function init(){
         "chapterTitle"
       )
       .textContent =
-        `الفصل ${numberText} — ${chapter.title || ""}`;
+        `الفصل ${numberText} — ${currentChapter.title || ""}`;
 
 
     /* =====================================================
@@ -1152,7 +1978,7 @@ async function init(){
         )
         .eq(
           "chapter_id",
-          chapter.id
+          currentChapter.id
         )
         .order(
           "page_number",
@@ -1373,9 +2199,37 @@ function render(){
   );
 
 
-  /*
-   * نهاية الفصل
-   */
+  createChapterEnd();
+
+
+  document
+    .getElementById(
+      "counter"
+    )?.remove();
+
+
+  if(mode === "single"){
+
+    setSingle(
+      index
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CHAPTER END
+========================================================= */
+
+async function createChapterEnd(){
+
+  const reader =
+    document.getElementById(
+      "reader"
+    );
+
 
   const end =
     document.createElement(
@@ -1395,18 +2249,32 @@ function render(){
       وصلت إلى نهاية الفصل الحالي.
     </p>
 
-    <div class="chapter-end-actions">
+    <div
+      id="chapterNavigation"
+      class="chapter-navigation"
+    >
 
       <button
-        id="endTop"
+        id="previousChapter"
+        class="chapter-nav-btn"
       >
-        العودة إلى البداية
+        <span>الفصل السابق</span>
+        جاري التحميل...
       </button>
 
       <button
         id="endChapters"
+        class="chapter-list-btn"
       >
         قائمة الفصول
+      </button>
+
+      <button
+        id="nextChapter"
+        class="chapter-nav-btn"
+      >
+        <span>الفصل التالي</span>
+        جاري التحميل...
       </button>
 
     </div>
@@ -1416,20 +2284,6 @@ function render(){
   reader.appendChild(
     end
   );
-
-
-  document
-    .getElementById(
-      "endTop"
-    )
-    .onclick = () => {
-
-      window.scrollTo({
-        top:0,
-        behavior:"smooth"
-      });
-
-    };
 
 
   document
@@ -1444,21 +2298,226 @@ function render(){
     };
 
 
-  document
-    .getElementById(
-      "counter"
+  await loadAdjacentChapters();
+
+}
+
+
+/* =========================================================
+   ADJACENT CHAPTERS
+========================================================= */
+
+async function loadAdjacentChapters(){
+
+  if(!currentChapter){
+    return;
+  }
+
+
+  const currentNumber =
+    Number(
+      currentChapter.number
+    );
+
+
+  if(
+    !Number.isFinite(
+      currentNumber
     )
-    .textContent =
-      `${images.length} صفحة`;
+  ){
+
+    setNoChapter(
+      "previousChapter",
+      "لا يوجد فصل سابق"
+    );
+
+    setNoChapter(
+      "nextChapter",
+      "لا يوجد فصل تالٍ"
+    );
+
+    return;
+
+  }
 
 
-  if(mode === "single"){
+  const result =
+    await db
+      .from("chapters")
+      .select(
+        "id,number,title"
+      )
+      .order(
+        "number",
+        {
+          ascending:true
+        }
+      );
 
-    setSingle(
-      0
+
+  if(result.error){
+
+    console.error(
+      "Adjacent chapters error:",
+      result.error
+    );
+
+    return;
+
+  }
+
+
+  const chapters =
+    Array.isArray(
+      result.data
+    )
+      ? result.data
+      : [];
+
+
+  const previous =
+    chapters
+      .filter(
+        chapter =>
+          Number(
+            chapter.number
+          ) <
+          currentNumber
+      )
+      .sort(
+        (a,b) =>
+          Number(b.number) -
+          Number(a.number)
+      )[0];
+
+
+  const next =
+    chapters
+      .filter(
+        chapter =>
+          Number(
+            chapter.number
+          ) >
+          currentNumber
+      )
+      .sort(
+        (a,b) =>
+          Number(a.number) -
+          Number(b.number)
+      )[0];
+
+
+  const previousButton =
+    document.getElementById(
+      "previousChapter"
+    );
+
+  const nextButton =
+    document.getElementById(
+      "nextChapter"
+    );
+
+
+  if(previous){
+
+    previousButton.innerHTML = `
+
+      <span>
+        الفصل السابق
+      </span>
+
+      الفصل ${escapeHtml(
+        previous.number
+      )}
+
+    `;
+
+    previousButton.disabled =
+      false;
+
+    previousButton.onclick = () => {
+
+      location.href =
+        `reader.html?chapter=${encodeURIComponent(
+          previous.id
+        )}`;
+
+    };
+
+  }else{
+
+    setNoChapter(
+      "previousChapter",
+      "لا يوجد فصل سابق"
     );
 
   }
+
+
+  if(next){
+
+    nextButton.innerHTML = `
+
+      <span>
+        الفصل التالي
+      </span>
+
+      الفصل ${escapeHtml(
+        next.number
+      )}
+
+    `;
+
+    nextButton.disabled =
+      false;
+
+    nextButton.onclick = () => {
+
+      location.href =
+        `reader.html?chapter=${encodeURIComponent(
+          next.id
+        )}`;
+
+    };
+
+  }else{
+
+    setNoChapter(
+      "nextChapter",
+      "لا يوجد فصل تالٍ"
+    );
+
+  }
+
+}
+
+
+function setNoChapter(
+  id,
+  text
+){
+
+  const button =
+    document.getElementById(
+      id
+    );
+
+  if(!button){
+    return;
+  }
+
+  button.innerHTML = `
+
+    <span>
+      —
+    </span>
+
+    ${text}
+
+  `;
+
+  button.disabled =
+    true;
 
 }
 
@@ -1500,111 +2559,13 @@ function setSingle(i){
     );
 
 
-  document
-    .getElementById(
-      "counter"
-    )
-    .textContent =
-      `${index + 1} / ${images.length}`;
-
-
   updateScrubber();
 
 }
 
 
 /* =========================================================
-   NEXT / PREVIOUS
-========================================================= */
-
-document
-  .getElementById(
-    "next"
-  )
-  .onclick = () => {
-
-    if(mode === "single"){
-
-      if(
-        index <
-        images.length - 1
-      ){
-
-        setSingle(
-          index + 1
-        );
-
-      }else{
-
-        scrollToEnd();
-
-      }
-
-    }else{
-
-      window.scrollBy({
-        top:
-          window.innerHeight * .85,
-        behavior:
-          "smooth"
-      });
-
-    }
-
-  };
-
-
-document
-  .getElementById(
-    "prev"
-  )
-  .onclick = () => {
-
-    if(mode === "single"){
-
-      if(index > 0){
-
-        setSingle(
-          index - 1
-        );
-
-      }else{
-
-        window.scrollTo({
-          top:0,
-          behavior:"smooth"
-        });
-
-      }
-
-    }else{
-
-      window.scrollBy({
-        top:
-          -window.innerHeight * .85,
-        behavior:
-          "smooth"
-      });
-
-    }
-
-  };
-
-
-function scrollToEnd(){
-
-  window.scrollTo({
-    top:
-      document.documentElement.scrollHeight,
-    behavior:
-      "smooth"
-  });
-
-}
-
-
-/* =========================================================
-   SETTINGS
+   SETTINGS PANEL
 ========================================================= */
 
 const settingsPanel =
@@ -1612,31 +2573,69 @@ const settingsPanel =
     "settingsPanel"
   );
 
+const settingsOverlay =
+  document.getElementById(
+    "settingsOverlay"
+  );
+
+
+function openSettings(){
+
+  settingsPanel.classList.add(
+    "open"
+  );
+
+  settingsOverlay.classList.add(
+    "open"
+  );
+
+}
+
+
+function closeSettings(){
+
+  settingsPanel.classList.remove(
+    "open"
+  );
+
+  settingsOverlay.classList.remove(
+    "open"
+  );
+
+}
+
+
 document
   .getElementById(
     "settingsBtn"
   )
-  .onclick = () => {
+  .onclick =
+    openSettings;
 
-    settingsPanel.classList.toggle(
-      "open"
-    );
 
-  };
+document
+  .getElementById(
+    "floatingSettings"
+  )
+  .onclick =
+    openSettings;
 
 
 document
   .getElementById(
     "closeSettings"
   )
-  .onclick = () => {
+  .onclick =
+    closeSettings;
 
-    settingsPanel.classList.remove(
-      "open"
-    );
 
-  };
+settingsOverlay.onclick =
+  closeSettings;
 
+
+/* =========================================================
+   MODE
+========================================================= */
 
 document
   .getElementById(
@@ -1666,6 +2665,10 @@ document
       .classList.remove(
         "active"
       );
+
+    index = 0;
+
+    saveSettings();
 
     render();
 
@@ -1701,6 +2704,8 @@ document
         "active"
       );
 
+    saveSettings();
+
     render();
 
   };
@@ -1720,6 +2725,24 @@ document
       "fit-original"
     );
 
+    document
+      .getElementById(
+        "fitBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "originalBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+    saveSettings();
+
   };
 
 
@@ -1732,6 +2755,214 @@ document
     document.body.classList.add(
       "fit-original"
     );
+
+    document
+      .getElementById(
+        "originalBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "fitBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+    saveSettings();
+
+  };
+
+
+/* =========================================================
+   SCALE
+========================================================= */
+
+document
+  .querySelectorAll(
+    "[data-scale]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick = () => {
+
+        applyScale(
+          button.dataset.scale
+        );
+
+      };
+
+    }
+  );
+
+
+/* =========================================================
+   BRIGHTNESS
+========================================================= */
+
+document
+  .querySelectorAll(
+    "[data-brightness]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick = () => {
+
+        applyBrightness(
+          button.dataset.brightness
+        );
+
+      };
+
+    }
+  );
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+document
+  .querySelectorAll(
+    "[data-theme]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick = () => {
+
+        applyTheme(
+          button.dataset.theme
+        );
+
+      };
+
+    }
+  );
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+document
+  .getElementById(
+    "resetSettings"
+  )
+  .onclick = () => {
+
+    mode =
+      DEFAULT_SETTINGS.mode;
+
+    document.body.classList.remove(
+      "single",
+      "fit-original"
+    );
+
+    document.body.classList.remove(
+      "scale-75",
+      "scale-85",
+      "scale-100",
+      "scale-110",
+      "scale-125"
+    );
+
+    document.body.classList.add(
+      "scale-100"
+    );
+
+    document.body.classList.remove(
+      "brightness-80",
+      "brightness-90",
+      "brightness-100",
+      "brightness-110",
+      "brightness-120"
+    );
+
+    document.body.classList.add(
+      "brightness-100"
+    );
+
+    document.body.classList.remove(
+      "theme-black",
+      "theme-dark",
+      "theme-gray"
+    );
+
+    document.body.classList.add(
+      "theme-black"
+    );
+
+
+    document
+      .getElementById(
+        "verticalBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "singleBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "fitBtn"
+      )
+      .classList.add(
+        "active"
+      );
+
+    document
+      .getElementById(
+        "originalBtn"
+      )
+      .classList.remove(
+        "active"
+      );
+
+
+    setActiveButtons(
+      "[data-scale]",
+      "scale",
+      "100"
+    );
+
+    setActiveButtons(
+      "[data-brightness]",
+      "brightness",
+      "100"
+    );
+
+    setActiveButtons(
+      "[data-theme]",
+      "theme",
+      "black"
+    );
+
+
+    index = 0;
+
+    try{
+
+      localStorage.removeItem(
+        "vortexReaderSettings"
+      );
+
+    }catch{}
+
+
+    render();
 
   };
 
@@ -1900,7 +3131,14 @@ function activateScrubber(){
 }
 
 
-function seekFromPointer(clientY){
+function seekFromPointer(
+  clientY
+){
+
+  if(!images.length){
+    return;
+  }
+
 
   const rect =
     scrubber.getBoundingClientRect();
@@ -1977,9 +3215,9 @@ function seekFromPointer(clientY){
 }
 
 
-/*
- * Click
- */
+/* =========================================================
+   SCRUBBER POINTER
+========================================================= */
 
 scrubberHitbox.addEventListener(
   "pointerdown",
@@ -2059,7 +3297,7 @@ scrubberHitbox.addEventListener(
 
 
 /* =========================================================
-   TOP / BOTTOM
+   SCRUBBER TOP
 ========================================================= */
 
 document
@@ -2089,6 +3327,10 @@ document
 
   };
 
+
+/* =========================================================
+   SCRUBBER BOTTOM
+========================================================= */
 
 document
   .getElementById(
@@ -2123,8 +3365,6 @@ document
 /* =========================================================
    SCROLL TRACKING
 ========================================================= */
-
-let scrollTimer = null;
 
 window.addEventListener(
   "scroll",
@@ -2190,12 +3430,62 @@ document.addEventListener(
 
 
 /* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key === "Escape" &&
+      settingsPanel.classList.contains(
+        "open"
+      )
+    ){
+
+      closeSettings();
+
+      return;
+
+    }
+
+
+    if(
+      event.key === "f" ||
+      event.key === "F"
+    ){
+
+      document
+        .getElementById(
+          "full"
+        )
+        .click();
+
+    }
+
+
+    if(
+      event.key === "Escape"
+    ){
+
+      closeSettings();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
    START
 ========================================================= */
+
+initializeSettings();
 
 init();
 
 </script>
 
 </body>
-        </html>
+  </html>
