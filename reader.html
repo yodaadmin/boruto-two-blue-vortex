@@ -9,7 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 *{
   box-sizing:border-box;
 }
@@ -21,6 +20,7 @@ body{
   background:#05080c;
   color:#fff;
   font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
+  transition: background .3s ease;
 }
 
 html{
@@ -29,62 +29,13 @@ html{
 
 body{
   overflow-x:hidden;
-  transition:
-    background .25s ease,
-    color .25s ease;
 }
 
+a,
 button,
 select{
   font:inherit;
 }
-
-button{
-  cursor:pointer;
-}
-
-a{
-  color:inherit;
-  text-decoration:none;
-}
-
-
-/* =========================================================
-   READER THEMES
-========================================================= */
-
-body.theme-dark{
-  --reader-bg:#05080c;
-  --reader-surface:#09131b;
-  --reader-panel:#09131bf5;
-  --reader-text:#fff;
-  --reader-muted:#91a5af;
-}
-
-body.theme-black{
-  --reader-bg:#000;
-  --reader-surface:#050505;
-  --reader-panel:#080808f5;
-  --reader-text:#fff;
-  --reader-muted:#929292;
-}
-
-body.theme-gray{
-  --reader-bg:#181b1e;
-  --reader-surface:#202428;
-  --reader-panel:#202428f5;
-  --reader-text:#f7f7f7;
-  --reader-muted:#aeb5b9;
-}
-
-body.theme-light{
-  --reader-bg:#eeeeee;
-  --reader-surface:#fff;
-  --reader-panel:#fffffff5;
-  --reader-text:#111;
-  --reader-muted:#687178;
-}
-
 
 /* =========================================================
    TOP BAR
@@ -93,167 +44,86 @@ body.theme-light{
 .bar{
   position:sticky;
   top:0;
-  z-index:200;
-
+  z-index:100;
   height:60px;
 
   display:flex;
   align-items:center;
+  justify-content:space-between;
+  gap:10px;
 
-  padding:7px 12px;
+  padding:8px 14px;
 
-  background:rgba(7,17,27,.94);
-
+  background:rgba(7,17,27,.92);
   border-bottom:1px solid #233746;
 
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-}
-
-.bar-home{
-  flex:1;
-
-  display:flex;
-  justify-content:flex-start;
-}
-
-.bar-center{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  gap:6px;
-
-  flex:0 0 auto;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
 }
 
 .bar-right{
-  flex:1;
-
-  display:flex;
-  justify-content:flex-end;
-}
-
-.top-button,
-.home-button{
-  height:38px;
-
   display:flex;
   align-items:center;
-  justify-content:center;
+  gap:8px;
+}
 
-  border:1px solid rgba(255,255,255,.055);
+.bar-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 
-  border-radius:10px;
-
-  background:#142532;
+.bar a,
+.bar button,
+.bar select{
   color:#fff;
-
-  padding:0 11px;
-
-  transition:
-    background .18s ease,
-    border-color .18s ease,
-    transform .18s ease;
-}
-
-.top-button:hover,
-.home-button:hover{
-  background:#1b3545;
-  border-color:#31596c;
-}
-
-.top-button:active,
-.home-button:active{
-  transform:scale(.96);
-}
-
-.home-button{
-  gap:6px;
-  font-size:12px;
-}
-
-.home-icon{
-  font-size:15px;
-}
-
-
-/* chapter select */
-
-.chapter-select-wrap{
-  position:relative;
-}
-
-.chapter-select{
-  appearance:none;
-  -webkit-appearance:none;
-
-  height:38px;
-
-  min-width:145px;
-  max-width:220px;
-
-  padding:0 31px 0 11px;
-
-  border:1px solid rgba(255,255,255,.055);
-  border-radius:10px;
-
+  text-decoration:none;
   background:#142532;
-
-  color:#fff;
-
-  outline:none;
-
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:10px;
+  padding:7px 12px;
   cursor:pointer;
-
-  font-size:12px;
-}
-
-.chapter-select:focus{
-  border-color:#13abd2;
-  box-shadow:0 0 0 3px rgba(19,171,210,.10);
-}
-
-.chapter-select-wrap:after{
-  content:"⌄";
-
-  position:absolute;
-
-  right:10px;
-  top:50%;
-
-  transform:translateY(-55%);
-
-  pointer-events:none;
-
-  color:#9eb4bf;
-
+  transition:.2s ease;
   font-size:13px;
 }
 
-
-/* chapter title */
-
-.chapter-title{
-  position:absolute;
-
-  left:50%;
-
-  transform:translateX(-50%);
-
-  bottom:-22px;
-
-  pointer-events:none;
-
-  white-space:nowrap;
-
-  font-size:9px;
-
-  color:#8096a2;
-
-  opacity:.75;
+.bar select{
+  outline:none;
+  max-width: 140px;
+  text-overflow: ellipsis;
 }
 
+.bar a:hover,
+.bar button:hover,
+.bar select:hover{
+  background:#1a3444;
+}
+
+.title{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1px;
+  text-align:center;
+}
+
+.title span{
+  font-size:10px;
+  color:#8fa4b1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:30vw;
+}
+
+.title b{
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:30vw;
+}
 
 /* =========================================================
    READER
@@ -261,126 +131,55 @@ body.theme-light{
 
 .reader{
   width:100%;
-
   display:flex;
   flex-direction:column;
   align-items:center;
-
   min-height:calc(100vh - 60px);
-
-  padding:0;
-
-  background:var(--reader-bg);
-
-  transition:
-    background .25s ease;
+  padding:0 0 90px;
 }
 
 .page-wrap{
   width:100%;
-
   margin:0;
   padding:0;
-
   text-align:center;
-
   line-height:0;
-
-  background:var(--reader-bg);
+  background:transparent;
+  transition: margin-bottom .2s ease;
 }
 
 .reader img{
   display:block;
-
   width:auto;
-
   max-width:100%;
-
   height:auto;
-
   margin:0 auto;
   padding:0;
-
   user-select:none;
-
   -webkit-user-drag:none;
-
   line-height:0;
-
-  transition:
-    filter .2s ease,
-    width .2s ease;
+  transition: filter .2s ease;
 }
 
-
-/* =========================================================
-   PAGE WIDTH
-========================================================= */
-
-body.width-fit .reader img{
-  width:auto;
-  max-width:100%;
-}
-
-body.width-wide .reader img{
-  width:100%;
-  max-width:100%;
-}
-
-body.width-original .reader img{
-  width:auto;
+body.fit-original .reader img{
   max-width:none;
 }
-
 
 /* =========================================================
    SINGLE PAGE MODE
 ========================================================= */
 
-body.single .reader{
-  min-height:calc(100vh - 60px);
-
-  display:flex;
-  justify-content:center;
-}
-
-body.single .reader .page-wrap{
+body.single .reader img{
   display:none;
 }
 
-body.single .reader .page-wrap.active{
+body.single .reader img.active{
   display:block;
-
-  width:100%;
-
-  min-height:calc(100vh - 60px);
-
-  display:flex;
-
-  align-items:center;
-  justify-content:center;
-}
-
-body.single .reader .page-wrap.active img{
   width:auto;
   max-width:100%;
-  max-height:calc(100vh - 95px);
-
+  max-height:calc(100vh - 70px);
   object-fit:contain;
 }
-
-
-/* =========================================================
-   IMAGE FILTERS
-========================================================= */
-
-.reader img{
-  filter:
-    brightness(var(--brightness,1))
-    contrast(var(--contrast,1))
-    saturate(var(--saturation,1));
-}
-
 
 /* =========================================================
    STATUS
@@ -388,11 +187,8 @@ body.single .reader .page-wrap.active img{
 
 .status{
   padding:40px 18px;
-
   text-align:center;
-
-  color:var(--reader-muted);
-
+  color:#9fb2bf;
   max-width:900px;
 }
 
@@ -406,289 +202,109 @@ body.single .reader .page-wrap.active img{
 
 .status small{
   color:#8296a4;
-
   word-break:break-all;
 }
 
-
 /* =========================================================
-   SETTINGS OVERLAY
-========================================================= */
-
-.settings-backdrop{
-  position:fixed;
-
-  inset:0;
-
-  z-index:240;
-
-  background:rgba(0,0,0,.28);
-
-  opacity:0;
-  visibility:hidden;
-
-  pointer-events:none;
-
-  transition:
-    opacity .2s ease,
-    visibility .2s ease;
-}
-
-.settings-backdrop.open{
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-}
-
-
-/* =========================================================
-   SETTINGS PANEL
+   COMPREHENSIVE READING SETTINGS PANEL
 ========================================================= */
 
 .settings-panel{
   position:fixed;
-
   top:68px;
-  right:12px;
-
-  z-index:250;
-
-  width:min(370px,calc(100vw - 24px));
-
-  max-height:calc(100vh - 82px);
-
-  overflow-y:auto;
-
+  right:14px;
+  z-index:120;
+  width:min(320px,calc(100vw - 28px));
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
   padding:14px;
-
   border:1px solid #294352;
-
-  border-radius:18px;
-
+  border-radius:16px;
   background:rgba(8,18,27,.97);
-
-  box-shadow:
-    0 25px 80px rgba(0,0,0,.62),
-    0 0 35px rgba(19,171,210,.06);
-
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
-
+  box-shadow:0 25px 80px rgba(0,0,0,.55), 0 0 30px rgba(19,171,210,.05);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
   opacity:0;
   visibility:hidden;
-
-  transform:
-    translateY(-8px)
-    scale(.97);
-
-  pointer-events:none;
-
-  transition:
-    opacity .2s ease,
-    transform .2s ease,
-    visibility .2s ease;
+  transform:translateY(-8px) scale(.98);
+  transition:opacity .2s ease, transform .2s ease, visibility .2s ease;
 }
 
 .settings-panel.open{
   opacity:1;
   visibility:visible;
-
-  transform:
-    translateY(0)
-    scale(1);
-
-  pointer-events:auto;
+  transform:translateY(0) scale(1);
 }
 
-
-/* settings header */
-
-.settings-header{
+.settings-title{
   display:flex;
-
-  align-items:center;
   justify-content:space-between;
-
-  padding-bottom:11px;
-
-  margin-bottom:4px;
-
-  border-bottom:1px solid rgba(255,255,255,.07);
+  align-items:center;
+  margin-bottom:12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
 }
 
-.settings-header strong{
-  font-size:14px;
+.settings-title strong{
+  font-size:13px;
+  color: #76e5fd;
 }
 
-.settings-header small{
-  display:block;
-
-  color:#718690;
-
-  font-size:9px;
-
-  margin-top:2px;
-}
-
-.settings-close{
-  width:30px;
-  height:30px;
-
+.settings-title button{
+  width:26px;
+  height:26px;
+  border:0;
+  border-radius:7px;
+  color:#fff;
+  background:#142532;
+  cursor:pointer;
   display:grid;
   place-items:center;
-
-  border:0;
-
-  border-radius:9px;
-
-  color:#fff;
-
-  background:#142532;
-
-  cursor:pointer;
+  font-size: 14px;
 }
 
-
-/* setting section */
-
-.setting-section{
-  padding:12px 0;
-
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-
-.setting-section:last-child{
-  border-bottom:0;
-}
-
-.setting-label{
+.setting-row{
   display:flex;
+  align-items:center;
   justify-content:space-between;
-  align-items:center;
-
-  margin-bottom:8px;
-
-  color:#c5d2d8;
-
-  font-size:11px;
+  gap:10px;
+  padding:9px 0;
+  border-top:1px solid rgba(255,255,255,.05);
 }
 
-.setting-label small{
-  color:#657984;
-
-  font-size:9px;
+.setting-row:first-of-type{
+  border-top:0;
 }
 
-
-/* buttons grid */
-
-.setting-options{
-  display:grid;
-
-  grid-template-columns:
-    repeat(2,1fr);
-
-  gap:6px;
+.setting-row span{
+  font-size:11.5px;
+  color:#aebec7;
 }
 
-.setting-options.three{
-  grid-template-columns:
-    repeat(3,1fr);
-}
-
-.setting-options.four{
-  grid-template-columns:
-    repeat(4,1fr);
-}
-
-.option{
-  min-height:34px;
-
-  padding:7px 8px;
-
-  border:1px solid #263c49;
-
-  border-radius:9px;
-
-  background:#101f29;
-
-  color:#b9cbd3;
-
-  font-size:10px;
-
-  transition:.18s ease;
-}
-
-.option:hover{
-  background:#152d3b;
-}
-
-.option.active{
-  color:#031015;
-
-  background:#13abd2;
-
-  border-color:#13abd2;
-
-  font-weight:800;
-}
-
-
-/* slider */
-
-.slider-row{
+.setting-actions{
   display:flex;
-
-  align-items:center;
-
-  gap:9px;
+  gap:4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-.slider{
-  flex:1;
-
-  accent-color:#13abd2;
-
+.setting-actions button{
+  border:1px solid #263c49;
+  background:#101f29;
+  color:#dce8ed;
+  border-radius:7px;
+  padding:5px 8px;
+  font-size:10.5px;
   cursor:pointer;
+  transition: .15s ease;
 }
 
-.slider-value{
-  width:38px;
-
-  text-align:center;
-
-  color:#9eb4bf;
-
-  font-size:9px;
-}
-
-
-/* reset */
-
-.reset-settings{
-  width:100%;
-
-  min-height:34px;
-
-  border:1px solid #293d48;
-
-  border-radius:9px;
-
-  background:#0d1921;
-
-  color:#8fa5af;
-
-  font-size:10px;
-
-  transition:.18s ease;
-}
-
-.reset-settings:hover{
-  color:#fff;
-
+.setting-actions button.active{
+  background:#13abd2;
+  color:#031015;
   border-color:#13abd2;
+  font-weight: 600;
 }
-
 
 /* =========================================================
    SIDE SCRUBBER
@@ -696,168 +312,109 @@ body.single .reader .page-wrap.active img{
 
 .page-scrubber{
   position:fixed;
-
   top:60px;
   right:0;
   bottom:0;
-
-  z-index:150;
-
+  z-index:90;
   width:46px;
-
   display:flex;
-
   align-items:center;
   justify-content:center;
-
   pointer-events:none;
 }
 
 .scrubber-hitbox{
   position:absolute;
-
   top:0;
   right:0;
   bottom:0;
-
   width:38px;
-
   pointer-events:auto;
 }
 
 .scrubber{
   position:absolute;
-
   right:5px;
-
-  width:7px;
-
+  width:8px;
   height:62vh;
-
   min-height:190px;
   max-height:680px;
-
   border-radius:999px;
-
-  background:rgba(255,255,255,.045);
-
-  border:1px solid rgba(255,255,255,.025);
-
-  opacity:.10;
-
-  transition:
-    opacity .2s ease,
-    width .2s ease,
-    background .2s ease;
-
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.035);
+  opacity:.16;
+  transition:opacity .2s ease, width .2s ease, background .2s ease;
   pointer-events:auto;
-
   cursor:pointer;
+  box-shadow:0 0 15px rgba(0,0,0,.25);
 }
 
 .scrubber-hitbox:hover .scrubber,
 .scrubber:hover,
 .scrubber.active{
   opacity:.72;
-
-  width:9px;
-
+  width:10px;
   background:rgba(19,171,210,.42);
 }
 
 .scrubber-thumb{
   position:absolute;
-
   left:50%;
-
-  width:7px;
+  width:8px;
   height:44px;
-
   transform:translateX(-50%);
-
   border-radius:999px;
-
   background:#76e5fd;
-
-  box-shadow:
-    0 0 12px rgba(118,229,253,.4);
-
+  box-shadow:0 0 12px rgba(118,229,253,.4);
+  transition:top .08s linear;
   pointer-events:none;
 }
 
 .scrubber-top,
 .scrubber-bottom{
   position:absolute;
-
   right:-1px;
-
-  width:27px;
-  height:27px;
-
+  width:26px;
+  height:26px;
   display:grid;
   place-items:center;
-
   border-radius:50%;
-
   background:rgba(9,20,29,.88);
-
   border:1px solid rgba(118,229,253,.18);
-
   color:#76e5fd;
-
   font-size:12px;
-
   opacity:0;
-
   transform:translateX(5px);
-
   transition:.2s ease;
-
+  cursor:pointer;
   pointer-events:auto;
 }
 
-.scrubber-top{
-  top:-38px;
-}
-
-.scrubber-bottom{
-  bottom:-38px;
-}
+.scrubber-top{ top:-38px; }
+.scrubber-bottom{ bottom:-38px; }
 
 .scrubber-hitbox:hover .scrubber-top,
-.scrubber-hitbox:hover .scrubber-bottom{
+.scrubber-hitbox:hover .scrubber-bottom,
+.scrubber.active ~ .scrubber-top,
+.scrubber.active ~ .scrubber-bottom{
   opacity:1;
-
   transform:translateX(0);
 }
 
 .scrubber-counter{
   position:absolute;
-
   right:18px;
-
   top:50%;
-
   transform:translateY(-50%);
-
-  padding:6px 9px;
-
-  border-radius:8px;
-
+  padding:5px 8px;
+  border-radius:7px;
   background:rgba(5,10,15,.9);
-
   border:1px solid rgba(118,229,253,.15);
-
   color:#dff8ff;
-
-  font-size:9px;
-
+  font-size:10px;
   white-space:nowrap;
-
   opacity:0;
-
   pointer-events:none;
-
   transition:.2s ease;
 }
 
@@ -866,329 +423,157 @@ body.single .reader .page-wrap.active img{
   opacity:1;
 }
 
-
 /* =========================================================
-   CHAPTER END
+   END OF CHAPTER
 ========================================================= */
 
 .chapter-end{
   width:min(700px,calc(100% - 28px));
-
-  margin:65px auto 30px;
-
-  padding:32px 20px;
-
+  margin:70px auto 20px;
+  padding:30px 20px;
   text-align:center;
-
   border:1px solid #243943;
-
-  border-radius:20px;
-
-  background:
-    radial-gradient(
-      circle at 50% 0,
-      rgba(19,171,210,.12),
-      transparent 65%
-    ),
-    var(--reader-surface);
-
-  box-shadow:
-    0 25px 80px rgba(0,0,0,.35);
+  border-radius:18px;
+  background:radial-gradient(circle at 50% 0, rgba(19,171,210,.12), transparent 65%), #09131b;
+  box-shadow:0 25px 80px rgba(0,0,0,.35);
 }
 
 .chapter-end h2{
-  margin:0 0 7px;
-
+  margin:0 0 6px;
   font-size:20px;
 }
 
 .chapter-end p{
-  margin:0 0 20px;
-
-  color:var(--reader-muted);
-
+  margin:0 0 18px;
+  color:#91a5af;
   font-size:12px;
 }
 
 .chapter-end-actions{
   display:flex;
-
   justify-content:center;
-
-  gap:7px;
-
+  gap:8px;
   flex-wrap:wrap;
 }
 
 .chapter-end-actions button{
   border:1px solid #29414e;
-
   background:#122632;
-
   color:#fff;
-
   border-radius:10px;
-
-  padding:9px 13px;
-
-  font-size:11px;
-
+  padding:8px 14px;
   cursor:pointer;
+  font-size: 12px;
+  transition:.2s ease;
 }
 
 .chapter-end-actions button:hover{
   background:#13abd2;
-
   color:#031015;
-
   border-color:#13abd2;
 }
 
-
 /* =========================================================
-   SINGLE PAGE BOTTOM NAV
+   BOTTOM CONTROL (Hidden in vertical, shown in single page)
 ========================================================= */
 
-.single-bottom{
+.bottom{
   position:fixed;
-
-  bottom:12px;
-
+  bottom:14px;
   left:50%;
-
   transform:translateX(-50%);
-
-  z-index:180;
-
-  display:none;
-
+  z-index:110;
+  background:rgba(12,26,37,.92);
+  border:1px solid #28404f;
+  border-radius:14px;
+  padding:6px;
+  display:none; /* مخفية افتراضياً في الوضع العمودي */
+  gap:6px;
   align-items:center;
-
-  gap:5px;
-
-  padding:5px;
-
-  border:1px solid #29414e;
-
-  border-radius:12px;
-
-  background:rgba(9,20,29,.91);
-
   backdrop-filter:blur(12px);
-
   -webkit-backdrop-filter:blur(12px);
-
-  box-shadow:
-    0 10px 35px rgba(0,0,0,.35);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-body.single .single-bottom{
-  display:flex;
+.bottom.visible {
+  display: flex;
 }
 
-.single-bottom button{
-  min-width:35px;
-  height:31px;
-
-  padding:0 9px;
-
-  border:0;
-
-  border-radius:8px;
-
+.bottom button{
   background:#18303f;
-
   color:#fff;
+  border:0;
+  border-radius:8px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-size: 11px;
+}
 
+.bottom span{
   font-size:11px;
-}
-
-.single-bottom button:hover{
-  background:#13abd2;
-
-  color:#031015;
-}
-
-.single-bottom span{
-  min-width:65px;
-
-  text-align:center;
-
   color:#b9cbd5;
-
-  font-size:9px;
+  min-width:70px;
+  text-align:center;
 }
-
-
-/* =========================================================
-   LIGHT THEME ADJUSTMENTS
-========================================================= */
-
-body.theme-light .bar{
-  background:rgba(255,255,255,.92);
-
-  border-bottom-color:#d4d9dc;
-}
-
-body.theme-light .top-button,
-body.theme-light .home-button,
-body.theme-light .chapter-select{
-  background:#f0f3f5;
-
-  color:#111;
-
-  border-color:#d8dfe3;
-}
-
-body.theme-light .settings-panel{
-  background:rgba(255,255,255,.97);
-
-  border-color:#d4dce0;
-
-  box-shadow:
-    0 25px 70px rgba(0,0,0,.18);
-}
-
-body.theme-light .settings-header,
-body.theme-light .setting-section{
-  border-color:#e2e6e8;
-}
-
-body.theme-light .settings-header strong,
-body.theme-light .setting-label{
-  color:#182126;
-}
-
-body.theme-light .option{
-  background:#f3f5f6;
-
-  color:#4f5d64;
-
-  border-color:#d8dfe2;
-}
-
-body.theme-light .option.active{
-  color:#031015;
-
-  background:#13abd2;
-
-  border-color:#13abd2;
-}
-
-body.theme-light .reset-settings{
-  background:#f2f4f5;
-
-  color:#657178;
-}
-
-body.theme-light .chapter-select option{
-  background:#fff;
-
-  color:#111;
-}
-
 
 /* =========================================================
    MOBILE
 ========================================================= */
 
 @media(max-width:700px){
-
   .bar{
-    height:56px;
-
-    padding:
-      6px 8px;
+    height:54px;
+    padding:6px 10px;
   }
-
-  .bar-center{
-    gap:4px;
+  .bar a,
+  .bar button,
+  .bar select{
+    padding:6px 9px;
+    font-size: 12px;
   }
-
-  .top-button,
-  .home-button{
-    height:36px;
-
-    padding:0 9px;
+  .title span{
+    max-width:25vw;
+    font-size:9px;
   }
-
-  .home-button{
-    font-size:0;
+  .title b{
+    max-width:25vw;
+    font-size:11px;
   }
-
-  .home-icon{
-    font-size:15px;
-  }
-
-  .chapter-select{
-    min-width:120px;
-
-    max-width:145px;
-
-    font-size:10px;
-  }
-
-  .settings-panel{
-    top:62px;
-
-    right:8px;
-
-    width:
-      calc(100vw - 16px);
-
-    max-height:
-      calc(100vh - 72px);
-  }
-
   .page-scrubber{
-    top:56px;
-
+    top:54px;
     width:38px;
   }
-
-  .scrubber-hitbox{
-    width:34px;
-  }
-
   .scrubber{
     right:3px;
-
-    width:6px;
-
+    width:7px;
     height:55vh;
   }
-
   .scrubber-thumb{
-    width:6px;
-
+    width:7px;
     height:38px;
   }
-
   .scrubber-counter{
-    right:14px;
+    right:15px;
   }
-
-  .single-bottom{
+  .bottom{
     bottom:8px;
+    padding:5px;
   }
-
+  .bottom button{
+    padding:6px 8px;
+  }
 }
-
 
 /* =========================================================
    FULLSCREEN
 ========================================================= */
 
 :fullscreen .bar{
-  position:fixed;
-
-  top:0;
-  left:0;
-  right:0;
+  display:none;
 }
 
 :fullscreen .reader{
-  padding-top:60px;
+  min-height:100vh;
 }
 
 :fullscreen .page-scrubber{
@@ -1196,404 +581,46 @@ body.theme-light .chapter-select option{
 }
 
 :fullscreen .settings-panel{
-  top:68px;
+  top:14px;
 }
-
-
-/* =========================================================
-   REDUCE MOTION
-========================================================= */
-
-@media(prefers-reduced-motion:reduce){
-
-  *,
-  *:before,
-  *:after{
-    scroll-behavior:auto !important;
-
-    transition:none !important;
-  }
-
-}
-
 </style>
 </head>
 
-<body class="theme-dark width-fit">
+<body>
 
 <header class="bar">
 
-  <!-- RIGHT -->
-  <div class="bar-home">
-
-    <a
-      href="index.html"
-      class="home-button"
-      aria-label="العودة إلى الصفحة الرئيسية"
-    >
-      <span class="home-icon">⌂</span>
-      <span>الرئيسية</span>
-    </a>
-
-  </div>
-
-
-  <!-- CENTER -->
-  <div class="bar-center">
-
-    <div class="chapter-select-wrap">
-
-      <select
-        id="chapterSelect"
-        class="chapter-select"
-        aria-label="اختيار الفصل"
-      >
-
-        <option value="">
-          تحميل الفصول...
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <button
-      id="settingsBtn"
-      class="top-button"
-      aria-label="إعدادات القراءة"
-      title="إعدادات القراءة"
-    >
-      ⚙
-    </button>
-
-
-    <button
-      id="full"
-      class="top-button"
-      aria-label="ملء الشاشة"
-      title="ملء الشاشة"
-    >
-      ⛶
-    </button>
-
-  </div>
-
-
-  <!-- LEFT -->
+  <!-- على اليمين: زر العودة للصفحة الرئيسية -->
   <div class="bar-right">
+    <a href="index.html#chapters" aria-label="الرئيسية">
+      ‹ الرئيسية
+    </a>
+  </div>
 
-    <div
-      id="topChapterTitle"
-      class="chapter-title"
-    >
-      جاري التحميل...
-    </div>
+  <div class="title">
+    <span>بوروتو: دوامتان زرقاوتان</span>
+    <b id="chapterTitle">جاري التحميل...</b>
+  </div>
 
+  <!-- بجانب بعضها: إعدادات التخصيص، قائمة الفصول، زر ملء الشاشة -->
+  <div class="bar-left">
+    <button id="settingsBtn" aria-label="إعدادات التخصيص">⚙️</button>
+    
+    <select id="chaptersSelect" aria-label="قائمة الفصول">
+      <option value="">الفصول...</option>
+    </select>
+
+    <button id="full" aria-label="ملء الشاشة">⛶</button>
   </div>
 
 </header>
 
 
-<main
-  id="reader"
-  class="reader"
->
-
+<main id="reader" class="reader">
   <div class="status">
     جاري تحميل الصفحات...
   </div>
-
 </main>
-
-
-<!-- =======================================================
-     SETTINGS BACKDROP
-======================================================= -->
-
-<div
-  id="settingsBackdrop"
-  class="settings-backdrop"
-></div>
-
-
-<!-- =======================================================
-     SETTINGS
-======================================================= -->
-
-<section
-  id="settingsPanel"
-  class="settings-panel"
-  aria-label="إعدادات القراءة"
->
-
-  <div class="settings-header">
-
-    <div>
-
-      <strong>
-        إعدادات القراءة
-      </strong>
-
-      <small>
-        تخصيص تجربة القراءة
-      </small>
-
-    </div>
-
-    <button
-      id="closeSettings"
-      class="settings-close"
-      aria-label="إغلاق"
-    >
-      ×
-    </button>
-
-  </div>
-
-
-  <!-- READING MODE -->
-
-  <div class="setting-section">
-
-    <div class="setting-label">
-
-      <span>
-        طريقة القراءة
-      </span>
-
-      <small>
-        اختر أسلوب العرض
-      </small>
-
-    </div>
-
-    <div class="setting-options">
-
-      <button
-        id="verticalBtn"
-        class="option active"
-      >
-        عمودي
-      </button>
-
-      <button
-        id="singleBtn"
-        class="option"
-      >
-        صفحة واحدة
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- PAGE WIDTH -->
-
-  <div class="setting-section">
-
-    <div class="setting-label">
-
-      <span>
-        حجم الصفحة
-      </span>
-
-      <small>
-        عرض صور المانجا
-      </small>
-
-    </div>
-
-    <div class="setting-options three">
-
-      <button
-        id="fitBtn"
-        class="option active"
-      >
-        مناسب
-      </button>
-
-      <button
-        id="wideBtn"
-        class="option"
-      >
-        كامل
-      </button>
-
-      <button
-        id="originalBtn"
-        class="option"
-      >
-        أصلي
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- BACKGROUND -->
-
-  <div class="setting-section">
-
-    <div class="setting-label">
-
-      <span>
-        خلفية القراءة
-      </span>
-
-      <small>
-        مظهر منطقة الصفحة
-      </small>
-
-    </div>
-
-    <div class="setting-options four">
-
-      <button
-        class="option active"
-        data-theme="dark"
-      >
-        داكن
-      </button>
-
-      <button
-        class="option"
-        data-theme="black"
-      >
-        أسود
-      </button>
-
-      <button
-        class="option"
-        data-theme="gray"
-      >
-        رمادي
-      </button>
-
-      <button
-        class="option"
-        data-theme="light"
-      >
-        فاتح
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- BRIGHTNESS -->
-
-  <div class="setting-section">
-
-    <div class="setting-label">
-
-      <span>
-        السطوع
-      </span>
-
-      <small id="brightnessValue">
-        100%
-      </small>
-
-    </div>
-
-    <div class="slider-row">
-
-      <input
-        id="brightness"
-        class="slider"
-        type="range"
-        min="50"
-        max="140"
-        value="100"
-      >
-
-    </div>
-
-  </div>
-
-
-  <!-- CONTRAST -->
-
-  <div class="setting-section">
-
-    <div class="setting-label">
-
-      <span>
-        التباين
-      </span>
-
-      <small id="contrastValue">
-        100%
-      </small>
-
-    </div>
-
-    <div class="slider-row">
-
-      <input
-        id="contrast"
-        class="slider"
-        type="range"
-        min="70"
-        max="140"
-        value="100"
-      >
-
-    </div>
-
-  </div>
-
-
-  <!-- SATURATION -->
-
-  <div class="setting-section">
-
-    <div class="setting-label">
-
-      <span>
-        التشبع
-      </span>
-
-      <small id="saturationValue">
-        100%
-      </small>
-
-    </div>
-
-    <div class="slider-row">
-
-      <input
-        id="saturation"
-        class="slider"
-        type="range"
-        min="0"
-        max="140"
-        value="100"
-      >
-
-    </div>
-
-  </div>
-
-
-  <!-- RESET -->
-
-  <div class="setting-section">
-
-    <button
-      id="resetSettings"
-      class="reset-settings"
-    >
-      إعادة الإعدادات الافتراضية
-    </button>
-
-  </div>
-
-</section>
 
 
 <!-- =======================================================
@@ -1601,82 +628,80 @@ body.theme-light .chapter-select option{
 ======================================================= -->
 
 <div class="page-scrubber">
-
-  <div
-    id="scrubberHitbox"
-    class="scrubber-hitbox"
-  >
-
-    <div
-      id="scrubber"
-      class="scrubber"
-    >
-
-      <div
-        id="scrubberThumb"
-        class="scrubber-thumb"
-      ></div>
-
+  <div id="scrubberHitbox" class="scrubber-hitbox">
+    <div id="scrubber" class="scrubber">
+      <div id="scrubberThumb" class="scrubber-thumb"></div>
     </div>
-
-
-    <button
-      id="scrubberTop"
-      class="scrubber-top"
-      aria-label="أول صفحة"
-    >
-      ↑
-    </button>
-
-
-    <button
-      id="scrubberBottom"
-      class="scrubber-bottom"
-      aria-label="آخر صفحة"
-    >
-      ↓
-    </button>
-
-
-    <div
-      id="scrubberCounter"
-      class="scrubber-counter"
-    >
-      1 / 1
-    </div>
-
+    <button id="scrubberTop" class="scrubber-top" aria-label="أول صفحة">↑</button>
+    <button id="scrubberBottom" class="scrubber-bottom" aria-label="آخر صفحة">↓</button>
+    <div id="scrubberCounter" class="scrubber-counter">1 / 1</div>
   </div>
-
 </div>
 
 
 <!-- =======================================================
-     SINGLE PAGE CONTROLS
+     COMPREHENSIVE READING SETTINGS PANEL
 ======================================================= -->
 
-<div
-  id="singleBottom"
-  class="single-bottom"
->
+<div id="settingsPanel" class="settings-panel">
+  <div class="settings-title">
+    <strong>إعدادات القراءة الشاملة</strong>
+    <button id="closeSettings">×</button>
+  </div>
 
-  <button
-    id="singlePrev"
-    aria-label="الصفحة السابقة"
-  >
-    ‹
-  </button>
+  <div class="setting-row">
+    <span>طريقة العرض</span>
+    <div class="setting-actions">
+      <button id="verticalBtn" class="active">عمودي</button>
+      <button id="singleBtn">صفحة</button>
+    </div>
+  </div>
 
-  <span id="counter">
-    —
-  </span>
+  <div class="setting-row">
+    <span>عرض الصفحة</span>
+    <div class="setting-actions">
+      <button id="fitBtn" class="active">مناسب</button>
+      <button id="originalBtn">أصلي</button>
+    </div>
+  </div>
 
-  <button
-    id="singleNext"
-    aria-label="الصفحة التالية"
-  >
-    ›
-  </button>
+  <div class="setting-row">
+    <span>لون الخلفية</span>
+    <div class="setting-actions">
+      <button id="bgDark" class="active">داكن</button>
+      <button id="bgPure">أسود</button>
+      <button id="bgDim">رمادي</button>
+    </div>
+  </div>
 
+  <div class="setting-row">
+    <span>سطوع الصفحات</span>
+    <div class="setting-actions">
+      <button id="bright100" class="active">100%</button>
+      <button id="bright90">90%</button>
+      <button id="bright80">80%</button>
+    </div>
+  </div>
+
+  <div class="setting-row">
+    <span>المسافة بين الصفحات</span>
+    <div class="setting-actions">
+      <button id="gap0">بدون</button>
+      <button id="gap10" class="active">متوسطة</button>
+      <button id="gap20">كبيرة</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- =======================================================
+     BOTTOM CONTROLS (Only visible in Single Page Mode)
+======================================================= -->
+
+<div id="bottomControls" class="bottom">
+  <button id="prev">السابق</button>
+  <span id="counter">—</span>
+  <button id="next">التالي</button>
 </div>
 
 
@@ -1686,564 +711,43 @@ body.theme-light .chapter-select option{
    SUPABASE
 ========================================================= */
 
-const SUPABASE_URL =
-  "https://smgvqaunvvkbwkkgmccx.supabase.co";
+const SUPABASE_URL = "https://smgvqaunvvkbwkkgmccx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_KEY =
-  "sb_publishable_S7Wd8d7OGc1m7bsHY4Awnw_ToSxY_j6";
-
-const db =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-/* =========================================================
-   URL
-========================================================= */
-
-const requested =
-  new URLSearchParams(
-    location.search
-  ).get("chapter");
-
-
-/* =========================================================
-   STATE
-========================================================= */
+const requested = new URLSearchParams(location.search).get("chapter");
 
 let images = [];
-
 let index = 0;
-
 let mode = "vertical";
-
 let scrubberDragging = false;
-
 let scrubberTimer = null;
-
-let chapters = [];
-
-
-/* =========================================================
-   DEFAULT SETTINGS
-========================================================= */
-
-const DEFAULT_SETTINGS = {
-
-  mode:"vertical",
-
-  width:"fit",
-
-  theme:"dark",
-
-  brightness:100,
-
-  contrast:100,
-
-  saturation:100
-
-};
-
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const reader =
-  document.getElementById(
-    "reader"
-  );
-
-const settingsPanel =
-  document.getElementById(
-    "settingsPanel"
-  );
-
-const settingsBackdrop =
-  document.getElementById(
-    "settingsBackdrop"
-  );
-
-const chapterSelect =
-  document.getElementById(
-    "chapterSelect"
-  );
-
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
 function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(
-      /[&<>"']/g,
-      m => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      }[m])
-    );
-
+  return String(value ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[m]));
 }
-
 
 function isUUID(value){
-
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    .test(
-      String(value || "").trim()
-    );
-
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || "").trim());
 }
 
-
-function safeNumber(value,index){
-
-  const n =
-    Number(value);
-
-  if(
-    Number.isFinite(n) &&
-    n > 0
-  ){
-
-    return n;
-
-  }
-
+function safeNumber(value, index){
+  const n = Number(value);
+  if(Number.isFinite(n) && n > 0) return n;
   return index + 1;
-
 }
-
 
 function publicUrl(path){
-
-  if(!path){
-    return "";
-  }
-
-  const clean =
-    String(path)
-      .split("/")
-      .filter(Boolean)
-      .map(
-        encodeURIComponent
-      )
-      .join("/");
-
-  return (
-    SUPABASE_URL +
-    "/storage/v1/object/public/manga-pages/" +
-    clean
-  );
-
+  if(!path) return "";
+  const clean = String(path).split("/").filter(Boolean).map(encodeURIComponent).join("/");
+  return SUPABASE_URL + "/storage/v1/object/public/manga-pages/" + clean;
 }
-
-
-/* =========================================================
-   SETTINGS STORAGE
-========================================================= */
-
-function loadSettings(){
-
-  try{
-
-    const saved =
-      JSON.parse(
-        localStorage.getItem(
-          "vortex-reader-settings"
-        ) || "null"
-      );
-
-    return {
-      ...DEFAULT_SETTINGS,
-      ...(saved || {})
-    };
-
-  }catch{
-
-    return {
-      ...DEFAULT_SETTINGS
-    };
-
-  }
-
-}
-
-
-function saveSettings(){
-
-  localStorage.setItem(
-    "vortex-reader-settings",
-    JSON.stringify({
-
-      mode,
-
-      width:
-        document.body.classList.contains(
-          "width-wide"
-        )
-          ? "wide"
-          : document.body.classList.contains(
-              "width-original"
-            )
-              ? "original"
-              : "fit",
-
-      theme:
-        [
-          "dark",
-          "black",
-          "gray",
-          "light"
-        ].find(
-          t =>
-            document.body.classList.contains(
-              "theme-" + t
-            )
-        ) || "dark",
-
-      brightness:
-        Number(
-          document.getElementById(
-            "brightness"
-          ).value
-        ),
-
-      contrast:
-        Number(
-          document.getElementById(
-            "contrast"
-          ).value
-        ),
-
-      saturation:
-        Number(
-          document.getElementById(
-            "saturation"
-          ).value
-        )
-
-    })
-  );
-
-}
-
-
-/* =========================================================
-   APPLY SETTINGS
-========================================================= */
-
-function applySettings(settings){
-
-  mode =
-    settings.mode === "single"
-      ? "single"
-      : "vertical";
-
-  document.body.classList.toggle(
-    "single",
-    mode === "single"
-  );
-
-
-  /* width */
-
-  document.body.classList.remove(
-    "width-fit",
-    "width-wide",
-    "width-original"
-  );
-
-  document.body.classList.add(
-    "width-" +
-    (
-      settings.width || "fit"
-    )
-  );
-
-
-  /* theme */
-
-  document.body.classList.remove(
-    "theme-dark",
-    "theme-black",
-    "theme-gray",
-    "theme-light"
-  );
-
-  document.body.classList.add(
-    "theme-" +
-    (
-      settings.theme || "dark"
-    )
-  );
-
-
-  /* filters */
-
-  const brightness =
-    Number(
-      settings.brightness ?? 100
-    );
-
-  const contrast =
-    Number(
-      settings.contrast ?? 100
-    );
-
-  const saturation =
-    Number(
-      settings.saturation ?? 100
-    );
-
-
-  document.documentElement
-    .style
-    .setProperty(
-      "--brightness",
-      brightness / 100
-    );
-
-  document.documentElement
-    .style
-    .setProperty(
-      "--contrast",
-      contrast / 100
-    );
-
-  document.documentElement
-    .style
-    .setProperty(
-      "--saturation",
-      saturation / 100
-    );
-
-
-  /* sliders */
-
-  document.getElementById(
-    "brightness"
-  ).value =
-    brightness;
-
-  document.getElementById(
-    "contrast"
-  ).value =
-    contrast;
-
-  document.getElementById(
-    "saturation"
-  ).value =
-    saturation;
-
-
-  updateSliderLabels();
-
-  updateSettingButtons();
-
-}
-
-
-/* =========================================================
-   SETTING BUTTON STATES
-========================================================= */
-
-function updateSettingButtons(){
-
-  document
-    .getElementById(
-      "verticalBtn"
-    )
-    .classList.toggle(
-      "active",
-      mode === "vertical"
-    );
-
-  document
-    .getElementById(
-      "singleBtn"
-    )
-    .classList.toggle(
-      "active",
-      mode === "single"
-    );
-
-
-  const width =
-    document.body.classList.contains(
-      "width-wide"
-    )
-      ? "wide"
-      : document.body.classList.contains(
-          "width-original"
-        )
-          ? "original"
-          : "fit";
-
-
-  document
-    .getElementById(
-      "fitBtn"
-    )
-    .classList.toggle(
-      "active",
-      width === "fit"
-    );
-
-  document
-    .getElementById(
-      "wideBtn"
-    )
-    .classList.toggle(
-      "active",
-      width === "wide"
-    );
-
-  document
-    .getElementById(
-      "originalBtn"
-    )
-    .classList.toggle(
-      "active",
-      width === "original"
-    );
-
-
-  const themes = [
-    "dark",
-    "black",
-    "gray",
-    "light"
-  ];
-
-
-  themes.forEach(
-    theme => {
-
-      const button =
-        document.querySelector(
-          `[data-theme="${theme}"]`
-        );
-
-      if(button){
-
-        button.classList.toggle(
-          "active",
-          document.body.classList.contains(
-            "theme-" + theme
-          )
-        );
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   SLIDER LABELS
-========================================================= */
-
-function updateSliderLabels(){
-
-  document.getElementById(
-    "brightnessValue"
-  ).textContent =
-    document.getElementById(
-      "brightness"
-    ).value + "%";
-
-
-  document.getElementById(
-    "contrastValue"
-  ).textContent =
-    document.getElementById(
-      "contrast"
-    ).value + "%";
-
-
-  document.getElementById(
-    "saturationValue"
-  ).textContent =
-    document.getElementById(
-      "saturation"
-    ).value + "%";
-
-}
-
-
-/* =========================================================
-   SETTINGS OPEN / CLOSE
-========================================================= */
-
-function openSettings(){
-
-  settingsPanel.classList.add(
-    "open"
-  );
-
-  settingsBackdrop.classList.add(
-    "open"
-  );
-
-}
-
-
-function closeSettings(){
-
-  settingsPanel.classList.remove(
-    "open"
-  );
-
-  settingsBackdrop.classList.remove(
-    "open"
-  );
-
-}
-
-
-document
-  .getElementById(
-    "settingsBtn"
-  )
-  .onclick = () => {
-
-    if(
-      settingsPanel.classList.contains(
-        "open"
-      )
-    ){
-
-      closeSettings();
-
-    }else{
-
-      openSettings();
-
-    }
-
-  };
-
-
-document
-  .getElementById(
-    "closeSettings"
-  )
-  .onclick =
-    closeSettings;
-
-
-settingsBackdrop.onclick =
-  closeSettings;
 
 
 /* =========================================================
@@ -2251,419 +755,98 @@ settingsBackdrop.onclick =
 ========================================================= */
 
 async function init(){
+  const reader = document.getElementById("reader");
 
   try{
-
     if(!requested){
-
-      throw new Error(
-        "معرّف الفصل غير موجود في الرابط."
-      );
-
+      throw new Error("معرّف الفصل غير موجود في الرابط.");
     }
 
+    const chapterId = String(requested).trim();
+    let chapterResult;
 
-    const saved =
-      loadSettings();
+    if(isUUID(chapterId)){
+      chapterResult = await db.from("chapters").select("id,number,title,published_at").eq("id", chapterId).maybeSingle();
+    }else{
+      const number = Number(chapterId);
+      if(!Number.isInteger(number) || number < 1) throw new Error("معرّف الفصل غير صالح.");
+      chapterResult = await db.from("chapters").select("id,number,title,published_at").eq("number", number).maybeSingle();
+    }
 
-    applySettings(
-      saved
-    );
+    if(chapterResult.error) throw new Error("فشل قراءة الفصل: " + chapterResult.error.message);
+    if(!chapterResult.data) throw new Error("لم يتم العثور على الفصل المطلوب.");
 
+    const chapter = chapterResult.data;
+    const numberText = safeNumber(chapter.number, 0);
 
-    await loadChapters();
+    document.getElementById("chapterTitle").textContent = `الفصل ${numberText} — ${chapter.title || ""}`;
 
-    await loadCurrentChapter();
+    // Load all chapters for the dropdown select list
+    loadChaptersDropdown(chapter.id);
+
+    /* =====================================================
+       LOAD PAGES
+    ===================================================== */
+    const pagesResult = await db.from("pages").select("id,page_number,storage_path").eq("chapter_id", chapter.id).order("page_number", { ascending: true });
+
+    if(pagesResult.error) throw new Error("تعذر قراءة الصفحات: " + pagesResult.error.message);
+
+    const pageRows = Array.isArray(pagesResult.data) ? pagesResult.data : [];
+    if(!pageRows.length) throw new Error("لا توجد صفحات مسجلة لهذا الفصل.");
+
+    images = pageRows.filter(p => p && p.storage_path).map((p, i) => ({
+      page: safeNumber(p.page_number, i),
+      path: String(p.storage_path),
+      url: publicUrl(p.storage_path)
+    }));
+
+    if(!images.length) throw new Error("مسارات الصور فارغة.");
+
+    images.sort((a, b) => a.page - b.page);
+
+    render();
+    updateScrubber();
 
   }catch(error){
-
-    console.error(
-      "Reader error:",
-      error
-    );
-
-
+    console.error("Reader error:", error);
     reader.innerHTML = `
-
       <div class="status error">
-
-        <h3>
-          تعذر تحميل الفصل
-        </h3>
-
-        <div>
-          ${escapeHtml(
-            error.message ||
-            String(error)
-          )}
-        </div>
-
+        <h3>تعذر تحميل الفصل</h3>
+        <div>${escapeHtml(error.message || String(error))}</div>
       </div>
-
     `;
-
   }
-
 }
 
-
 /* =========================================================
-   LOAD CHAPTERS
+   CHAPTERS DROPDOWN LIST
 ========================================================= */
 
-async function loadChapters(){
-
-  const result =
-    await db
-      .from("chapters")
-      .select(
-        "id,number,title,published_at"
-      )
-      .order(
-        "number",
-        {
-          ascending:false
+async function loadChaptersDropdown(currentId){
+  try{
+    const { data } = await db.from("chapters").select("id, number, title").order("number", { ascending: true });
+    if(data){
+      const select = document.getElementById("chaptersSelect");
+      select.innerHTML = '<option value="">الفصول...</option>';
+      data.forEach(ch => {
+        const opt = document.createElement("option");
+        opt.value = ch.id;
+        opt.textContent = `الفصل ${ch.number}`;
+        if(ch.id === currentId){
+          opt.selected = true;
         }
-      );
-
-
-  if(result.error){
-
-    console.error(
-      "Chapter list error:",
-      result.error
-    );
-
-    return;
-
-  }
-
-
-  chapters =
-    Array.isArray(
-      result.data
-    )
-      ? result.data
-      : [];
-
-
-  chapterSelect.innerHTML =
-    "";
-
-
-  if(!chapters.length){
-
-    chapterSelect.innerHTML = `
-      <option value="">
-        لا توجد فصول
-      </option>
-    `;
-
-    return;
-
-  }
-
-
-  chapters.forEach(
-    chapter => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-      option.value =
-        chapter.number;
-
-      option.textContent =
-        `الفصل ${chapter.number}${
-          chapter.title
-            ? " — " + chapter.title
-            : ""
-        }`;
-
-      chapterSelect.appendChild(
-        option
-      );
-
-    }
-  );
-
-
-  const current =
-    String(
-      requested
-    );
-
-
-  const currentChapter =
-    chapters.find(
-      c =>
-        String(c.id) === current ||
-        String(c.number) === current
-    );
-
-
-  if(currentChapter){
-
-    chapterSelect.value =
-      String(
-        currentChapter.number
-      );
-
-  }
-
-}
-
-
-/* =========================================================
-   CHAPTER SELECT
-========================================================= */
-
-chapterSelect.onchange =
-  () => {
-
-    const number =
-      chapterSelect.value;
-
-    if(!number){
-      return;
-    }
-
-    closeSettings();
-
-    location.href =
-      `reader.html?chapter=${encodeURIComponent(
-        number
-      )}`;
-
-  };
-
-
-/* =========================================================
-   LOAD CURRENT CHAPTER
-========================================================= */
-
-async function loadCurrentChapter(){
-
-  const chapterId =
-    String(
-      requested
-    ).trim();
-
-
-  let chapterResult;
-
-
-  if(isUUID(chapterId)){
-
-    chapterResult =
-      await db
-        .from("chapters")
-        .select(
-          "id,number,title,published_at"
-        )
-        .eq(
-          "id",
-          chapterId
-        )
-        .maybeSingle();
-
-  }else{
-
-    const number =
-      Number(
-        chapterId
-      );
-
-
-    if(
-      !Number.isInteger(number) ||
-      number < 1
-    ){
-
-      throw new Error(
-        "معرّف الفصل غير صالح."
-      );
-
-    }
-
-
-    chapterResult =
-      await db
-        .from("chapters")
-        .select(
-          "id,number,title,published_at"
-        )
-        .eq(
-          "number",
-          number
-        )
-        .maybeSingle();
-
-  }
-
-
-  if(chapterResult.error){
-
-    throw new Error(
-      "فشل قراءة الفصل: " +
-      chapterResult.error.message
-    );
-
-  }
-
-
-  if(!chapterResult.data){
-
-    throw new Error(
-      "لم يتم العثور على الفصل المطلوب."
-    );
-
-  }
-
-
-  const chapter =
-    chapterResult.data;
-
-
-  const numberText =
-    safeNumber(
-      chapter.number,
-      0
-    );
-
-
-  document.title =
-    `الفصل ${numberText} — ${
-      chapter.title || "دوامتان زرقاوتان"
-    }`;
-
-
-  document.getElementById(
-    "topChapterTitle"
-  ).textContent =
-    `الفصل ${numberText}${
-      chapter.title
-        ? " — " + chapter.title
-        : ""
-    }`;
-
-
-  if(
-    chapterSelect.querySelector(
-      `option[value="${CSS.escape(
-        String(chapter.number)
-      )}"]`
-    )
-  ){
-
-    chapterSelect.value =
-      String(
-        chapter.number
-      );
-
-  }
-
-
-  /* =====================================================
-     LOAD PAGES
-  ===================================================== */
-
-  const pagesResult =
-    await db
-      .from("pages")
-      .select(
-        "id,page_number,storage_path"
-      )
-      .eq(
-        "chapter_id",
-        chapter.id
-      )
-      .order(
-        "page_number",
-        {
-          ascending:true
+        select.appendChild(opt);
+      });
+
+      select.onchange = (e) => {
+        if(e.target.value){
+          location.href = `?chapter=${e.target.value}`;
         }
-      );
-
-
-  if(pagesResult.error){
-
-    throw new Error(
-      "تم العثور على الفصل، لكن تعذر قراءة الصفحات: " +
-      pagesResult.error.message
-    );
-
+      };
+    }
+  }catch(e){
+    console.error("Chapters list error:", e);
   }
-
-
-  const pageRows =
-    Array.isArray(
-      pagesResult.data
-    )
-      ? pagesResult.data
-      : [];
-
-
-  if(!pageRows.length){
-
-    throw new Error(
-      "الفصل موجود، لكن لا توجد صفحات مسجلة له."
-    );
-
-  }
-
-
-  images =
-    pageRows
-      .filter(
-        p =>
-          p &&
-          p.storage_path
-      )
-      .map(
-        (p,i) => ({
-
-          page:
-            safeNumber(
-              p.page_number,
-              i
-            ),
-
-          path:
-            String(
-              p.storage_path
-            ),
-
-          url:
-            publicUrl(
-              p.storage_path
-            )
-
-        })
-      );
-
-
-  if(!images.length){
-
-    throw new Error(
-      "تم العثور على الصفحات، لكن مسارات الصور فارغة."
-    );
-
-  }
-
-
-  images.sort(
-    (a,b) =>
-      a.page - b.page
-  );
-
-
-  render();
-
-  updateScrubber();
-
 }
 
 
@@ -2672,174 +855,60 @@ async function loadCurrentChapter(){
 ========================================================= */
 
 function render(){
-
+  const reader = document.getElementById("reader");
   reader.innerHTML = "";
 
+  images.forEach((page, i) => {
+    const wrap = document.createElement("div");
+    wrap.className = "page-wrap";
 
-  images.forEach(
-    (page,i) => {
+    const img = document.createElement("img");
+    img.className = "manga-page";
+    img.src = page.url;
+    img.alt = `صفحة ${page.page}`;
+    img.loading = i < 3 ? "eager" : "lazy";
+    img.decoding = "async";
+    img.referrerPolicy = "no-referrer";
+    img.dataset.pageIndex = String(i);
 
-      const wrap =
-        document.createElement(
-          "div"
-        );
+    img.onerror = () => {
+      wrap.innerHTML = `
+        <div class="status error">
+          تعذر تحميل الصفحة ${escapeHtml(page.page)}<br>
+          <small>المسار: ${escapeHtml(page.path)}</small>
+        </div>
+      `;
+    };
 
-      wrap.className =
-        "page-wrap";
+    wrap.appendChild(img);
+    reader.appendChild(wrap);
+  });
 
-
-      const img =
-        document.createElement(
-          "img"
-        );
-
-
-      img.className =
-        "manga-page";
-
-
-      img.src =
-        page.url;
-
-
-      img.alt =
-        `صفحة ${page.page}`;
-
-
-      img.loading =
-        i < 3
-          ? "eager"
-          : "lazy";
-
-
-      img.decoding =
-        "async";
-
-
-      img.referrerPolicy =
-        "no-referrer";
-
-
-      img.dataset.pageIndex =
-        String(i);
-
-
-      img.onerror =
-        () => {
-
-          wrap.innerHTML = `
-
-            <div class="status error">
-
-              تعذر تحميل الصفحة
-              ${escapeHtml(
-                page.page
-              )}
-
-              <br>
-
-              <small>
-                المسار:
-                ${escapeHtml(
-                  page.path
-                )}
-              </small>
-
-            </div>
-
-          `;
-
-        };
-
-
-      wrap.appendChild(
-        img
-      );
-
-      reader.appendChild(
-        wrap
-      );
-
-    }
-  );
-
-
-  /* =====================================================
-     CHAPTER END
-  ===================================================== */
-
-  const end =
-    document.createElement(
-      "section"
-    );
-
-
-  end.className =
-    "chapter-end";
-
-
+  const end = document.createElement("section");
+  end.className = "chapter-end";
   end.innerHTML = `
-
-    <h2>
-      انتهى الفصل
-    </h2>
-
-    <p>
-      وصلت إلى نهاية الفصل الحالي.
-    </p>
-
+    <h2>انتهى الفصل</h2>
+    <p>وصلت إلى نهاية الفصل الحالي.</p>
     <div class="chapter-end-actions">
-
-      <button id="endTop">
-        العودة إلى البداية
-      </button>
-
-      <button id="endChapters">
-        قائمة الفصول
-      </button>
-
+      <button id="endTop">العودة إلى البداية</button>
+      <button id="endChapters">قائمة الفصول</button>
     </div>
-
   `;
+  reader.appendChild(end);
 
+  document.getElementById("endTop").onclick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  reader.appendChild(
-    end
-  );
+  document.getElementById("endChapters").onclick = () => {
+    location.href = "index.html#chapters";
+  };
 
-
-  document.getElementById(
-    "endTop"
-  ).onclick =
-    () => {
-
-      window.scrollTo({
-        top:0,
-        behavior:"smooth"
-      });
-
-    };
-
-
-  document.getElementById(
-    "endChapters"
-  ).onclick =
-    () => {
-
-      location.href =
-        "index.html#chapters";
-
-    };
-
+  document.getElementById("counter").textContent = `${images.length} صفحة`;
 
   if(mode === "single"){
-
-    setSingle(
-      0
-    );
-
+    setSingle(0);
   }
-
 }
 
 
@@ -2848,867 +917,308 @@ function render(){
 ========================================================= */
 
 function setSingle(i){
+  if(!images.length) return;
+  index = Math.max(0, Math.min(images.length - 1, i));
 
-  if(!images.length){
-    return;
-  }
-
-
-  index =
-    Math.max(
-      0,
-      Math.min(
-        images.length - 1,
-        i
-      )
-    );
-
-
-  document
-    .querySelectorAll(
-      ".reader .page-wrap"
-    )
-    .forEach(
-      (wrap,n) => {
-
-        wrap.classList.toggle(
-          "active",
-          n === index
-        );
-
-      }
-    );
-
-
-  document.getElementById(
-    "counter"
-  ).textContent =
-    `${index + 1} / ${images.length}`;
-
-
-  updateScrubber();
-
-}
-
-
-/* =========================================================
-   SINGLE NAVIGATION
-========================================================= */
-
-document.getElementById(
-  "singleNext"
-).onclick =
-  () => {
-
-    if(
-      index <
-      images.length - 1
-    ){
-
-      setSingle(
-        index + 1
-      );
-
-    }else{
-
-      scrollToEnd();
-
-    }
-
-  };
-
-
-document.getElementById(
-  "singlePrev"
-).onclick =
-  () => {
-
-    if(index > 0){
-
-      setSingle(
-        index - 1
-      );
-
-    }
-
-  };
-
-
-function scrollToEnd(){
-
-  window.scrollTo({
-    top:
-      document.documentElement
-        .scrollHeight,
-    behavior:"smooth"
+  document.querySelectorAll(".reader img").forEach((img, n) => {
+    img.classList.toggle("active", n === index);
   });
 
+  document.getElementById("counter").textContent = `${index + 1} / ${images.length}`;
+  updateScrubber();
 }
 
 
 /* =========================================================
-   SETTINGS — MODE
+   NEXT / PREVIOUS
 ========================================================= */
 
-document.getElementById(
-  "verticalBtn"
-).onclick =
-  () => {
-
-    mode =
-      "vertical";
-
-    document.body.classList.remove(
-      "single"
-    );
-
-    render();
-
-    saveSettings();
-
-    updateSettingButtons();
-
-  };
-
-
-document.getElementById(
-  "singleBtn"
-).onclick =
-  () => {
-
-    mode =
-      "single";
-
-    document.body.classList.add(
-      "single"
-    );
-
-    render();
-
-    saveSettings();
-
-    updateSettingButtons();
-
-  };
-
-
-/* =========================================================
-   SETTINGS — WIDTH
-========================================================= */
-
-function setWidth(width){
-
-  document.body.classList.remove(
-    "width-fit",
-    "width-wide",
-    "width-original"
-  );
-
-  document.body.classList.add(
-    "width-" +
-    width
-  );
-
-  saveSettings();
-
-  updateSettingButtons();
-
-}
-
-
-document.getElementById(
-  "fitBtn"
-).onclick =
-  () => setWidth(
-    "fit"
-  );
-
-
-document.getElementById(
-  "wideBtn"
-).onclick =
-  () => setWidth(
-    "wide"
-  );
-
-
-document.getElementById(
-  "originalBtn"
-).onclick =
-  () => setWidth(
-    "original"
-  );
-
-
-/* =========================================================
-   SETTINGS — THEME
-========================================================= */
-
-document
-  .querySelectorAll(
-    "[data-theme]"
-  )
-  .forEach(
-    button => {
-
-      button.onclick =
-        () => {
-
-          const theme =
-            button.dataset.theme;
-
-
-          document.body.classList.remove(
-            "theme-dark",
-            "theme-black",
-            "theme-gray",
-            "theme-light"
-          );
-
-
-          document.body.classList.add(
-            "theme-" +
-            theme
-          );
-
-
-          saveSettings();
-
-          updateSettingButtons();
-
-        };
-
+document.getElementById("next").onclick = () => {
+  if(mode === "single"){
+    if(index < images.length - 1){
+      setSingle(index + 1);
+    }else{
+      scrollToEnd();
     }
-  );
+  }else{
+    window.scrollBy({ top: window.innerHeight * .85, behavior: "smooth" });
+  }
+};
 
+document.getElementById("prev").onclick = () => {
+  if(mode === "single"){
+    if(index > 0){
+      setSingle(index - 1);
+    }else{
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }else{
+    window.scrollBy({ top: -window.innerHeight * .85, behavior: "smooth" });
+  }
+};
 
-/* =========================================================
-   SETTINGS — FILTERS
-========================================================= */
-
-function updateFilters(){
-
-  const brightness =
-    Number(
-      document.getElementById(
-        "brightness"
-      ).value
-    );
-
-  const contrast =
-    Number(
-      document.getElementById(
-        "contrast"
-      ).value
-    );
-
-  const saturation =
-    Number(
-      document.getElementById(
-        "saturation"
-      ).value
-    );
-
-
-  document.documentElement
-    .style
-    .setProperty(
-      "--brightness",
-      brightness / 100
-    );
-
-  document.documentElement
-    .style
-    .setProperty(
-      "--contrast",
-      contrast / 100
-    );
-
-  document.documentElement
-    .style
-    .setProperty(
-      "--saturation",
-      saturation / 100
-    );
-
-
-  updateSliderLabels();
-
-  saveSettings();
-
+function scrollToEnd(){
+  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
 }
 
 
-document.getElementById(
-  "brightness"
-).oninput =
-  updateFilters;
-
-
-document.getElementById(
-  "contrast"
-).oninput =
-  updateFilters;
-
-
-document.getElementById(
-  "saturation"
-).oninput =
-  updateFilters;
-
-
 /* =========================================================
-   RESET
+   SETTINGS PANEL & COMPREHENSIVE CONTROLS
 ========================================================= */
 
-document.getElementById(
-  "resetSettings"
-).onclick =
-  () => {
+const settingsPanel = document.getElementById("settingsPanel");
+const bottomControls = document.getElementById("bottomControls");
 
-    applySettings(
-      DEFAULT_SETTINGS
-    );
+document.getElementById("settingsBtn").onclick = () => {
+  settingsPanel.classList.toggle("open");
+};
 
-    saveSettings();
+document.getElementById("closeSettings").onclick = () => {
+  settingsPanel.classList.remove("open");
+};
 
-    if(mode === "single"){
+// Mode: Vertical vs Single
+document.getElementById("verticalBtn").onclick = () => {
+  mode = "vertical";
+  document.body.classList.remove("single");
+  document.getElementById("verticalBtn").classList.add("active");
+  document.getElementById("singleBtn").classList.remove("active");
+  bottomControls.classList.remove("visible"); // إخفاء النافذة السفلية في العمودي
+  render();
+};
 
-      render();
+document.getElementById("singleBtn").onclick = () => {
+  mode = "single";
+  document.body.classList.add("single");
+  document.getElementById("singleBtn").classList.add("active");
+  document.getElementById("verticalBtn").classList.remove("active");
+  bottomControls.classList.add("visible"); // إظهار النافذة السفلية في صفحة واحدة
+  render();
+};
 
-    }
+// Fit / Original Width
+document.getElementById("fitBtn").onclick = () => {
+  document.body.classList.remove("fit-original");
+  document.getElementById("fitBtn").classList.add("active");
+  document.getElementById("originalBtn").classList.remove("active");
+};
 
-  };
+document.getElementById("originalBtn").onclick = () => {
+  document.body.classList.add("fit-original");
+  document.getElementById("originalBtn").classList.add("active");
+  document.getElementById("fitBtn").classList.remove("active");
+};
+
+// Background Colors
+document.getElementById("bgDark").onclick = () => {
+  document.documentElement.style.background = "#05080c";
+  document.body.style.background = "#05080c";
+  setActiveGroup("bgDark", ["bgDark", "bgPure", "bgDim"]);
+};
+document.getElementById("bgPure").onclick = () => {
+  document.documentElement.style.background = "#000000";
+  document.body.style.background = "#000000";
+  setActiveGroup("bgPure", ["bgDark", "bgPure", "bgDim"]);
+};
+document.getElementById("bgDim").onclick = () => {
+  document.documentElement.style.background = "#12161c";
+  document.body.style.background = "#12161c";
+  setActiveGroup("bgDim", ["bgDark", "bgPure", "bgDim"]);
+};
+
+// Brightness Filter
+document.getElementById("bright100").onclick = () => {
+  setBrightness("1");
+  setActiveGroup("bright100", ["bright100", "bright90", "bright80"]);
+};
+document.getElementById("bright90").onclick = () => {
+  setBrightness("0.9");
+  setActiveGroup("bright90", ["bright100", "bright90", "bright80"]);
+};
+document.getElementById("bright80").onclick = () => {
+  setBrightness("0.8");
+  setActiveGroup("bright80", ["bright100", "bright90", "bright80"]);
+};
+
+function setBrightness(val){
+  document.querySelectorAll(".reader img").forEach(img => {
+    img.style.filter = `brightness(${val})`;
+  });
+}
+
+// Page Gap
+document.getElementById("gap0").onclick = () => {
+  setGap("0px");
+  setActiveGroup("gap0", ["gap0", "gap10", "gap20"]);
+};
+document.getElementById("gap10").onclick = () => {
+  setGap("10px");
+  setActiveGroup("gap10", ["gap0", "gap10", "gap20"]);
+};
+document.getElementById("gap20").onclick = () => {
+  setGap("20px");
+  setActiveGroup("gap20", ["gap0", "gap10", "gap20"]);
+};
+
+function setGap(val){
+  document.querySelectorAll(".page-wrap").forEach(wrap => {
+    wrap.style.marginBottom = val;
+  });
+}
+
+function setActiveGroup(activeId, ids){
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove("active");
+  });
+  const target = document.getElementById(activeId);
+  if(target) target.classList.add("active");
+}
 
 
 /* =========================================================
    FULLSCREEN
 ========================================================= */
 
-document.getElementById(
-  "full"
-).onclick =
-  async () => {
-
-    try{
-
-      if(
-        !document.fullscreenElement
-      ){
-
-        await document.documentElement
-          .requestFullscreen();
-
-      }else{
-
-        await document.exitFullscreen();
-
-      }
-
-    }catch(error){
-
-      console.error(
-        "Fullscreen error:",
-        error
-      );
-
+document.getElementById("full").onclick = async () => {
+  try{
+    if(!document.fullscreenElement){
+      await document.documentElement.requestFullscreen();
+    }else{
+      await document.exitFullscreen();
     }
-
-  };
-
-
-/* =========================================================
-   ESCAPE CLOSE SETTINGS
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if(
-      event.key === "Escape" &&
-      settingsPanel.classList.contains(
-        "open"
-      )
-    ){
-
-      closeSettings();
-
-    }
-
+  }catch(error){
+    console.error("Fullscreen error:", error);
   }
-);
+};
 
 
 /* =========================================================
    SIDE SCRUBBER
 ========================================================= */
 
-const scrubber =
-  document.getElementById(
-    "scrubber"
-  );
-
-const scrubberHitbox =
-  document.getElementById(
-    "scrubberHitbox"
-  );
-
-const scrubberThumb =
-  document.getElementById(
-    "scrubberThumb"
-  );
-
-const scrubberCounter =
-  document.getElementById(
-    "scrubberCounter"
-  );
-
+const scrubber = document.getElementById("scrubber");
+const scrubberHitbox = document.getElementById("scrubberHitbox");
+const scrubberThumb = document.getElementById("scrubberThumb");
+const scrubberCounter = document.getElementById("scrubberCounter");
 
 function updateScrubber(){
-
-  if(!images.length){
-    return;
-  }
-
-
-  let currentIndex =
-    index;
-
+  if(!images.length) return;
+  let currentIndex = index;
 
   if(mode === "vertical"){
-
-    const maxScroll =
-      document.documentElement
-        .scrollHeight -
-      window.innerHeight;
-
-
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     if(maxScroll > 0){
-
-      const ratio =
-        window.scrollY /
-        maxScroll;
-
-
-      currentIndex =
-        Math.round(
-          ratio *
-          (images.length - 1)
-        );
-
+      const ratio = window.scrollY / maxScroll;
+      currentIndex = Math.round(ratio * (images.length - 1));
     }else{
-
-      currentIndex =
-        0;
-
+      currentIndex = 0;
     }
-
   }
 
+  const ratio = images.length <= 1 ? 0 : currentIndex / (images.length - 1);
+  const trackHeight = scrubber.clientHeight;
+  const thumbHeight = scrubberThumb.offsetHeight;
+  const maxTop = Math.max(0, trackHeight - thumbHeight);
 
-  const ratio =
-    images.length <= 1
-      ? 0
-      : currentIndex /
-        (images.length - 1);
-
-
-  const trackHeight =
-    scrubber.clientHeight;
-
-
-  const thumbHeight =
-    scrubberThumb.offsetHeight;
-
-
-  const maxTop =
-    Math.max(
-      0,
-      trackHeight -
-      thumbHeight
-    );
-
-
-  scrubberThumb.style.top =
-    `${ratio * maxTop}px`;
-
-
-  scrubberCounter.textContent =
-    `${currentIndex + 1} / ${images.length}`;
-
+  scrubberThumb.style.top = `${ratio * maxTop}px`;
+  scrubberCounter.textContent = `${currentIndex + 1} / ${images.length}`;
 }
-
 
 function activateScrubber(){
-
-  scrubber.classList.add(
-    "active"
-  );
-
-  clearTimeout(
-    scrubberTimer
-  );
-
-  scrubberTimer =
-    setTimeout(
-      () => {
-
-        if(!scrubberDragging){
-
-          scrubber.classList.remove(
-            "active"
-          );
-
-        }
-
-      },
-      1500
-    );
-
+  scrubber.classList.add("active");
+  clearTimeout(scrubberTimer);
+  scrubberTimer = setTimeout(() => {
+    if(!scrubberDragging){
+      scrubber.classList.remove("active");
+    }
+  }, 1800);
 }
-
-
-/* =========================================================
-   SEEK
-========================================================= */
 
 function seekFromPointer(clientY){
-
-  const rect =
-    scrubber.getBoundingClientRect();
-
-
-  const thumbHeight =
-    scrubberThumb.offsetHeight;
-
-
-  const usable =
-    Math.max(
-      1,
-      rect.height -
-      thumbHeight
-    );
-
-
-  let y =
-    clientY -
-    rect.top -
-    thumbHeight / 2;
-
-
-  y =
-    Math.max(
-      0,
-      Math.min(
-        usable,
-        y
-      )
-    );
-
-
-  const ratio =
-    y /
-    usable;
-
-
-  const target =
-    Math.round(
-      ratio *
-      (images.length - 1)
-    );
-
+  const rect = scrubber.getBoundingClientRect();
+  const thumbHeight = scrubberThumb.offsetHeight;
+  const usable = Math.max(1, rect.height - thumbHeight);
+  let y = clientY - rect.top - thumbHeight / 2;
+  y = Math.max(0, Math.min(usable, y));
+  const ratio = y / usable;
+  const target = Math.round(ratio * (images.length - 1));
 
   if(mode === "single"){
-
-    setSingle(
-      target
-    );
-
+    setSingle(target);
   }else{
-
-    const targetPage =
-      document.querySelectorAll(
-        ".page-wrap"
-      )[target];
-
-
+    const targetPage = document.querySelectorAll(".page-wrap")[target];
     if(targetPage){
-
-      targetPage.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-      });
-
+      targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-
   }
-
-
   updateScrubber();
-
 }
 
+scrubberHitbox.addEventListener("pointerdown", event => {
+  if(event.target === document.getElementById("scrubberTop") || event.target === document.getElementById("scrubberBottom")) return;
+  scrubberDragging = true;
+  scrubber.setPointerCapture?.(event.pointerId);
+  activateScrubber();
+  seekFromPointer(event.clientY);
+});
 
-/* =========================================================
-   SCRUBBER POINTER
-========================================================= */
+scrubberHitbox.addEventListener("pointermove", event => {
+  if(!scrubberDragging) return;
+  seekFromPointer(event.clientY);
+});
 
-scrubberHitbox.addEventListener(
-  "pointerdown",
-  event => {
+scrubberHitbox.addEventListener("pointerup", () => {
+  scrubberDragging = false;
+  activateScrubber();
+});
 
-    if(
-      event.target ===
-        document.getElementById(
-          "scrubberTop"
-        ) ||
-      event.target ===
-        document.getElementById(
-          "scrubberBottom"
-        )
-    ){
+scrubberHitbox.addEventListener("pointercancel", () => {
+  scrubberDragging = false;
+});
 
-      return;
-
-    }
-
-
-    scrubberDragging =
-      true;
-
-
-    activateScrubber();
-
-
-    seekFromPointer(
-      event.clientY
-    );
-
+document.getElementById("scrubberTop").onclick = event => {
+  event.stopPropagation();
+  if(mode === "single"){
+    setSingle(0);
+  }else{
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
-);
+  activateScrubber();
+};
 
-
-scrubberHitbox.addEventListener(
-  "pointermove",
-  event => {
-
-    if(!scrubberDragging){
-      return;
-    }
-
-    seekFromPointer(
-      event.clientY
-    );
-
+document.getElementById("scrubberBottom").onclick = event => {
+  event.stopPropagation();
+  if(mode === "single"){
+    setSingle(images.length - 1);
+  }else{
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
   }
-);
-
-
-window.addEventListener(
-  "pointerup",
-  () => {
-
-    scrubberDragging =
-      false;
-
-  }
-);
-
-
-/* =========================================================
-   SCRUBBER TOP / BOTTOM
-========================================================= */
-
-document.getElementById(
-  "scrubberTop"
-).onclick =
-  event => {
-
-    event.stopPropagation();
-
-    if(mode === "single"){
-
-      setSingle(
-        0
-      );
-
-    }else{
-
-      window.scrollTo({
-        top:0,
-        behavior:"smooth"
-      });
-
-    }
-
-    activateScrubber();
-
-  };
-
-
-document.getElementById(
-  "scrubberBottom"
-).onclick =
-  event => {
-
-    event.stopPropagation();
-
-    if(mode === "single"){
-
-      setSingle(
-        images.length - 1
-      );
-
-    }else{
-
-      window.scrollTo({
-        top:
-          document.documentElement
-            .scrollHeight,
-        behavior:"smooth"
-      });
-
-    }
-
-    activateScrubber();
-
-  };
-
-
-/* =========================================================
-   SCROLL TRACKING
-========================================================= */
+  activateScrubber();
+};
 
 let scrollTimer = null;
-
-window.addEventListener(
-  "scroll",
-  () => {
-
-    if(mode === "vertical"){
-
-      updateScrubber();
-
-    }
-
-    clearTimeout(
-      scrollTimer
-    );
-
-
-    scrollTimer =
-      setTimeout(
-        () => {
-
-          scrubber.classList.remove(
-            "active"
-          );
-
-        },
-        1000
-      );
-
-  },
-  {
-    passive:true
+window.addEventListener("scroll", () => {
+  if(mode === "vertical"){
+    updateScrubber();
   }
-);
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    scrubber.classList.remove("active");
+  }, 1200);
+}, { passive: true });
 
+window.addEventListener("resize", updateScrubber);
 
-window.addEventListener(
-  "resize",
-  updateScrubber
-);
-
-
-/* =========================================================
-   EDGE ACTIVATION
-========================================================= */
-
-document.addEventListener(
-  "pointermove",
-  event => {
-
-    if(
-      event.clientX >
-      window.innerWidth - 55
-    ){
-
-      activateScrubber();
-
-    }
-
-  },
-  {
-    passive:true
+document.addEventListener("pointermove", event => {
+  if(event.clientX > window.innerWidth - 55){
+    activateScrubber();
   }
-);
+}, { passive: true });
 
+// Start
+init();
 
-/* =========================================================
-   KEYBOARD SHORTCUTS
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if(
-      event.target.tagName === "SELECT" ||
-      event.target.tagName === "INPUT"
-    ){
-
-      return;
-
-    }
-
-
-    if(
-      event.key === "ArrowRight" &&
-      mode === "single"
-    ){
-
-      if(
-        index <
-        images.length - 1
-      ){
-
-        setSingle(
-          index + 1
-        );
-
-      }
-
-    }
-
-
-    if(
-      event.key === "ArrowLeft" &&
-      mode === "single"
-    ){
-
-      if(index > 0){
-
-        setSingle(
-          index - 1
-        );
-
-      }
-
-    }
-
-
-    if(
-      event.key === "Escape"
-    ){
-
-      closeSettings();
-
-    }
-
-  }
-);
-
-
-/* =========================
+</script>
+</body>
+</html>
