@@ -1,6 +1,0 @@
-vortex-mark-white.png
-vortex-mark-cyan.png
-vortex-icon.png
-vortex-pattern.svg
-boruto-cover.jpg
-cover.png
