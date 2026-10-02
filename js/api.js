@@ -55,6 +55,8 @@ const VortexAPI = (() => {
         },
         chaptersByManga: (id) =>
             get(`chapters?select=id,number,title,published_at&manga_id=eq.${encodeURIComponent(id)}&order=number.desc`),
+        getPages: (id) =>
+            get(`pages?select=page_number,storage_path&chapter_id=eq.${encodeURIComponent(id)}&order=page_number.asc`),
         getChapter: async (id) => {
             const e = encodeURIComponent(id);
             const rows = await get(`chapters?select=*,manga(id,title)&id=eq.${e}&limit=1`);
