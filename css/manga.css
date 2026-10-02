@@ -1,0 +1,88 @@
+/* VORTEX — MANGA CSS */
+
+.manga-header {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 36px;
+    align-items: start;
+}
+
+.manga-poster {
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--vortex-black-3);
+    box-shadow: var(--shadow);
+}
+
+.manga-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.manga-details h1 {
+    margin: 6px 0 14px;
+    font-size: clamp(30px, 4.5vw, 46px);
+    line-height: 1.15;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.tag {
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--vortex-cyan-light);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.info-list {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.info-row {
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.info-row span {
+    min-width: 110px;
+    color: var(--vortex-gray);
+}
+
+.manga-description {
+    max-width: 760px;
+    color: var(--vortex-white-soft);
+    font-size: 15px;
+    white-space: pre-line;
+}
+
+@media (max-width: 720px) {
+
+    .manga-header {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .manga-poster {
+        width: 55%;
+        margin-inline: auto;
+    }
+
+    .info-row span {
+        min-width: 95px;
+    }
+
+}
