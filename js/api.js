@@ -55,6 +55,24 @@ const VortexAPI = (() => {
         },
         chaptersByManga: (id) =>
             get(`chapters?select=id,number,title,published_at&manga_id=eq.${encodeURIComponent(id)}&order=number.desc`),
+        getChapter: async (id) => {
+            const e = encodeURIComponent(id);
+            const rows = await get(`chapters?select=*,manga(id,title)&id=eq.${e}&limit=1`);
+            const ch = rows[0];
+            if (!ch) return null;
+            const [pages, siblings] = await Promise.all([
+                get(`pages?select=id&chapter_id=eq.${e}`),
+                get(`chapters?select=id,number&manga_id=eq.${encodeURIComponent(ch.manga_id)}&order=number.asc`)
+            ]);
+            const i = siblings.findIndex(c => c.id === ch.id);
+            return {
+                ...ch,
+                manga_title: ch.manga ? ch.manga.title : "",
+                pages,
+                previous_chapter: i > 0 ? siblings[i - 1].id : null,
+                next_chapter: i >= 0 && i < siblings.length - 1 ? siblings[i + 1].id : null
+            };
+        },
         latestChapters: (n = 8) =>
             get(`chapters?select=id,number,title,published_at,created_at,manga(id,title,cover_url)&order=created_at.desc&limit=${n}`),
         recentManga: (n = 12) =>
