@@ -49,6 +49,12 @@ const VortexAPI = (() => {
 
     return {
         fileUrl,
+        mangaById: async (id) => {
+            const rows = await get(`manga?select=*&id=eq.${encodeURIComponent(id)}&limit=1`);
+            return rows[0] || null;
+        },
+        chaptersByManga: (id) =>
+            get(`chapters?select=id,number,title,published_at&manga_id=eq.${encodeURIComponent(id)}&order=number.desc`),
         latestChapters: (n = 8) =>
             get(`chapters?select=id,number,title,published_at,created_at,manga(id,title,cover_url)&order=created_at.desc&limit=${n}`),
         recentManga: (n = 12) =>
