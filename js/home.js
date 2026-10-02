@@ -40,7 +40,10 @@
         /* ---------- آخر الفصول ---------- */
         latestEl.innerHTML = chapters.length
             ? chapters.map(c => `
-                <a class="chapter-card" href="chapter.html?id=${c.id}">
+                <a class="chapter-card" href="chapter.html?chapter=${c.id}">
+                    <div class="chapter-thumb">
+                        ${c.manga?.cover_url ? `<img src="${V.esc(VortexAPI.fileUrl(c.manga.cover_url))}" alt="" loading="lazy">` : ""}
+                    </div>
                     <div class="chapter-card-info">
                         <h3>${V.esc(c.manga?.title || "")} — فصل ${c.number}</h3>
                         <div class="chapter-card-meta">${V.esc(c.title)}</div>
