@@ -1,0 +1,18 @@
+/* VORTEX — HOME CSS */
+
+[data-page="home"] .hero:empty {
+    min-height: 0;
+    border: 0;
+    box-shadow: none;
+}
+
+[data-page="home"] .hero-content p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+[data-page="home"] .chapter-card .section-link {
+    flex-shrink: 0;
+}
