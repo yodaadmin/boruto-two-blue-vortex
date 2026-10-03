@@ -290,6 +290,13 @@
                 img.loading = i < 2 ? "eager" : "lazy";
                 img.addEventListener("error", () => w.classList.add("failed"));
                 w.appendChild(img);
+                if (params.get("debug")) {
+                    w.style.position = "relative";
+                    const b = document.createElement("div");
+                    b.textContent = list[i].storage_path.split("/").pop();
+                    b.style.cssText = "position:absolute;top:8px;right:8px;z-index:5;padding:4px 12px;border-radius:999px;background:#ffeb3b;color:#000;font:700 15px/1.5 sans-serif;direction:ltr";
+                    w.appendChild(b);
+                }
                 pagesEl.appendChild(w);
                 return w;
             });
