@@ -5,7 +5,7 @@
     const $ = id => document.getElementById(id);
 
     const KEY = "vortex-reader-settings";
-    const DEFAULTS = { mode: "vertical", fit: "width", rtl: true, bg: "black", remember: true };
+    const DEFAULTS = { mode: "vertical", fit: "width", rtl: true, bg: "black", remember: true, reverse: false };
 
     let S = { ...DEFAULTS };
     try { S = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) {}
@@ -20,6 +20,22 @@
     let cur = 0;
     let zoom = 1;
     let toastTimer;
+
+    /* ---------- إضافة خيار ترتيب الصفحات للإعدادات ---------- */
+
+    (function addReverseSetting() {
+        const footer = document.querySelector(".settings-footer");
+        if (!footer) return;
+        const sec = document.createElement("div");
+        sec.className = "settings-section";
+        sec.innerHTML = `
+            <label class="settings-label">ترتيب الصفحات</label>
+            <div class="settings-options" role="group" aria-label="ترتيب الصفحات">
+                <button type="button" class="settings-option" data-setting="reverse" data-value="false">عادي</button>
+                <button type="button" class="settings-option" data-setting="reverse" data-value="true">معكوس</button>
+            </div>`;
+        footer.parentNode.insertBefore(sec, footer);
+    })();
 
     /* ---------- أدوات ---------- */
 
@@ -156,9 +172,14 @@
         b.addEventListener("click", () => {
             const key = b.dataset.setting;
             let val = b.dataset.value;
-            if (key === "rtl") val = val === "true";
+            if (key === "rtl" || key === "reverse") val = val === "true";
             S[key] = val;
             saveSettings();
+            if (key === "reverse") {
+                try { localStorage.removeItem(POS_KEY); } catch (e) {}
+                location.reload();
+                return;
+            }
             applySettings();
             if (key === "mode" || key === "fit") goTo(cur, false);
         });
@@ -256,7 +277,8 @@
                 $("reader-next").classList.remove("hidden");
             }
 
-            srcs = pages.map(p => VortexAPI.fileUrl(p.storage_path));
+            const list = S.reverse ? [...pages].reverse() : pages;
+            srcs = list.map(p => VortexAPI.fileUrl(p.storage_path));
 
             wraps = srcs.map((src, i) => {
                 const w = document.createElement("div");
