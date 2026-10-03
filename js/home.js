@@ -46,7 +46,7 @@
         const genres = [...new Set(recent.flatMap(m => m.genres || []))];
         if (genres.length) {
             $("genre-chips").innerHTML = genres.map(g =>
-                `<a class="chip" href="browse.html?genre=${encodeURIComponent(g)}">${V.esc(g)}</a>`
+                `<a class="chip" href="search.html?genre=${encodeURIComponent(g)}">${V.esc(g)}</a>`
             ).join("");
             $("genres-section").classList.remove("hidden");
         }
