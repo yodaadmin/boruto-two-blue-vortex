@@ -14,6 +14,7 @@
 const ICONS = {
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    filter: '<path d="M4 6h16M7 12h10M10 18h4"/>',
     play: '<path d="m8 5 11 7-11 7z"/>',
     chevron: '<path d="m15 6-6 6 6 6"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
