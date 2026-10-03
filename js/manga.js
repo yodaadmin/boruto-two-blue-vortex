@@ -55,8 +55,8 @@
                 <div class="info-list">${info}</div>
                 <p class="manga-description">${V.esc(m.description || "لا يوجد وصف.")}</p>
                 <div class="hero-actions">
-                    ${first ? `<a class="btn primary" href="chapter.html?chapter=${first.id}">ابدأ القراءة</a>` : ""}
-                    ${last && last.id !== first.id ? `<a class="btn secondary" href="chapter.html?chapter=${last.id}">آخر فصل</a>` : ""}
+                    ${first ? `<a class="btn primary" href="reader.html?chapter=${first.id}">ابدأ القراءة</a>` : ""}
+                    ${last && last.id !== first.id ? `<a class="btn secondary" href="reader.html?chapter=${last.id}">آخر فصل</a>` : ""}
                 </div>
             </div>
         </section>
@@ -70,7 +70,7 @@
             </div>
             <div class="chapter-grid">
                 ${chapters.length ? chapters.map(c => `
-                <a class="chapter-card" href="chapter.html?chapter=${c.id}">
+                <a class="chapter-card" href="reader.html?chapter=${c.id}">
                     <div class="chapter-card-info">
                         <h3>فصل ${c.number}</h3>
                         <div class="chapter-card-meta">${V.esc(c.title)}${c.published_at ? " • " + V.esc(c.published_at) : ""}</div>
