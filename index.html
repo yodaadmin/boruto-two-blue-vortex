@@ -1,333 +1,51 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="VORTEX — منصة قراءة المانجا والكوميكس"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VORTEX — منصة قراءة المانجا والكوميكس">
     <title>VORTEX — الرئيسية</title>
-
-    <!-- التصميم الأساسي -->
     <link rel="stylesheet" href="css/core.css">
-
-    <!-- تصميم الصفحة الرئيسية -->
     <link rel="stylesheet" href="css/home.css">
 </head>
-
 <body data-page="home">
-
-    <!-- =========================================
-         HEADER
-    ========================================== -->
 
     <div id="app-header"></div>
 
-
-    <!-- =========================================
-         MAIN CONTENT
-    ========================================== -->
-
     <main>
-
         <div class="container">
 
+            <section id="featured" class="feature" aria-label="العمل المميز"></section>
 
-            <!-- =====================================
-                 HERO / FEATURED MANGA
-            ====================================== -->
-
-            <section
-                id="featured"
-                class="hero"
-                aria-label="العمل المميز"
-            >
-
-                <!--
-                    سيتم إنشاء محتوى هذه المنطقة
-                    بواسطة home.js
-                -->
-
+            <section id="genres-section" class="section hidden">
+                <div class="section-head"><h2>التصنيفات</h2></div>
+                <div id="genre-chips" class="chips"></div>
             </section>
-
-
-            <!-- =====================================
-                 LATEST CHAPTERS
-            ====================================== -->
 
             <section class="section">
-
                 <div class="section-head">
-
-                    <div>
-                        <span class="eyebrow">
-                            آخر التحديثات
-                        </span>
-
-                        <h2>
-                            آخر الفصول
-                        </h2>
-                    </div>
-
-                    <a
-                        href="browse.html?sort=latest"
-                        class="section-link"
-                    >
-                        عرض الكل
-                    </a>
-
+                    <h2>آخر الفصول</h2>
+                    <a href="browse.html?sort=latest" class="section-link">عرض الكل</a>
                 </div>
-
-
-                <div
-                    id="latest-chapters"
-                    class="chapter-grid"
-                >
-
-                    <!--
-                        الفصول ستُحمّل بواسطة JavaScript
-                    -->
-
-                </div>
-
+                <div id="latest-chapters" class="chapter-grid"></div>
             </section>
-
-
-            <!-- =====================================
-                 RECENTLY ADDED
-            ====================================== -->
 
             <section class="section">
-
                 <div class="section-head">
-
-                    <div>
-                        <span class="eyebrow">
-                            مكتبة VORTEX
-                        </span>
-
-                        <h2>
-                            أضيفت حديثًا
-                        </h2>
-                    </div>
-
-                    <a
-                        href="browse.html"
-                        class="section-link"
-                    >
-                        عرض الكل
-                    </a>
-
+                    <h2>أضيفت حديثًا</h2>
+                    <a href="browse.html" class="section-link">عرض الكل</a>
                 </div>
-
-
-                <div
-                    id="recent-manga"
-                    class="manga-grid"
-                >
-
-                    <!--
-                        الأعمال ستظهر هنا
-                    -->
-
-                </div>
-
+                <div id="recent-manga" class="manga-grid"></div>
             </section>
-
-
-            <!-- =====================================
-                 POPULAR MANGA
-            ====================================== -->
-
-            <section class="section">
-
-                <div class="section-head">
-
-                    <div>
-                        <span class="eyebrow">
-                            الأكثر متابعة
-                        </span>
-
-                        <h2>
-                            مانجا شائعة
-                        </h2>
-                    </div>
-
-                    <a
-                        href="browse.html?sort=popular"
-                        class="section-link"
-                    >
-                        عرض الكل
-                    </a>
-
-                </div>
-
-
-                <div
-                    id="popular-manga"
-                    class="manga-grid"
-                >
-
-                    <!--
-                        الأعمال الشائعة ستظهر هنا
-                    -->
-
-                </div>
-
-            </section>
-
-
-            <!-- =====================================
-                 QUICK NAVIGATION
-            ====================================== -->
-
-            <section class="section">
-
-                <div class="section-head">
-
-                    <div>
-                        <span class="eyebrow">
-                            تصفح سريع
-                        </span>
-
-                        <h2>
-                            اكتشف المزيد
-                        </h2>
-                    </div>
-
-                </div>
-
-
-                <div class="quick-navigation">
-
-                    <a
-                        href="browse.html"
-                        class="quick-card"
-                    >
-
-                        <span class="quick-icon">
-                            ◈
-                        </span>
-
-                        <div>
-                            <strong>
-                                تصفح المانجا
-                            </strong>
-
-                            <small>
-                                استكشف جميع الأعمال
-                            </small>
-                        </div>
-
-                    </a>
-
-
-                    <a
-                        href="search.html"
-                        class="quick-card"
-                    >
-
-                        <span class="quick-icon">
-                            ⌕
-                        </span>
-
-                        <div>
-                            <strong>
-                                البحث
-                            </strong>
-
-                            <small>
-                                ابحث عن عمل معين
-                            </small>
-                        </div>
-
-                    </a>
-
-
-                    <a
-                        href="library.html"
-                        class="quick-card"
-                    >
-
-                        <span class="quick-icon">
-                            ▣
-                        </span>
-
-                        <div>
-                            <strong>
-                                مكتبتي
-                            </strong>
-
-                            <small>
-                                أعمالك المحفوظة
-                            </small>
-                        </div>
-
-                    </a>
-
-
-                    <a
-                        href="history.html"
-                        class="quick-card"
-                    >
-
-                        <span class="quick-icon">
-                            ↻
-                        </span>
-
-                        <div>
-                            <strong>
-                                سجل القراءة
-                            </strong>
-
-                            <small>
-                                تابع من حيث توقفت
-                            </small>
-                        </div>
-
-                    </a>
-
-                </div>
-
-            </section>
-
 
         </div>
-
     </main>
-
-
-    <!-- =========================================
-         FOOTER
-    ========================================== -->
 
     <div id="app-footer"></div>
 
-
-    <!-- =========================================
-         JAVASCRIPT
-    ========================================== -->
-
-    <!-- إعدادات الموقع -->
     <script src="js/config.js"></script>
-
-    <!-- الاتصال بالبيانات -->
     <script src="js/api.js"></script>
-
-    <!-- الوظائف المشتركة -->
     <script src="js/core.js"></script>
-
-    <!-- وظائف الصفحة الرئيسية -->
     <script src="js/home.js"></script>
-
 </body>
-
 </html>
