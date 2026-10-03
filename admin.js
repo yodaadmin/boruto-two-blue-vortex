@@ -12,7 +12,7 @@ async function setup(){
    const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";s.onload=async()=>{supa=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);el("loginCard").hidden=false;const {data}=await supa.auth.getSession();if(data.session){el("loginCard").hidden=true;el("dashboard").hidden=false;await loadCloud()}else{el("dashboard").hidden=true}};document.head.appendChild(s);
  }else{el("loginCard").hidden=true;el("dashboard").hidden=false;loadLocal()}
 }
-function fill(d){el("fTitle").value=d.title||"";el("fEnglish").value=d.english||"";el("fJapanese").value=d.japanese||"";el("fStatus").value=d.status||"";el("fAuthor").value=d.author||"";el("fArtist").value=d.artist||"";el("fGenres").value=(d.genres||[]).join(", ");el("fDescription").value=d.description||""}
+function fill(d){window.__lastManga=d;if(window.taxState)window.taxState.set(d);el("fTitle").value=d.title||"";el("fEnglish").value=d.english||"";el("fJapanese").value=d.japanese||"";el("fStatus").value=d.status||"";el("fAuthor").value=d.author||"";el("fArtist").value=d.artist||"";el("fGenres").value=(d.genres||[]).join(", ");el("fDescription").value=d.description||""}
 async function loadLocal(){fill(localGet());renderChapters(localGet().chapters||[])}
 async function loadCloud(){
  const {data,error}=await supa.from("manga").select("*").limit(1).maybeSingle();if(error){alert("تحقق من إعداد قاعدة البيانات في supabase.sql");return}
@@ -23,6 +23,7 @@ let statusTimer;
 function status(t,keep){const m=el("chapterMsg");m.textContent=t;m.style.display="block";clearTimeout(statusTimer);if(!keep)statusTimer=setTimeout(()=>m.style.display="none",5000)}
 el("saveInfo").onclick=async()=>{
  const d={title:el("fTitle").value,english:el("fEnglish").value,japanese:el("fJapanese").value,status:el("fStatus").value,author:el("fAuthor").value,artist:el("fArtist").value,genres:el("fGenres").value.split(",").map(x=>x.trim()).filter(Boolean),description:el("fDescription").value};
+ if(window.taxState)Object.assign(d,window.taxState.extra());
  if(!CLOUD){const old=localGet();localSave({...old,...d});el("saveState").textContent="● محفوظ";return}
  const coverFile=el("coverFile").files[0];
  if(coverFile){
@@ -31,7 +32,7 @@ el("saveInfo").onclick=async()=>{
    if(up.error){alert(up.error.message);return}
    d.cover_url=supa.storage.from(cfg.STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
  }
- if(!remoteManga){const r=await supa.from("manga").insert({...d}).select().single();remoteManga=r.data}else{await supa.from("manga").update(d).eq("id",remoteManga.id)}
+ if(!remoteManga){const r=await supa.from("manga").insert({...d}).select().single();if(r.error){alert(r.error.message);return}remoteManga=r.data}else{const r=await supa.from("manga").update(d).eq("id",remoteManga.id);if(r.error){alert(r.error.message);return}}
  alert("تم حفظ المعلومات.")
 };
 
@@ -145,4 +146,34 @@ el("importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new
 el("resetBtn").onclick=()=>{if(confirm("إعادة ضبط البيانات المحلية؟")){localStorage.removeItem("mangaData");location.reload()}}
 el("loginBtn").onclick=async()=>{const {error}=await supa.auth.signInWithPassword({email:el("loginEmail").value,password:el("loginPassword").value});if(error)el("loginMsg").textContent=error.message;else{el("loginCard").hidden=true;el("dashboard").hidden=false;await loadCloud()}}
 el("logoutBtn").onclick=async()=>{if(CLOUD)await supa.auth.signOut();location.reload()}
+
+/* ===== التصنيفات المتقدمة (تُحمَّل من js/taxonomy.js) ===== */
+window.taxState=null;
+(function(){
+ const sc=document.createElement("script");sc.src="js/taxonomy.js";
+ sc.onload=()=>{
+  const st={genres:new Set(),tags:new Set(),type:"",demographic:""};
+  const panel=document.createElement("div");panel.style.margin="14px 0";
+  el("saveInfo").insertAdjacentElement("beforebegin",panel);
+  const groups=[["genres","التصنيفات",TAX.genres,true],["type","نوع العمل",TAX.types],["demographic","الديموغرافية",TAX.demographics],["status","حالة العمل",TAX.status],["tags","الوسوم",TAX.tags,true]];
+  panel.innerHTML=groups.map(([k,t,items])=>`<details style="margin-bottom:8px"><summary style="cursor:pointer;font-weight:800;padding:8px 0">${t}</summary><div>${items.map(i=>`<button type="button" class="mini-btn" data-k="${k}" data-v="${esc(i.v)}" style="margin:3px">${esc(i.ar)}</button>`).join("")}</div></details>`).join("");
+  const isOn=(k,v)=>k==="status"?el("fStatus").value.includes(v):(k==="genres"||k==="tags")?st[k].has(v):st[k]===v;
+  function refresh(){panel.querySelectorAll("button").forEach(b=>{const on=isOn(b.dataset.k,b.dataset.v);b.style.background=on?"#13abd2":"";b.style.color=on?"#041015":""})}
+  panel.addEventListener("click",e=>{
+   const b=e.target.closest("button");if(!b)return;
+   const k=b.dataset.k,v=b.dataset.v;
+   if(k==="status")el("fStatus").value=v;
+   else if(k==="genres"||k==="tags"){st[k].has(v)?st[k].delete(v):st[k].add(v);if(k==="genres")el("fGenres").value=[...st.genres].join(", ")}
+   else st[k]=st[k]===v?"":v;
+   refresh();
+  });
+  window.taxState={
+   extra:()=>({type:st.type||null,tags:[...st.tags],demographic:st.demographic||null}),
+   set:d=>{st.genres=new Set(d.genres||[]);st.tags=new Set(d.tags||[]);st.type=d.type||"";st.demographic=d.demographic||"";refresh()}
+  };
+  if(window.__lastManga)window.taxState.set(window.__lastManga);
+ };
+ document.head.appendChild(sc);
+})();
+
 setup();
