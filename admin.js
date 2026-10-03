@@ -14,11 +14,50 @@ async function setup(){
 }
 function fill(d){window.__lastManga=d;if(window.taxState)window.taxState.set(d);el("fTitle").value=d.title||"";el("fEnglish").value=d.english||"";el("fJapanese").value=d.japanese||"";el("fStatus").value=d.status||"";el("fAuthor").value=d.author||"";el("fArtist").value=d.artist||"";el("fGenres").value=(d.genres||[]).join(", ");el("fDescription").value=d.description||""}
 async function loadLocal(){fill(localGet());renderChapters(localGet().chapters||[])}
-async function loadCloud(){
- const {data,error}=await supa.from("manga").select("*").limit(1).maybeSingle();if(error){alert("تحقق من إعداد قاعدة البيانات في supabase.sql");return}
- remoteManga=data||null;const chapters=await getCloudChapters();fill({...DEFAULT,...(data||{}),chapters});renderChapters(chapters)
+const BLANK={title:"",english:"",japanese:"",status:"مستمرة",author:"",artist:"",genres:[],description:"",tags:[],type:"",demographic:"",chapters:[]};
+let allManga=[], selectedId=null, creatingNew=false;
+
+const picker=document.createElement("div");
+picker.className="card";
+picker.style.cssText="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center";
+picker.innerHTML='<strong>العمل:</strong><select id="mangaSelect" style="flex:1;min-width:180px"></select><button type="button" class="mini-btn" id="newMangaBtn">+ مانجا جديدة</button><button type="button" class="mini-btn danger" id="delMangaBtn">حذف العمل</button><p class="hint" id="newMangaHint" style="flex-basis:100%;margin:0" hidden>أنت تضيف مانجا جديدة: املأ المعلومات واختر الغلاف ثم اضغط حفظ، وبعدها أضف الفصول.</p>';
+el("dashboard").insertAdjacentElement("afterbegin",picker);
+
+function drawPicker(){
+ const sel=el("mangaSelect");
+ sel.innerHTML=(creatingNew?'<option value="">— مانجا جديدة —</option>':"")+allManga.map(m=>`<option value="${m.id}">${esc(m.title)}</option>`).join("");
+ if(!creatingNew&&selectedId)sel.value=selectedId;
+ el("newMangaHint").hidden=!creatingNew;
+ el("delMangaBtn").hidden=creatingNew||!allManga.length;
 }
-async function getCloudChapters(){const {data,error}=await supa.from("chapters").select("id,number,title,published_at").order("number",{ascending:false});if(error)return[];return data||[]}
+el("mangaSelect").onchange=e=>{if(!e.target.value)return;creatingNew=false;selectedId=e.target.value;loadCloud()};
+el("newMangaBtn").onclick=()=>{creatingNew=true;loadCloud()};
+el("delMangaBtn").onclick=async()=>{
+ if(!remoteManga||!confirm(`حذف «${remoteManga.title}» مع كل فصوله وصفحاته؟ لا يمكن التراجع.`))return;
+ const ch=await supa.from("chapters").select("id").eq("manga_id",remoteManga.id);
+ const ids=(ch.data||[]).map(c=>c.id);
+ if(ids.length){
+  const pg=await supa.from("pages").select("storage_path").in("chapter_id",ids);
+  const paths=(pg.data||[]).map(p=>p.storage_path).filter(p=>p&&!/^https?:/.test(p));
+  if(paths.length){try{await supa.storage.from(cfg.STORAGE_BUCKET).remove(paths)}catch{}}
+ }
+ const r=await supa.from("manga").delete().eq("id",remoteManga.id);
+ if(r.error){alert(r.error.message);return}
+ selectedId=null;await loadCloud();
+};
+
+async function loadCloud(){
+ const {data,error}=await supa.from("manga").select("*").order("created_at",{ascending:true});
+ if(error){alert("تحقق من إعداد قاعدة البيانات في supabase.sql");return}
+ allManga=data||[];
+ if(creatingNew){remoteManga=null}
+ else{remoteManga=allManga.find(m=>m.id===selectedId)||allManga[0]||null;selectedId=remoteManga?remoteManga.id:null}
+ drawPicker();
+ const chapters=remoteManga?await getCloudChapters(remoteManga.id):[];
+ fill(remoteManga?{...DEFAULT,...remoteManga,chapters}:{...BLANK});
+ renderChapters(chapters)
+}
+async function getCloudChapters(mangaId){const {data,error}=await supa.from("chapters").select("id,number,title,published_at").eq("manga_id",mangaId).order("number",{ascending:false});if(error)return[];return data||[]}
 let statusTimer;
 function status(t,keep){const m=el("chapterMsg");m.textContent=t;m.style.display="block";clearTimeout(statusTimer);if(!keep)statusTimer=setTimeout(()=>m.style.display="none",5000)}
 el("saveInfo").onclick=async()=>{
@@ -32,7 +71,8 @@ el("saveInfo").onclick=async()=>{
    if(up.error){alert(up.error.message);return}
    d.cover_url=supa.storage.from(cfg.STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
  }
- if(!remoteManga){const r=await supa.from("manga").insert({...d}).select().single();if(r.error){alert(r.error.message);return}remoteManga=r.data}else{const r=await supa.from("manga").update(d).eq("id",remoteManga.id);if(r.error){alert(r.error.message);return}}
+ if(!remoteManga){const r=await supa.from("manga").insert({...d}).select().single();if(r.error){alert(r.error.message);return}remoteManga=r.data;creatingNew=false;selectedId=r.data.id}else{const r=await supa.from("manga").update(d).eq("id",remoteManga.id);if(r.error){alert(r.error.message);return}}
+ await loadCloud();
  alert("تم حفظ المعلومات.")
 };
 
