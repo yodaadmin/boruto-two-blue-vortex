@@ -1,346 +1,57 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="VORTEX — تصفح المانجا"
-    >
-
-    <title>VORTEX — تصفح</title>
-
-    <!-- التصميم الأساسي -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VORTEX GROUP — تصفح كل الأعمال">
+    <title>VORTEX GROUP — تصفح الأعمال</title>
     <link rel="stylesheet" href="css/core.css">
-
-    <!-- تصميم صفحة التصفح -->
     <link rel="stylesheet" href="css/browse.css">
 </head>
-
-
 <body data-page="browse">
-
-
-    <!-- =========================================
-         HEADER
-    ========================================== -->
 
     <div id="app-header"></div>
 
-
-    <!-- =========================================
-         MAIN
-    ========================================== -->
-
     <main>
-
         <div class="container">
 
-
-            <!-- =====================================
-                 PAGE HEADER
-            ====================================== -->
-
-            <section class="page-title">
-
-                <span class="eyebrow">
-                    مكتبة VORTEX
-                </span>
-
-                <h1>
-                    تصفح المانجا
-                </h1>
-
-                <p>
-                    ابحث واستكشف الأعمال حسب النوع والحالة
-                    وترتيب الإضافة أو الشعبية.
-                </p>
-
-            </section>
-
-
-            <!-- =====================================
-                 FILTERS
-            ====================================== -->
-
-            <section class="browse-controls">
-
-
-                <!-- SEARCH -->
-
-                <form
-                    id="filters"
-                    class="filters"
-                >
-
-
-                    <div class="filter-search">
-
-                        <label for="q">
-                            البحث
-                        </label>
-
-                        <input
-                            id="q"
-                            name="q"
-                            type="search"
-                            placeholder="ابحث عن اسم المانجا..."
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-
-                    <!-- TYPE -->
-
-                    <div class="filter-field">
-
-                        <label for="type">
-                            النوع
-                        </label>
-
-                        <select
-                            id="type"
-                            name="type"
-                        >
-
-                            <option value="">
-                                جميع الأنواع
-                            </option>
-
-                            <option value="مانجا">
-                                مانجا
-                            </option>
-
-                            <option value="مانهوا">
-                                مانهوا
-                            </option>
-
-                            <option value="مانها">
-                                مانها
-                            </option>
-
-                            <option value="ويب تون">
-                                ويب تون
-                            </option>
-
-                            <option value="رواية">
-                                رواية
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- STATUS -->
-
-                    <div class="filter-field">
-
-                        <label for="status">
-                            الحالة
-                        </label>
-
-                        <select
-                            id="status"
-                            name="status"
-                        >
-
-                            <option value="">
-                                جميع الحالات
-                            </option>
-
-                            <option value="مستمرة">
-                                مستمرة
-                            </option>
-
-                            <option value="مكتملة">
-                                مكتملة
-                            </option>
-
-                            <option value="متوقفة">
-                                متوقفة
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- SORT -->
-
-                    <div class="filter-field">
-
-                        <label for="sort">
-                            الترتيب
-                        </label>
-
-                        <select
-                            id="sort"
-                            name="sort"
-                        >
-
-                            <option value="latest">
-                                الأحدث
-                            </option>
-
-                            <option value="popular">
-                                الأكثر متابعة
-                            </option>
-
-                            <option value="rating">
-                                الأعلى تقييمًا
-                            </option>
-
-                            <option value="title">
-                                حسب الاسم
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- BUTTON -->
-
-                    <button
-                        type="submit"
-                        class="btn primary filter-button"
-                    >
-                        تطبيق الفلاتر
-                    </button>
-
-
-                </form>
-
-            </section>
-
-
-            <!-- =====================================
-                 RESULTS HEADER
-            ====================================== -->
-
-            <section class="results-header">
-
-                <div>
-
-                    <span class="eyebrow">
-                        النتائج
-                    </span>
-
-                    <h2>
-                        الأعمال
-                    </h2>
-
+            <div class="page-title">
+                <span class="eyebrow">المكتبة</span>
+                <h1>تصفح الأعمال</h1>
+                <p>كل الأعمال المتوفرة، رتّبها وصفّها كما تريد.</p>
+            </div>
+
+            <div class="toolbar">
+                <label class="tf">الترتيب<select id="f-sort"></select></label>
+                <label class="tf">نوع العمل<select id="f-type"></select></label>
+                <label class="tf">الحالة<select id="f-status"></select></label>
+                <label class="tf">التصنيف<select id="f-genre"></select></label>
+                <a class="btn secondary toolbar-adv" href="search.html">بحث متقدم</a>
+            </div>
+
+            <div class="results-header">
+                <h2 id="results-title">كل الأعمال</h2>
+                <div class="results-side">
+                    <span id="count" class="results-count"></span>
+                    <button id="clear" type="button" class="text-button hidden">مسح الفلاتر</button>
                 </div>
+            </div>
 
+            <div id="results" class="manga-grid"></div>
 
-                <span
-                    id="results-count"
-                    class="results-count"
-                >
-                    0 عمل
-                </span>
-
-            </section>
-
-
-            <!-- =====================================
-                 MANGA RESULTS
-            ====================================== -->
-
-            <section>
-
-                <div
-                    id="results"
-                    class="manga-grid"
-                >
-
-                    <!--
-                        النتائج يتم توليدها
-                        بواسطة browse.js
-                    -->
-
-                </div>
-
-
-                <!-- =================================
-                     EMPTY STATE
-                ================================== -->
-
-                <div
-                    id="empty"
-                    class="empty hidden"
-                >
-
-                    <div class="empty-icon">
-                        ◌
-                    </div>
-
-                    <h3>
-                        لم يتم العثور على نتائج
-                    </h3>
-
-                    <p>
-                        جرّب تغيير كلمات البحث أو الفلاتر.
-                    </p>
-
-                </div>
-
-
-                <!-- =================================
-                     LOADING
-                ================================== -->
-
-                <div
-                    id="loading"
-                    class="empty"
-                    style="display:none;"
-                >
-
-                    <div class="loading-spinner"></div>
-
-                    <p>
-                        جارٍ تحميل الأعمال...
-                    </p>
-
-                </div>
-
-
-            </section>
-
+            <div class="more-wrap">
+                <button id="more" type="button" class="btn secondary hidden">تحميل المزيد</button>
+            </div>
 
         </div>
-
     </main>
-
-
-    <!-- =========================================
-         FOOTER
-    ========================================== -->
 
     <div id="app-footer"></div>
 
-
-    <!-- =========================================
-         JAVASCRIPT
-    ========================================== -->
-
     <script src="js/config.js"></script>
-
     <script src="js/api.js"></script>
-
     <script src="js/core.js"></script>
-
+    <script src="js/taxonomy.js"></script>
     <script src="js/browse.js"></script>
-
-
 </body>
-
 </html>
