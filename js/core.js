@@ -60,6 +60,7 @@ const V = {
         <article class="manga-card">
             <a class="manga-cover" href="manga.html?id=${m.id}">
                 ${cover ? `<img src="${V.esc(cover)}" alt="${V.esc(m.title)}" loading="lazy">` : ""}
+                ${m.status ? `<span class="manga-tag">${V.esc(String(m.status).split(" ")[0])}</span>` : ""}
             </a>
             <div class="manga-card-body">
                 <h3><a href="manga.html?id=${m.id}">${V.esc(m.title)}</a></h3>
@@ -105,7 +106,7 @@ const V = {
             <div class="site-header-inner">
                 <a class="site-logo" href="index.html">
                     <img src="assets/vortex-mark-cyan.png" alt="" width="38" height="38">
-                    <span>VORTEX</span>
+                    <span>VORTEX GROUP</span>
                 </a>
                 <nav class="site-nav">${items}</nav>
                 <div class="header-actions">
@@ -126,7 +127,7 @@ const V = {
         footer.innerHTML = `
         <footer class="site-footer">
             <div class="site-footer-inner">
-                <p>© ${new Date().getFullYear()} VORTEX</p>
+                <p>© ${new Date().getFullYear()} VORTEX GROUP</p>
                 <div class="site-footer-links">
                     <a href="browse.html">تصفح</a>
                     <a href="search.html">بحث</a>
