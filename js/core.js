@@ -86,10 +86,7 @@ const V = {
     const links = [
         ["index.html", "الرئيسية"],
         ["browse.html", "تصفح"],
-        ["library.html", "مكتبتي"],
-        ["favorites.html", "المفضلة"],
-        ["history.html", "السجل"],
-        ["lists.html", "القوائم"]
+        ["favorites.html", "المفضلة"]
     ];
 
     const current = location.pathname.split("/").pop() || "index.html";
@@ -131,7 +128,6 @@ const V = {
                 <div class="site-footer-links">
                     <a href="browse.html">تصفح</a>
                     <a href="search.html">بحث</a>
-                    <a href="library.html">مكتبتي</a>
                 </div>
             </div>
         </footer>`;
