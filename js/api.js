@@ -40,6 +40,16 @@ const VortexAPI = (() => {
         return res.json();
     }
 
+    async function getWithCount(path) {
+        const res = await fetch(`${url}/rest/v1/${path}`, {
+            headers: { apikey: key, Prefer: "count=exact" }
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const rows = await res.json();
+        const m = (res.headers.get("content-range") || "").match(/\/(\d+|\*)$/);
+        return { rows, total: m && m[1] !== "*" ? Number(m[1]) : null };
+    }
+
     function fileUrl(path) {
         if (!path) return "";
         if (/^https?:\/\//i.test(path)) return path;
@@ -50,6 +60,7 @@ const VortexAPI = (() => {
     return {
         fileUrl,
         rawGet: get,
+        getWithCount,
         mangaById: async (id) => {
             const rows = await get(`manga?select=*&id=eq.${encodeURIComponent(id)}&limit=1`);
             return rows[0] || null;
