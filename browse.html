@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="VORTEX GROUP — تصفح كل الأعمال">
+    <meta name="description" content="VORTEX GROUP — تصفح الأعمال حسب الأقسام والتصنيفات">
     <title>VORTEX GROUP — تصفح الأعمال</title>
     <link rel="stylesheet" href="css/core.css">
     <link rel="stylesheet" href="css/browse.css">
@@ -18,26 +18,33 @@
             <div class="page-title">
                 <span class="eyebrow">المكتبة</span>
                 <h1>تصفح الأعمال</h1>
-                <p>كل الأعمال المتوفرة، رتّبها وصفّها كما تريد.</p>
+                <p>كل الأعمال مقسّمة حسب التصنيفات. اختر قسماً أو ابحث أو صفِّ حسب النوع والحالة.</p>
             </div>
 
-            <div class="toolbar">
-                <label class="tf">الترتيب<select id="f-sort"></select></label>
-                <label class="tf">نوع العمل<select id="f-type"></select></label>
-                <label class="tf">الحالة<select id="f-status"></select></label>
-                <label class="tf">التصنيف<select id="f-genre"></select></label>
-                <a class="btn secondary toolbar-adv" href="search.html">بحث متقدم</a>
-            </div>
-
-            <div class="results-header">
-                <h2 id="results-title">كل الأعمال</h2>
-                <div class="results-side">
-                    <span id="count" class="results-count"></span>
-                    <button id="clear" type="button" class="text-button hidden">مسح الفلاتر</button>
+            <div class="bbar">
+                <div id="type-tabs" class="pills"></div>
+                <div class="bbar-row">
+                    <input id="q" type="search" placeholder="ابحث في المكتبة...">
+                    <select id="f-status" aria-label="الحالة"></select>
+                    <select id="f-sort" aria-label="الترتيب"></select>
+                    <div class="seg" role="group" aria-label="طريقة العرض">
+                        <button type="button" data-mode="sections">الأقسام</button>
+                        <button type="button" data-mode="all">كل الأعمال</button>
+                    </div>
                 </div>
             </div>
 
-            <div id="results" class="manga-grid"></div>
+            <div id="jump" class="chips"></div>
+
+            <div class="results-header">
+                <div id="active" class="active-filter"></div>
+                <div class="results-side">
+                    <span id="count" class="results-count"></span>
+                    <a class="section-link" href="search.html">بحث متقدم</a>
+                </div>
+            </div>
+
+            <div id="content"></div>
 
             <div class="more-wrap">
                 <button id="more" type="button" class="btn secondary hidden">تحميل المزيد</button>
