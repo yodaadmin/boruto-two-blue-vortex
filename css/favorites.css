@@ -1,0 +1,6 @@
+/* VORTEX GROUP — FAVORITES CSS */
+.fav-item { position: relative; }
+.fav-x { position: absolute; z-index: 3; top: 10px; left: 10px; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: rgba(8, 9, 11, 0.8); border: 1px solid rgba(255, 122, 147, 0.5); color: #ff7a93; cursor: pointer; backdrop-filter: blur(6px); }
+.fav-x .icon { width: 16px; height: 16px; fill: currentColor; }
+.fav-x:hover { background: #ff7a93; color: #041015; }
+.manga-tag { position: absolute; z-index: 2; top: 10px; right: 10px; padding: 3px 10px; border-radius: 999px; background: rgba(8, 9, 11, 0.75); border: 1px solid rgba(118, 229, 253, 0.4); color: var(--vortex-cyan-light); font-size: 11px; font-weight: 800; }
