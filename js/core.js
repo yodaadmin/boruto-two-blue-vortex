@@ -28,6 +28,10 @@ const ICONS = {
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
     filter: '<path d="M4 6h16M7 12h10M10 18h4"/>',
+    heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>',
+    file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+    sort: '<path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/>',
     play: '<path d="m8 5 11 7-11 7z"/>',
     chevron: '<path d="m15 6-6 6 6 6"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
@@ -80,6 +84,30 @@ const V = {
 
 };
 
+
+/* تاريخ بصيغة 2023/08/26 (أرقام إنجليزية) */
+V.dateYMD = function (value) {
+    if (!value) return "";
+    const s = String(value);
+    if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10).replace(/-/g, "/");
+    const d = new Date(s);
+    if (isNaN(d)) return "";
+    const p = n => String(n).padStart(2, "0");
+    return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())}`;
+};
+
+/* المفضلة (محفوظة على جهاز القارئ) */
+V.favs = {
+    key: "vortex-favorites",
+    all() { try { return JSON.parse(localStorage.getItem(this.key) || "[]"); } catch (e) { return []; } },
+    has(id) { return this.all().includes(id); },
+    toggle(id) {
+        const a = this.all(), i = a.indexOf(id);
+        if (i >= 0) a.splice(i, 1); else a.unshift(id);
+        try { localStorage.setItem(this.key, JSON.stringify(a)); } catch (e) {}
+        return i < 0;
+    }
+};
 
 (function buildLayout() {
 
