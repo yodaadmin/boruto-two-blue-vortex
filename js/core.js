@@ -20,7 +20,7 @@
     b.rel = "preconnect"; b.href = "https://fonts.gstatic.com"; b.crossOrigin = "";
     const c = document.createElement("link");
     c.rel = "stylesheet";
-    c.href = "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap";
+    c.href = "https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap";
     document.head.append(a, b, c);
 })();
 
@@ -131,7 +131,7 @@ V.favs = {
             <div class="site-header-inner">
                 <a class="site-logo" href="index.html">
                     <img src="assets/vortex-mark-cyan.png" alt="" width="38" height="38">
-                    <span>VORTEX GROUP</span>
+                    <span class="logo-text"><b>VORTEX</b><em>GROUP</em></span>
                 </a>
                 <nav class="site-nav">${items}</nav>
                 <div class="header-actions">
