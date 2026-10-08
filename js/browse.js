@@ -127,7 +127,7 @@
         const none = list.filter(m => !(m.genres || []).length);
         const latest = [...list].sort(byLatest).slice(0, 12);
 
-        let html = section("latest", "🆕 أُضيفت حديثًا", "", latest, null);
+        let html = section("latest", "أُضيفت حديثًا", "", latest, null);
         entries.forEach(([g, items], i) => { html += section("g-" + i, V.esc(labelOf(g)), enOf(g), sorted(items), g); });
         if (none.length) html += section("g-other", "أعمال أخرى", "", sorted(none), null);
 
