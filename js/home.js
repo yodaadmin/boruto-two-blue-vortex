@@ -90,10 +90,30 @@
             }).join("")
             : V.empty(V.icon("book", 26), "لا توجد فصول بعد", "الفصول المضافة حديثًا ستظهر هنا.");
 
-        /* ---------- أضيفت حديثًا ---------- */
-        recentEl.innerHTML = recent.length
-            ? recent.map(V.mangaCard).join("")
+        /* ---------- أضيفت حديثًا (رف مصغّر) ---------- */
+        const shelf = recent.slice(0, 12);
+        recentEl.innerHTML = shelf.length
+            ? shelf.map((m, i) => {
+                const c = VortexAPI.fileUrl(m.cover_url);
+                const fresh = m.created_at && (Date.now() - new Date(m.created_at)) < 7 * 86400000;
+                return `
+                <a class="shelf-card" href="manga.html?id=${m.id}">
+                    <div class="shelf-cover">
+                        ${c ? `<img src="${V.esc(c)}" alt="${V.esc(m.title)}" loading="lazy">` : ""}
+                        ${fresh ? `<span class="shelf-new">جديد</span>` : ""}
+                        <span class="shelf-rank">${String(i + 1).padStart(2, "0")}</span>
+                    </div>
+                    <h3>${V.esc(m.title)}</h3>
+                    <small>${V.esc(String(m.status || "").split(" ")[0])}</small>
+                </a>`;
+            }).join("")
             : V.empty(V.icon("book", 26), "لا توجد أعمال بعد", "أضف أول عمل من لوحة الإدارة.");
+
+        const step = () => Math.max(240, recentEl.clientWidth * 0.8);
+        $("shelf-next").innerHTML = V.icon("chevron");
+        $("shelf-prev").innerHTML = V.icon("chevron");
+        $("shelf-next").addEventListener("click", () => recentEl.scrollBy({ left: -step(), behavior: "smooth" }));
+        $("shelf-prev").addEventListener("click", () => recentEl.scrollBy({ left: step(), behavior: "smooth" }));
 
     } catch (err) {
 
