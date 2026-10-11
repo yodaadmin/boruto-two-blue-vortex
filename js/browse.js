@@ -32,14 +32,38 @@
 
     /* ---------- بيانات ---------- */
     async function fetchAll() {
-        const base = "manga?order=created_at.desc&limit=1000&select=";
+        const BATCH = 1000;                       // حد PostgREST الافتراضي لكل طلب
+        const cols = () => "id,title,english,japanese,status,cover_url,genres," + (hasType ? "type," : "") + "created_at";
+        const page = off => VortexAPI.rawGet(`manga?order=created_at.desc&limit=${BATCH}&offset=${off}&select=${cols()}`);
+
+        let first;
         try {
-            return await VortexAPI.rawGet(base + "id,title,english,japanese,status,cover_url,genres,type,created_at");
+            first = await page(0);
         } catch (e) {
             hasType = false;   // عمود type غير موجود بعد
-            return await VortexAPI.rawGet(base + "id,title,english,japanese,status,cover_url,genres,created_at");
+            first = await page(0);
         }
+        let all = first, last = first;
+        while (last.length === BATCH) {            // أكثر من 1000 عمل: نكمل بدفعات
+            last = await page(all.length);
+            all = all.concat(last);
+        }
+        return all;
     }
+
+    /* كاش قصير بالجلسة: فتح فوري عند الرجوع للصفحة، ثم تحديث بالخلفية */
+    const CACHE_KEY = "vortex-browse-v1";
+    function readCache() {
+        try {
+            const c = JSON.parse(sessionStorage.getItem(CACHE_KEY) || "null");
+            if (c && Array.isArray(c.list) && Date.now() - c.t < 5 * 60 * 1000) return c;
+        } catch (e) {}
+        return null;
+    }
+    function writeCache(list) {
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), hasType, list })); } catch (e) {}
+    }
+    const sig = l => l.length + "|" + l.map(m => m.id + (m.cover_url || "") + (m.status || "") + (m.title || "")).join(",");
 
     /* ---------- فلترة وترتيب ---------- */
     const byLatest = (a, b) => new Date(b.created_at) - new Date(a.created_at);
@@ -223,7 +247,19 @@
         buildControls();
         $("content").innerHTML = skeleton();
         try {
+            const cached = readCache();
+            if (cached) {
+                data = cached.list;
+                hasType = cached.hasType;
+                render();
+                fetchAll().then(fresh => {
+                    writeCache(fresh);
+                    if (sig(fresh) !== sig(data)) { data = fresh; render(); }
+                }).catch(() => {});
+                return;
+            }
             data = await fetchAll();
+            writeCache(data);
             render();
         } catch (err) {
             console.error("VORTEX browse error:", err);
