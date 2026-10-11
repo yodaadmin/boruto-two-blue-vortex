@@ -4,6 +4,17 @@
 
     const $ = id => document.getElementById(id);
 
+    /* ---------- الأيقونات ---------- */
+    function fillIcons(root) {
+        (root || document).querySelectorAll("i[data-icon]").forEach(el => {
+            el.outerHTML = V.icon(el.dataset.icon, el.dataset.size ? +el.dataset.size : 0);
+        });
+    }
+    fillIcons();
+    $("toggle-fullscreen").innerHTML =
+        V.icon("expand").replace('class="icon"', 'class="icon ico-expand"') +
+        V.icon("compress").replace('class="icon"', 'class="icon ico-compress"');
+
     const KEY = "vortex-reader-v2";
     const DEF = { mode: "vertical", fit: "width", rtl: true, bg: "navy", bright: 100, gap: 0, remember: true };
 
@@ -45,6 +56,21 @@
         c.querySelector("strong").textContent = wraps.length ? cur + 1 : 0;
         c.querySelectorAll("span")[1].textContent = wraps.length;
         $("scrub-bubble").textContent = `${cur + 1} / ${wraps.length}`;
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const bar = $("reader-progress");
+        if (!wraps.length) { bar.style.width = "0"; return; }
+        let r;
+        if (isPaged()) {
+            r = Math.min(1, (cur + step()) / wraps.length);
+        } else {
+            const top = pagesEl.getBoundingClientRect().top + window.scrollY;
+            const end = Math.max(top + 1, top + pagesEl.offsetHeight - window.innerHeight);
+            r = Math.min(1, Math.max(0, (window.scrollY - top) / (end - top)));
+        }
+        bar.style.width = (r * 100).toFixed(1) + "%";
     }
 
     function renderView() {
@@ -83,6 +109,9 @@
         $("set-gap").value = S.gap;
         $("gap-value").textContent = S.gap + "px";
         $("remember-position").checked = !!S.remember;
+        $("previous-page").innerHTML = V.icon(S.rtl ? "right" : "left", 20);
+        $("next-page").innerHTML = V.icon(S.rtl ? "left" : "right", 20);
+        $("reader-bottom-inner").style.direction = S.rtl ? "rtl" : "ltr";
         renderView();
     }
 
@@ -160,7 +189,17 @@
             }
             if (idx !== cur) { cur = idx; updateCounter(); savePos(); }
             scrubSync();
+            updateProgress();
         });
+    }, { passive: true });
+
+    /* إخفاء الشريط العلوي عند النزول وإظهاره عند الصعود */
+    let lastY = window.scrollY;
+    window.addEventListener("scroll", () => {
+        const y = window.scrollY, d = y - lastY;
+        if (Math.abs(d) < 8) return;
+        document.body.classList.toggle("ui-hidden", !isPaged() && d > 0 && y > 160);
+        lastY = y;
     }, { passive: true });
 
     /* ---------- النوافذ (إعدادات / فصول) ---------- */
@@ -193,8 +232,9 @@
         if (!chapterList || !currentChapter) return;
         $("chapters-list").innerHTML = chapterList.map(c => `
             <a class="chapter-item${c.id === currentChapter.id ? " current" : ""}" href="${self}?chapter=${encodeURIComponent(c.id)}">
-                <strong>فصل ${V.esc(c.number)}</strong>
-                <span>${V.esc(c.title || "")}</span>
+                <b class="chapter-num">${V.esc(c.number)}</b>
+                <span class="chapter-name">${V.esc(c.title || "الفصل " + c.number)}</span>
+                ${c.views !== undefined ? `<small class="chapter-views">${V.icon("eye", 14)}<bdi dir="ltr">${V.num(c.views)}</bdi></small>` : ""}
             </a>`).join("") || `<p class="hint">لا توجد فصول أخرى.</p>`;
     }
 
@@ -331,6 +371,22 @@
         pagesEl.style.visibility = document.hidden ? "hidden" : "";
     });
 
+    /* ---------- المشاهدات: مرة واحدة لكل جهاز كل 6 ساعات ---------- */
+    function countView(ch) {
+        const key = "vortex-view-" + ch.id;
+        let last = 0;
+        try { last = +localStorage.getItem(key) || 0; } catch (e) {}
+        if (Date.now() - last < 6 * 3600 * 1000) return;
+        setTimeout(async () => {
+            try {
+                const total = await VortexAPI.addView(ch.id);
+                try { localStorage.setItem(key, String(Date.now())); } catch (e) {}
+                const el = $("views-count");
+                if (el && total != null) el.textContent = V.num(total);
+            } catch (e) { /* العمود/الدالة غير مضافة بعد: نتجاهل بصمت */ }
+        }, 4000);
+    }
+
     /* ---------- التحميل ---------- */
 
     async function init() {
@@ -350,10 +406,15 @@
             const mangaHref = ch.manga_id ? `manga.html?id=${encodeURIComponent(ch.manga_id)}` : "index.html";
 
             document.title = `VORTEX — ${mangaName} — ${title}`;
-            $("reader-title").innerHTML = `<span>${V.esc(mangaName)} — ${V.esc(title)}</span>`;
+            $("reader-title").innerHTML = `<small>${V.esc(mangaName)}</small><b>${V.esc(title)}</b>`;
             $("reader-manga-name").textContent = mangaName;
             $("reader-chapter-name").textContent = title;
-            $("reader-chapter-description").textContent = ch.number ? `الفصل ${ch.number}` : "";
+            const chips = [];
+            if (ch.number) chips.push(`<span class="chip">${V.icon("book", 15)} فصل ${V.esc(ch.number)}</span>`);
+            chips.push(`<span class="chip">${V.icon("image", 15)} ${pages.length} صفحة</span>`);
+            if (ch.published_at || ch.created_at) chips.push(`<span class="chip">${V.icon("calendar", 15)}<bdi dir="ltr">${V.dateYMD(ch.published_at || ch.created_at)}</bdi></span>`);
+            if (ch.views !== undefined) chips.push(`<span class="chip views">${V.icon("eye", 15)}<bdi dir="ltr" id="views-count">${V.num(ch.views)}</bdi> مشاهدة</span>`);
+            $("reader-chips").innerHTML = chips.join("");
             ["manga-link", "reader-info-link", "reader-manga"].forEach(id => { $(id).href = mangaHref; });
 
             if (ch.previous_chapter) {
@@ -385,6 +446,8 @@
             $("reader-content").classList.remove("hidden");
             applySettings();
             scrubSync();
+
+            countView(ch);
 
             if (ch.manga_id) {
                 VortexAPI.chaptersByManga(ch.manga_id).then(l => { chapterList = l; renderChapterList(); }).catch(() => {
