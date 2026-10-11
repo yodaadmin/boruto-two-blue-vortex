@@ -65,8 +65,26 @@ const VortexAPI = (() => {
             const rows = await get(`manga?select=*&id=eq.${encodeURIComponent(id)}&limit=1`);
             return rows[0] || null;
         },
-        chaptersByManga: (id) =>
-            get(`chapters?select=id,number,title,published_at,created_at,pages(count)&manga_id=eq.${encodeURIComponent(id)}&order=number.desc`),
+        chaptersByManga: async (id) => {
+            const e = encodeURIComponent(id);
+            const base = "id,number,title,published_at,created_at,pages(count)";
+            try {
+                return await get(`chapters?select=${base},views&manga_id=eq.${e}&order=number.desc`);
+            } catch (err) {
+                /* عمود views غير موجود بعد: نكمل بدونه */
+                return get(`chapters?select=${base}&manga_id=eq.${e}&order=number.desc`);
+            }
+        },
+        /* تسجيل مشاهدة (دالة increment_chapter_views في Supabase) */
+        addView: async (id) => {
+            const res = await fetch(`${url}/rest/v1/rpc/increment_chapter_views`, {
+                method: "POST",
+                headers: { apikey: key, "Content-Type": "application/json" },
+                body: JSON.stringify({ cid: String(id) })
+            });
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
+        },
         getPages: (id) =>
             get(`pages?select=page_number,storage_path&chapter_id=eq.${encodeURIComponent(id)}&order=page_number.asc`),
         getChapter: async (id) => {
