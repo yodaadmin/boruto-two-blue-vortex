@@ -291,7 +291,7 @@
 
     /* لمس نصف الصفحة: الجهة المحددة = الصفحة التالية */
     pagesEl.addEventListener("click", e => {
-        if (!isPaged() || !e.target.closest("img")) return;
+        if (!isPaged() || !e.target.closest(".reader-page")) return;
         const leftHalf = e.clientX < window.innerWidth / 2;
         (leftHalf === S.rtl) ? nextPage() : prevPage();
     });
@@ -307,6 +307,29 @@
             (dx < 0) === S.rtl ? nextPage() : prevPage();
         }
     }, { passive: true });
+
+
+    /* ---------- حماية الصفحات من الحفظ العادي ---------- */
+    ["contextmenu", "dragstart", "selectstart", "copy", "cut"].forEach(ev =>
+        pagesEl.addEventListener(ev, e => e.preventDefault()));
+
+    document.addEventListener("contextmenu", e => {
+        if (e.target.closest(".reader-pages")) e.preventDefault();
+    });
+
+    document.addEventListener("keydown", e => {
+        const k = (e.key || "").toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && (k === "s" || k === "p")) { e.preventDefault(); toast("الحفظ والطباعة غير متاحين"); }
+        if (e.key === "PrintScreen") {
+            try { navigator.clipboard && navigator.clipboard.writeText(""); } catch (err) {}
+            toast("لقطة الشاشة غير مسموحة");
+        }
+    });
+
+    /* إخفاء الصفحات عند مغادرة التبويب (يمنع لقطات مبدّل التطبيقات) */
+    document.addEventListener("visibilitychange", () => {
+        pagesEl.style.visibility = document.hidden ? "hidden" : "";
+    });
 
     /* ---------- التحميل ---------- */
 
@@ -350,6 +373,7 @@
                 img.src = src;
                 img.alt = `صفحة ${i + 1}`;
                 img.decoding = "async";
+                img.draggable = false;
                 img.loading = i < 2 ? "eager" : "lazy";
                 img.addEventListener("error", () => w.classList.add("failed"));
                 w.appendChild(img);
