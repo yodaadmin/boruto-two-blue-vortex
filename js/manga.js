@@ -12,6 +12,7 @@
 
     const readPos = cid => { try { return parseInt(localStorage.getItem("vortex-pos-" + cid) || "0", 10) || 0; } catch (e) { return 0; } };
     const pagesOf = c => (c.pages && c.pages[0] && c.pages[0].count) || 0;
+    const hasViews = list => list.some(c => c.views !== undefined);
 
     try {
 
@@ -27,9 +28,11 @@
         const last = chapters.length ? chapters[0] : null;
         const resume = chapters.find(c => readPos(c.id) > 0);   // أعلى فصل فيه موضع محفوظ
 
+        const totalViews = chapters.reduce((a, c) => a + (Number(c.views) || 0), 0);
         const info = [
             ["الحالة", m.status], ["المؤلف", m.author], ["الرسام", m.artist],
-            ["الاسم الإنجليزي", m.english], ["الاسم الياباني", m.japanese]
+            ["الاسم الإنجليزي", m.english], ["الاسم الياباني", m.japanese],
+            ["المشاهدات", hasViews(chapters) ? V.num(totalViews) : ""]
         ].filter(r => r[1]).map(r => `<div class="info-row"><span>${r[0]}</span><strong>${V.esc(r[1])}</strong></div>`).join("");
 
         root.innerHTML = `
@@ -100,6 +103,7 @@
             const pos = readPos(c.id);
             const n = String(c.number);
             const pg = pagesOf(c);
+            const views = c.views !== undefined ? Number(c.views) || 0 : null;
             return `
             <a class="ch-row${fresh ? " is-new" : ""}" href="reader.html?chapter=${c.id}">
                 <div class="ch-num${n.length > 3 ? " long" : ""}"><small>فصل</small><b>${V.esc(n)}</b></div>
@@ -110,7 +114,8 @@
                     </div>
                     <div class="ch-meta">
                         ${date ? `<span class="ch-date">${V.icon("calendar", 14)}<bdi dir="ltr">${date}</bdi></span>` : ""}
-                        ${pg ? `<span>${V.icon("file", 14)}${pg} صفحة</span>` : ""}
+                        ${pg ? `<span>${V.icon("image", 14)}${pg} صفحة</span>` : ""}
+                        ${views !== null ? `<span class="ch-views" title="عدد المشاهدات">${V.icon("eye", 15)}<bdi dir="ltr">${V.num(views)}</bdi> مشاهدة</span>` : ""}
                     </div>
                 </div>
                 <span class="ch-go">${V.icon("chevron")}</span>
