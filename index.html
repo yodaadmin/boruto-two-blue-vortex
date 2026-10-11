@@ -1,18 +1,57 @@
--- VORTEX GROUP: فهارس لتسريع الاستعلامات
--- شغّله مرة وحدة من Supabase > SQL Editor (آمن لو شغّلته أكثر من مرة)
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VORTEX GROUP — منصة قراءة المانجا والكوميكس">
+    <title>VORTEX GROUP — الرئيسية</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body data-page="home">
 
-create index if not exists chapters_manga_id_idx   on public.chapters (manga_id);
-create index if not exists chapters_created_at_idx on public.chapters (created_at desc);
-create index if not exists manga_created_at_idx    on public.manga (created_at desc);
-create index if not exists manga_genres_gin_idx    on public.manga using gin (genres);
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 
--- فهرس الوسوم فقط إذا العمود موجود
-do $$
-begin
-  if exists (select 1 from information_schema.columns
-             where table_schema = 'public' and table_name = 'manga' and column_name = 'tags') then
-    execute 'create index if not exists manga_tags_gin_idx on public.manga using gin (tags)';
-  end if;
-end $$;
+    <div id="app-header"></div>
 
--- ملاحظة: جدول pages عنده فهرس مسبقًا بسبب قيد (chapter_id, page_number) الفريد، فما نحتاج غيره.
+    <main>
+        <div class="container">
+
+            <section id="featured" class="feature reveal" aria-label="العمل المميز"></section>
+
+            <section class="section reveal">
+                <div class="section-head">
+                    <h2>آخر الفصول</h2>
+                    <a href="browse.html?sort=latest" class="section-link">عرض الكل</a>
+                </div>
+                <div id="latest-chapters" class="latest-grid"></div>
+            </section>
+
+            <section class="section reveal">
+                <div class="section-head">
+                    <h2>أضيفت حديثًا</h2>
+                    <div class="head-tools">
+                        <div class="shelf-nav">
+                            <button type="button" id="shelf-prev" class="flip" aria-label="السابق"></button>
+                            <button type="button" id="shelf-next" aria-label="التالي"></button>
+                        </div>
+                        <a href="browse.html" class="section-link">عرض الكل</a>
+                    </div>
+                </div>
+                <div id="recent-manga" class="shelf"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <div id="app-footer"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
