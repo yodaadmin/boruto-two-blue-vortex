@@ -158,3 +158,25 @@ body[data-mode="vertical"] #previous-page, body[data-mode="vertical"] #next-page
     .reader-chapter-info { flex-direction: column; align-items: flex-start; }
     .reader-control-divider, #zoom-out, #zoom-in { display: none; }
 }
+
+/* ======================= حماية المحتوى ======================= */
+.reader-pages, .reader-page {
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.reader-page { position: relative; }
+.reader-page img { pointer-events: none; -webkit-user-drag: none; user-drag: none; }
+
+/* علامة مائية خفيفة تظهر في أي لقطة شاشة */
+.reader-page::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: url("../assets/vortex-mark-white.png") center / 150px repeat;
+    opacity: 0.055;
+}
+.reader-body[data-bg="white"] .reader-page::after { filter: invert(1); opacity: 0.07; }
+
+@media print {
+    .reader-body * { display: none !important; }
+    .reader-body::before { content: "الطباعة غير متاحة"; display: block; padding: 40px; font-size: 24px; text-align: center; color: #000; }
+}
