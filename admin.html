@@ -149,6 +149,7 @@ details.grp{border-top:1px solid var(--line);padding:10px 0}details.grp summary{
    <label class="field">&#1593;&#1606;&#1608;&#1575;&#1606; &#1575;&#1604;&#1601;&#1589;&#1604;<input id="title"></label>
    <label class="field">&#1578;&#1575;&#1585;&#1610;&#1582; &#1575;&#1604;&#1606;&#1588;&#1585;<input id="date" type="date"></label>
    <label class="field">&#1591;&#1585;&#1610;&#1602;&#1577; &#1575;&#1604;&#1585;&#1601;&#1593;<select id="uploadMode"><option value="append">&#1573;&#1590;&#1575;&#1601;&#1577; &#1575;&#1604;&#1589;&#1601;&#1581;&#1575;&#1578; &#1604;&#1604;&#1605;&#1608;&#1580;&#1608;&#1583;</option><option value="replace">&#1575;&#1587;&#1578;&#1576;&#1583;&#1575;&#1604; &#1589;&#1601;&#1581;&#1575;&#1578; &#1575;&#1604;&#1601;&#1589;&#1604; &#1576;&#1575;&#1604;&#1603;&#1575;&#1605;&#1604;</option></select></label>
+   <label class="field" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="compress" checked style="width:auto"> &#1590;&#1594;&#1591; &#1575;&#1604;&#1589;&#1608;&#1585; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575; &#1573;&#1604;&#1609; WebP (&#1578;&#1581;&#1605;&#1610;&#1604; &#1571;&#1587;&#1585;&#1593; &#1604;&#1604;&#1602;&#1585;&#1575;&#1569;)</label>
   </div>
   <div style="height:14px"></div>
   <div id="dropzone" class="drop"><b>&#1575;&#1590;&#1594;&#1591; &#1604;&#1575;&#1582;&#1578;&#1610;&#1575;&#1585; &#1589;&#1608;&#1585; &#1575;&#1604;&#1589;&#1601;&#1581;&#1575;&#1578;</b><span>JPG / PNG / WEBP &#8212; &#1585;&#1575;&#1580;&#1593; &#1575;&#1604;&#1578;&#1585;&#1578;&#1610;&#1576; &#1576;&#1575;&#1604;&#1602;&#1575;&#1574;&#1605;&#1577; &#1602;&#1576;&#1604; &#1575;&#1604;&#1585;&#1601;&#1593;</span>
@@ -370,6 +371,21 @@ $('orderTools').addEventListener('click',e=>{
 });
 
 /* ---------- \u0646\u0634\u0631 \u0627\u0644\u0641\u0635\u0644 (\u0645\u0639 \u062a\u062d\u0642\u0642 \u0648\u062a\u0631\u0627\u062c\u0639) ---------- */
+const fmtMB=n=>(n/1048576).toFixed(1);
+async function toWebp(file){
+ try{
+  if(!$('compress').checked)return file;
+  const bmp=await createImageBitmap(file);
+  let w=bmp.width,h=bmp.height;const MAXW=1600;
+  if(w>MAXW){h=Math.round(h*MAXW/w);w=MAXW}
+  if(h>16383||w*h>150e6){if(bmp.close)bmp.close();return file}
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(bmp,0,0,w,h);if(bmp.close)bmp.close();
+  const blob=await new Promise(r=>c.toBlob(r,'image/webp',0.82));
+  if(!blob||blob.type!=='image/webp'||blob.size>=file.size)return file;
+  return blob;
+ }catch(e){return file}
+}
 const extOf=f=>({'image/jpeg':'.jpg','image/png':'.png','image/webp':'.webp'}[f.type]||'.jpg');
 $('saveChapter').onclick=async()=>{
  if(busy)return;
@@ -378,7 +394,7 @@ $('saveChapter').onclick=async()=>{
  if(!number)return say('uploadMsg','\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0641\u0635\u0644 \u0635\u062d\u064a\u062d.');
  if(mode==='replace'&&!files.length)return say('uploadMsg','\u0648\u0636\u0639 \u0627\u0644\u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u064a\u062a\u0637\u0644\u0628 \u0627\u062e\u062a\u064a\u0627\u0631 \u0635\u0648\u0631.');
  busy=true;$('saveChapter').disabled=true;$('bar').style.width='0%';say('uploadMsg','\u062c\u0627\u0631\u064d \u0627\u0644\u062d\u0641\u0638...');
- const uploaded=[];let created=null,chapterId=null,restore=null;
+ let sizeBefore=0,sizeAfter=0;const uploaded=[];let created=null,chapterId=null,restore=null;
  try{
   if(!(await session()))throw new Error('\u0627\u0646\u062a\u0647\u062a \u0627\u0644\u062c\u0644\u0633\u0629. \u0633\u062c\u0651\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0645\u062c\u062f\u062f\u064b\u0627.');
   const ex=await db.from('chapters').select('id').eq('manga_id',cur.id).eq('number',number).maybeSingle();
@@ -393,9 +409,10 @@ $('saveChapter').onclick=async()=>{
    const tag=mode==='replace'?`r${Date.now()}-`:'';
    const rows=[];
    for(let i=0;i<files.length;i++){
-    const no=start+i,path=`${cur.id}/${chapterId}/${tag}${String(no).padStart(4,'0')}${extOf(files[i])}`;
+    const f=await toWebp(files[i]);sizeBefore+=files[i].size;sizeAfter+=f.size;
+    const no=start+i,path=`${cur.id}/${chapterId}/${tag}${String(no).padStart(4,'0')}${extOf(f)}`;
     say('uploadMsg',`\u0631\u0641\u0639 \u0627\u0644\u0635\u0641\u062d\u0629 ${i+1} \u0645\u0646 ${files.length}...`);
-    const up=await db.storage.from(BUCKET).upload(path,files[i],{upsert:false,contentType:files[i].type||'image/jpeg',cacheControl:'31536000'});
+    const up=await db.storage.from(BUCKET).upload(path,f,{upsert:false,contentType:f.type||'image/jpeg',cacheControl:'31536000'});
     if(up.error)throw new Error(`\u0641\u0634\u0644 \u0631\u0641\u0639 \u0627\u0644\u0635\u0641\u062d\u0629 ${i+1}: ${up.error.message}`);
     uploaded.push(path);rows.push({chapter_id:chapterId,page_number:no,storage_path:path});
     $('bar').style.width=((i+1)/files.length*100)+'%';
@@ -411,7 +428,7 @@ $('saveChapter').onclick=async()=>{
   }
   say('uploadMsg',`\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0641\u0635\u0644 ${number} (${files.length} \u0635\u0641\u062d\u0629) \u0648\u062a\u0645 \u0627\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u062a\u0631\u062a\u064a\u0628.`);toast(`\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0641\u0635\u0644 ${number}.`);
   clearFiles();$('title').dataset.touched='';await loadMangas();
-  say('uploadMsg',`\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0641\u0635\u0644 ${number} \u0648\u062a\u0645 \u0627\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u062a\u0631\u062a\u064a\u0628.`);
+  say('uploadMsg',`\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0641\u0635\u0644 ${number} \u0648\u062a\u0645 \u0627\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u062a\u0631\u062a\u064a\u0628.${sizeBefore&&sizeAfter<sizeBefore?' ('+fmtMB(sizeBefore)+' MB \u2192 '+fmtMB(sizeAfter)+' MB)':''}`);
  }catch(e){
   console.error(e);
   try{if(chapterId&&uploaded.length)await db.from('pages').delete().eq('chapter_id',chapterId).in('storage_path',uploaded)}catch{}
