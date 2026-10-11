@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b1426">
-    <title>VORTEX — قارئ الفصل</title>
+    <title>VORTEX GROUP — قارئ الفصل</title>
     <link rel="stylesheet" href="css/core.css">
     <link rel="stylesheet" href="css/reader.css">
 </head>
@@ -14,31 +14,20 @@
 <header id="reader-header" class="reader-header">
     <div class="reader-header-inner">
 
-        <a href="index.html" class="reader-logo" aria-label="VORTEX">VORTEX</a>
+        <a href="index.html" class="reader-logo" aria-label="VORTEX GROUP">
+            <img src="assets/vortex-mark-cyan.png" alt="" width="30" height="30">
+        </a>
 
-        <div id="reader-title" class="reader-title"><span>جارٍ تحميل الفصل...</span></div>
+        <div id="reader-title" class="reader-title"><b>جارٍ تحميل الفصل...</b></div>
 
         <div class="reader-header-actions">
-
-            <a id="manga-link" href="index.html" class="reader-icon-btn" title="صفحة المانجا" aria-label="صفحة المانجا">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M5 4h9a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h9"/></svg>
-            </a>
-
-            <button id="toggle-chapters" type="button" class="reader-icon-btn" title="الفصول" aria-label="قائمة الفصول">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
-            </button>
-
-            <button id="toggle-fullscreen" type="button" class="reader-icon-btn" title="ملء الشاشة" aria-label="ملء الشاشة">
-                <svg class="icon ico-expand" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-                <svg class="icon ico-compress" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
-            </button>
-
-            <button id="toggle-settings" type="button" class="reader-icon-btn" title="إعدادات القارئ" aria-label="إعدادات القارئ" aria-expanded="false">
-                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-            </button>
-
+            <a id="manga-link" href="index.html" class="reader-icon-btn" title="صفحة المانجا" aria-label="صفحة المانجا"><i data-icon="book"></i></a>
+            <button id="toggle-chapters" type="button" class="reader-icon-btn" title="الفصول" aria-label="قائمة الفصول"><i data-icon="list"></i></button>
+            <button id="toggle-fullscreen" type="button" class="reader-icon-btn" title="ملء الشاشة" aria-label="ملء الشاشة"></button>
+            <button id="toggle-settings" type="button" class="reader-icon-btn" title="إعدادات القارئ" aria-label="إعدادات القارئ" aria-expanded="false"><i data-icon="settings"></i></button>
         </div>
     </div>
+    <div class="reader-progress"><span id="reader-progress"></span></div>
 </header>
 
 <!-- ============ SETTINGS ============ -->
@@ -46,55 +35,55 @@
 
     <div class="settings-header">
         <h2>إعدادات القراءة</h2>
-        <button id="close-settings" type="button" class="settings-close" aria-label="إغلاق">×</button>
+        <button id="close-settings" type="button" class="settings-close" aria-label="إغلاق"><i data-icon="close"></i></button>
     </div>
 
     <div class="settings-section">
         <label class="settings-label">نمط القراءة</label>
-        <div class="settings-options">
-            <button type="button" class="settings-option" data-setting="mode" data-value="vertical">Webtoon</button>
-            <button type="button" class="settings-option" data-setting="mode" data-value="single">صفحة واحدة</button>
-            <button type="button" class="settings-option" data-setting="mode" data-value="double">صفحات مزدوجة</button>
+        <div class="settings-options tiles">
+            <button type="button" class="settings-option tile" data-setting="mode" data-value="vertical"><i data-icon="rows" data-size="22"></i><span>Webtoon</span></button>
+            <button type="button" class="settings-option tile" data-setting="mode" data-value="single"><i data-icon="single" data-size="22"></i><span>صفحة واحدة</span></button>
+            <button type="button" class="settings-option tile" data-setting="mode" data-value="double"><i data-icon="double" data-size="22"></i><span>صفحتان</span></button>
         </div>
     </div>
 
     <div class="settings-section">
         <label class="settings-label">جهة الانتقال للصفحة التالية</label>
         <div class="settings-options">
-            <button type="button" class="settings-option" data-setting="rtl" data-value="true">يسار</button>
-            <button type="button" class="settings-option" data-setting="rtl" data-value="false">يمين</button>
+            <button type="button" class="settings-option with-ico" data-setting="rtl" data-value="true"><span>يسار</span><i data-icon="left" data-size="18"></i></button>
+            <button type="button" class="settings-option with-ico" data-setting="rtl" data-value="false"><i data-icon="right" data-size="18"></i><span>يمين</span></button>
         </div>
     </div>
 
     <div class="settings-section">
         <label class="settings-label">ملاءمة الصفحة</label>
-        <div class="settings-options">
-            <button type="button" class="settings-option" data-setting="fit" data-value="width">عرض الشاشة</button>
-            <button type="button" class="settings-option" data-setting="fit" data-value="height">ارتفاع الشاشة</button>
-            <button type="button" class="settings-option" data-setting="fit" data-value="original">الحجم الأصلي</button>
+        <div class="settings-options tiles">
+            <button type="button" class="settings-option tile" data-setting="fit" data-value="width"><i data-icon="arrows_h" data-size="22"></i><span>عرض الشاشة</span></button>
+            <button type="button" class="settings-option tile" data-setting="fit" data-value="height"><i data-icon="arrows_v" data-size="22"></i><span>ارتفاع الشاشة</span></button>
+            <button type="button" class="settings-option tile" data-setting="fit" data-value="original"><i data-icon="expand" data-size="22"></i><span>الحجم الأصلي</span></button>
         </div>
     </div>
 
     <div class="settings-section">
         <label class="settings-label">خلفية القارئ</label>
         <div class="settings-options">
-            <button type="button" class="settings-option" data-setting="bg" data-value="black">أسود</button>
-            <button type="button" class="settings-option" data-setting="bg" data-value="navy">أزرق داكن</button>
-            <button type="button" class="settings-option" data-setting="bg" data-value="white">أبيض</button>
+            <button type="button" class="settings-option with-ico" data-setting="bg" data-value="black"><span class="swatch" style="background:#000"></span><span>أسود</span></button>
+            <button type="button" class="settings-option with-ico" data-setting="bg" data-value="navy"><span class="swatch" style="background:#0b1426"></span><span>أزرق داكن</span></button>
+            <button type="button" class="settings-option with-ico" data-setting="bg" data-value="white"><span class="swatch" style="background:#f1f3f7"></span><span>أبيض</span></button>
         </div>
     </div>
 
     <div class="settings-section">
-        <label class="settings-label">السطوع <b id="bright-value">100%</b></label>
+        <label class="settings-label"><span class="lbl"><i data-icon="sun" data-size="16"></i> السطوع</span> <b id="bright-value">100%</b></label>
         <input id="set-bright" type="range" min="50" max="125" step="5" value="100">
     </div>
 
     <div class="settings-section">
-        <label class="settings-label">المسافة بين الصفحات (Webtoon) <b id="gap-value">0</b></label>
+        <label class="settings-label"><span class="lbl"><i data-icon="rows" data-size="16"></i> المسافة بين الصفحات (Webtoon)</span> <b id="gap-value">0</b></label>
         <input id="set-gap" type="range" min="0" max="80" step="4" value="0">
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section card">
         <label class="toggle-setting">
             <span><strong>حفظ آخر موضع</strong><small>العودة للصفحة الأخيرة عند فتح الفصل</small></span>
             <input id="remember-position" type="checkbox">
@@ -112,7 +101,7 @@
     <div class="chapters-panel">
         <div class="settings-header">
             <h2>الفصول</h2>
-            <button id="close-chapters" type="button" class="settings-close" aria-label="إغلاق">×</button>
+            <button id="close-chapters" type="button" class="settings-close" aria-label="إغلاق"><i data-icon="close"></i></button>
         </div>
         <div id="chapters-list" class="chapters-list"><div class="loading-spinner"></div></div>
     </div>
@@ -130,7 +119,7 @@
     </section>
 
     <section id="reader-error" class="reader-state hidden">
-        <div class="reader-state-icon">◌</div>
+        <div class="reader-state-icon"><i data-icon="info" data-size="40"></i></div>
         <h2>تعذر تحميل الفصل</h2>
         <p id="reader-error-message">لم يتم العثور على الفصل المطلوب.</p>
         <div class="reader-state-actions">
@@ -145,21 +134,22 @@
             <div>
                 <span id="reader-manga-name" class="eyebrow">المانجا</span>
                 <h1 id="reader-chapter-name">الفصل</h1>
-                <p id="reader-chapter-description"></p>
+                <div id="reader-chips" class="reader-chips"></div>
+                <p id="reader-chapter-description" class="hidden"></p>
             </div>
-            <a id="reader-info-link" href="#" class="btn secondary">صفحة المانجا</a>
+            <a id="reader-info-link" href="#" class="btn secondary"><i data-icon="book" data-size="18"></i> صفحة المانجا</a>
         </div>
 
         <div id="reader-pages" class="reader-pages" tabindex="0"></div>
 
         <div id="reader-end" class="reader-end">
-            <div class="reader-end-line"></div>
+            <div class="reader-end-badge"><i data-icon="check" data-size="26"></i></div>
             <h2>انتهى الفصل</h2>
             <p>انتقل إلى فصل آخر أو ارجع إلى صفحة المانجا.</p>
             <div class="reader-navigation">
-                <a id="reader-previous" href="#" class="btn secondary hidden">← الفصل السابق</a>
-                <a id="reader-manga" href="#" class="btn secondary">صفحة المانجا</a>
-                <a id="reader-next" href="#" class="btn primary hidden">الفصل التالي →</a>
+                <a id="reader-previous" href="#" class="btn secondary hidden"><i data-icon="right" data-size="18"></i> الفصل السابق</a>
+                <a id="reader-manga" href="#" class="btn secondary"><i data-icon="book" data-size="18"></i> صفحة المانجا</a>
+                <a id="reader-next" href="#" class="btn primary hidden">الفصل التالي <i data-icon="left" data-size="18"></i></a>
             </div>
         </div>
 
@@ -175,16 +165,16 @@
 
 <!-- ============ BOTTOM BAR ============ -->
 <nav id="reader-bottom-bar" class="reader-bottom-bar" aria-label="أدوات القراءة">
-    <div class="reader-bottom-inner">
-        <button id="previous-page" type="button" class="reader-control" aria-label="الصفحة السابقة">‹</button>
+    <div id="reader-bottom-inner" class="reader-bottom-inner">
+        <button id="previous-page" type="button" class="reader-control" aria-label="الصفحة السابقة"></button>
         <div id="page-counter" class="page-counter"><strong>0</strong><span>/</span><span>0</span></div>
-        <button id="next-page" type="button" class="reader-control" aria-label="الصفحة التالية">›</button>
+        <button id="next-page" type="button" class="reader-control" aria-label="الصفحة التالية"></button>
         <span class="reader-control-divider"></span>
-        <button id="zoom-out" type="button" class="reader-control" aria-label="تصغير">−</button>
-        <button id="zoom-reset" type="button" class="reader-control" aria-label="إعادة التكبير">100%</button>
-        <button id="zoom-in" type="button" class="reader-control" aria-label="تكبير">+</button>
+        <button id="zoom-out" type="button" class="reader-control" aria-label="تصغير"><i data-icon="minus" data-size="18"></i></button>
+        <button id="zoom-reset" type="button" class="reader-control zoom-val" aria-label="إعادة التكبير">100%</button>
+        <button id="zoom-in" type="button" class="reader-control" aria-label="تكبير"><i data-icon="plus" data-size="18"></i></button>
         <span class="reader-control-divider"></span>
-        <button id="reader-top" type="button" class="reader-control" aria-label="للأعلى">↑</button>
+        <button id="reader-top" type="button" class="reader-control" aria-label="للأعلى"><i data-icon="up" data-size="18"></i></button>
     </div>
 </nav>
 
