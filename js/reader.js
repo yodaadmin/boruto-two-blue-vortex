@@ -57,6 +57,23 @@
         c.querySelectorAll("span")[1].textContent = wraps.length;
         $("scrub-bubble").textContent = `${cur + 1} / ${wraps.length}`;
         updateProgress();
+        warmUp();
+    }
+
+    /* تحميل مسبق: الصفحات القادمة، ثم أول صفحات الفصل التالي عند الاقتراب من النهاية */
+    let nextWarmed = false;
+    function warmUp() {
+        if (!wraps.length) return;
+        for (let k = 1; k <= 3; k++) {
+            const img = wraps[cur + k] && wraps[cur + k].firstChild;
+            if (img && img.loading === "lazy") img.loading = "eager";
+        }
+        if (!nextWarmed && currentChapter && currentChapter.next_chapter && cur >= wraps.length - 4) {
+            nextWarmed = true;
+            VortexAPI.getPages(currentChapter.next_chapter).then(list => {
+                list.slice(0, 3).forEach(p => { new Image().src = VortexAPI.fileUrl(p.storage_path); });
+            }).catch(() => {});
+        }
     }
 
     function updateProgress() {
@@ -435,7 +452,8 @@
                 img.alt = `صفحة ${i + 1}`;
                 img.decoding = "async";
                 img.draggable = false;
-                img.loading = i < 2 ? "eager" : "lazy";
+                img.loading = i < 3 ? "eager" : "lazy";
+                if (i === 0) img.fetchPriority = "high";
                 img.addEventListener("error", () => w.classList.add("failed"));
                 w.appendChild(img);
                 pagesEl.appendChild(w);
