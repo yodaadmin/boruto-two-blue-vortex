@@ -57,6 +57,13 @@ details.grp{border-top:1px solid var(--line);padding:10px 0}details.grp summary{
 .file-item img{width:40px;height:55px;object-fit:cover;border-radius:6px}.file-item .info{flex:1;min-width:0}.file-item b{display:block;font-size:13px}.file-item small{color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-item .btn{padding:6px 11px}
 .progress{height:9px;background:#10171c;border-radius:99px;overflow:hidden;margin-top:12px}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#075bff,var(--cyan),var(--ice));transition:.2s}
+.vol-list{display:grid;gap:12px}
+.vol-item{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;padding:12px;border:1px solid var(--line);background:#090e13;border-radius:14px}
+.vol-cover{width:96px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:linear-gradient(145deg,#0f3a49,#0a1a22);display:grid;place-items:center;border:1px solid var(--line2);font-size:34px;font-weight:900;color:var(--ice)}
+.vol-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.vol-item h3{margin:0 0 4px;font-size:16px}.vol-item .vol-range{color:var(--muted);font-size:12px;margin-bottom:8px}
+.vol-item .field{margin-bottom:8px}
+@media(max-width:700px){.vol-item{grid-template-columns:70px minmax(0,1fr)}.vol-cover{width:70px;font-size:26px}}
 .page-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
 .page-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#070b0f}.page-card img{display:block;width:100%;aspect-ratio:2/3;object-fit:cover}
 .page-foot{padding:7px;display:flex;align-items:center;justify-content:space-between;gap:6px}.page-foot small{color:#93a2aa}.page-foot .btn{padding:5px 9px;font-size:11px}
@@ -96,6 +103,7 @@ details.grp{border-top:1px solid var(--line);padding:10px 0}details.grp summary{
   <button class="tab-btn active" data-tab="libraryTab">&#1575;&#1604;&#1605;&#1603;&#1578;&#1576;&#1577;</button>
   <button class="tab-btn" data-tab="infoTab">&#1576;&#1610;&#1575;&#1606;&#1575;&#1578; &#1575;&#1604;&#1605;&#1575;&#1606;&#1580;&#1575;</button>
   <button class="tab-btn" data-tab="chaptersTab">&#1575;&#1604;&#1601;&#1589;&#1608;&#1604;</button>
+  <button class="tab-btn" data-tab="volumesTab">&#1575;&#1604;&#1605;&#1580;&#1604;&#1583;&#1575;&#1578;</button>
   <button class="tab-btn" data-tab="publishTab">&#1606;&#1588;&#1585; &#1601;&#1589;&#1604;</button>
   <button class="tab-btn" data-tab="pagesTab">&#1575;&#1604;&#1589;&#1601;&#1581;&#1575;&#1578;</button>
  </nav>
@@ -138,6 +146,14 @@ details.grp{border-top:1px solid var(--line);padding:10px 0}details.grp summary{
   <h2>&#1575;&#1604;&#1601;&#1589;&#1608;&#1604;</h2><p class="hint" style="margin-bottom:12px">&#1601;&#1589;&#1608;&#1604; &#1575;&#1604;&#1593;&#1605;&#1604; &#1575;&#1604;&#1605;&#1581;&#1583;&#1583; &#1601;&#1602;&#1591;.</p>
   <input id="chapterSearch" class="sel" placeholder="&#1575;&#1576;&#1581;&#1579; &#1576;&#1585;&#1602;&#1605; &#1575;&#1604;&#1601;&#1589;&#1604; &#1571;&#1608; &#1575;&#1604;&#1593;&#1606;&#1608;&#1575;&#1606;..." style="margin:0 0 12px">
   <div id="chaptersList" class="chapter-list"></div>
+ </div></div>
+
+ <!-- &#1575;&#1604;&#1605;&#1580;&#1604;&#1583;&#1575;&#1578; -->
+ <div id="volumesTab" class="tab"><div class="card">
+  <h2>&#1575;&#1604;&#1605;&#1580;&#1604;&#1583;&#1575;&#1578;</h2>
+  <p class="hint" style="margin-bottom:12px">&#1575;&#1604;&#1601;&#1589;&#1608;&#1604; &#1578;&#1578;&#1608;&#1586;&#1593; &#1578;&#1604;&#1602;&#1575;&#1574;&#1610;&#1611;&#1575; &#1593;&#1604;&#1609; &#1605;&#1580;&#1604;&#1583;&#1575;&#1578;&#1548; &#1603;&#1604; &#1605;&#1580;&#1604;&#1583; 4 &#1601;&#1589;&#1608;&#1604; (&#1575;&#1604;&#1601;&#1589;&#1604; &#1575;&#1604;&#1582;&#1575;&#1605;&#1587; &#1610;&#1576;&#1583;&#1571; &#1575;&#1604;&#1605;&#1580;&#1604;&#1583; &#1575;&#1604;&#1578;&#1575;&#1604;&#1610;). &#1578;&#1602;&#1583;&#1585; &#1578;&#1590;&#1610;&#1601; &#1589;&#1608;&#1585;&#1577; &#1593;&#1585;&#1590; &#1608;&#1593;&#1606;&#1608;&#1575;&#1606; &#1604;&#1603;&#1604; &#1605;&#1580;&#1604;&#1583;.</p>
+  <div id="volumesMsg" class="msg"></div>
+  <div id="volumesList" class="vol-list"></div>
  </div></div>
 
  <!-- &#1575;&#1604;&#1606;&#1588;&#1585; -->
@@ -284,6 +300,7 @@ $('deleteManga').onclick=async()=>{
   const ch=await db.from('chapters').select('id').eq('manga_id',cur.id);if(ch.error)throw ch.error;
   const ids=(ch.data||[]).map(c=>c.id);
   if(ids.length)await removeFiles(await pathsOf(ids));
+  try{const vv=await db.from('volumes').select('cover_url').eq('manga_id',cur.id);await removeFiles((vv.data||[]).map(v=>volPath(v.cover_url)).filter(Boolean))}catch{}
   const r=await db.from('manga').delete().eq('id',cur.id);if(r.error)throw r.error;
   cur=null;toast('\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u0639\u0645\u0644.');await loadMangas();setTab('libraryTab');
  }catch(e){toast('\u0641\u0634\u0644 \u0627\u0644\u062d\u0630\u0641: '+e.message,'err')}
@@ -292,7 +309,7 @@ $('deleteManga').onclick=async()=>{
 /* ---------- \u0627\u0644\u0641\u0635\u0648\u0644 ---------- */
 async function loadChapters(){
  $('pubTarget').textContent=cur&&!creating?cur.title:'\u2014 (\u0627\u062d\u0641\u0638 \u0627\u0644\u0639\u0645\u0644 \u0623\u0648\u0644\u064b\u0627)';
- if(!cur||creating){chapters=[];renderChapters();fillPageChapter();return}
+ if(!cur||creating){chapters=[];volumes=[];renderChapters();renderVolumes();fillPageChapter();return}
  const r=await db.from('chapters').select('id,number,title,published_at,pages(count)').eq('manga_id',cur.id).order('number',{ascending:false});
  if(r.error){toast('\u062a\u0639\u0630\u0631 \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0641\u0635\u0648\u0644: '+r.error.message,'err');return}
  chapters=r.data||[];
@@ -300,7 +317,7 @@ async function loadChapters(){
   const f=await db.from('pages').select('chapter_id,storage_path').in('chapter_id',chapters.map(c=>c.id)).eq('page_number',1);
   const mp={};(f.data||[]).forEach(p=>mp[p.chapter_id]=p.storage_path);chapters.forEach(c=>c.cover=mp[c.id]||'');
  }
- renderChapters();fillPageChapter();
+ await loadVolumes();renderChapters();renderVolumes();fillPageChapter();
  const max=chapters.reduce((n,c)=>Math.max(n,Number(c.number)),0);
  if(!$('title').dataset.touched){$('num').value=max+1;$('title').value='\u0627\u0644\u0641\u0635\u0644 '+(max+1)}
 }
@@ -308,7 +325,7 @@ $('title').addEventListener('input',()=>$('title').dataset.touched='1');
 function renderChapters(){
  const q=$('chapterSearch').value.trim().toLowerCase();
  const list=chapters.filter(c=>`${c.number} ${c.title||''}`.toLowerCase().includes(q));
- $('chaptersList').innerHTML=list.length?list.map(c=>`<div class="chapter-item"><img class="chapter-cover" src="${esc(pub(c.cover))}" alt="" onerror="this.style.visibility='hidden'"><div><div class="row"><span class="chapter-num">\u0627\u0644\u0641\u0635\u0644 ${esc(c.number)}</span><span class="badge">${c.pages?.[0]?.count||0} \u0635\u0641\u062d\u0629</span></div><div style="font-weight:700;margin-top:3px">${esc(c.title||'')}</div><div class="chapter-meta">${esc(c.published_at||'\u0628\u062f\u0648\u0646 \u062a\u0627\u0631\u064a\u062e')}</div></div><div class="row"><a class="btn" href="reader.html?chapter=${esc(c.id)}" target="_blank">\u0645\u0639\u0627\u064a\u0646\u0629</a><button class="btn" data-edit="${esc(c.id)}">\u062a\u0639\u062f\u064a\u0644</button><button class="btn danger" data-del="${esc(c.id)}">\u062d\u0630\u0641</button></div></div>`).join(''):'<div class="empty">\u0644\u0627 \u062a\u0648\u062c\u062f \u0641\u0635\u0648\u0644 \u0644\u0647\u0630\u0627 \u0627\u0644\u0639\u0645\u0644.</div>';
+ $('chaptersList').innerHTML=list.length?list.map(c=>`<div class="chapter-item"><img class="chapter-cover" src="${esc(pub(c.cover))}" alt="" onerror="this.style.visibility='hidden'"><div><div class="row"><span class="chapter-num">\u0627\u0644\u0641\u0635\u0644 ${esc(c.number)}</span><span class="badge">${c.pages?.[0]?.count||0} \u0635\u0641\u062d\u0629</span><span class="badge">\u0645\u062c\u0644\u062f ${volNo(c.id)}</span></div><div style="font-weight:700;margin-top:3px">${esc(c.title||'')}</div><div class="chapter-meta">${esc(c.published_at||'\u0628\u062f\u0648\u0646 \u062a\u0627\u0631\u064a\u062e')}</div></div><div class="row"><a class="btn" href="reader.html?chapter=${esc(c.id)}" target="_blank">\u0645\u0639\u0627\u064a\u0646\u0629</a><button class="btn" data-edit="${esc(c.id)}">\u062a\u0639\u062f\u064a\u0644</button><button class="btn danger" data-del="${esc(c.id)}">\u062d\u0630\u0641</button></div></div>`).join(''):'<div class="empty">\u0644\u0627 \u062a\u0648\u062c\u062f \u0641\u0635\u0648\u0644 \u0644\u0647\u0630\u0627 \u0627\u0644\u0639\u0645\u0644.</div>';
  $('chaptersList').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editChapter(b.dataset.edit));
  $('chaptersList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteChapter(b.dataset.del));
 }
@@ -318,6 +335,66 @@ async function deleteChapter(id){
  const c=chapters.find(x=>x.id===id);if(!c||!confirm(`\u062d\u0630\u0641 \u0627\u0644\u0641\u0635\u0644 ${c.number} \u0648\u0643\u0644 \u0635\u0641\u062d\u0627\u062a\u0647\u061f`))return;
  try{await removeFiles(await pathsOf([id]));const r=await db.from('chapters').delete().eq('id',id);if(r.error)throw r.error;toast('\u062a\u0645 \u062d\u0630\u0641 \u0627\u0644\u0641\u0635\u0644.');await loadMangas()}
  catch(e){toast('\u0641\u0634\u0644 \u062d\u0630\u0641 \u0627\u0644\u0641\u0635\u0644: '+e.message,'err')}
+}
+
+
+/* ---------- Volumes (4 chapters each, automatic) ---------- */
+const VOL_SIZE=4;let volumes=[],volumesMissing=false;
+function volGroups(){
+ const asc=[...chapters].sort((a,b)=>Number(a.number)-Number(b.number));
+ const out=[];for(let i=0;i<asc.length;i+=VOL_SIZE)out.push({n:i/VOL_SIZE+1,items:asc.slice(i,i+VOL_SIZE)});return out;
+}
+function volNo(chapterId){const g=volGroups().find(g=>g.items.some(c=>c.id===chapterId));return g?g.n:'-'}
+function volPath(url){if(!url)return'';const k=`/storage/v1/object/public/${BUCKET}/`;const i=url.indexOf(k);return i<0?'':decodeURIComponent(url.slice(i+k.length))}
+async function loadVolumes(){
+ volumesMissing=false;volumes=[];
+ const r=await db.from('volumes').select('*').eq('manga_id',cur.id);
+ if(r.error){volumesMissing=true;return}
+ volumes=r.data||[];
+}
+function renderVolumes(){
+ const box=$('volumesList');
+ say('volumesMsg',volumesMissing?'\u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u062c\u0644\u062f\u0627\u062a \u063a\u064a\u0631 \u0645\u0648\u062c\u0648\u062f \u0628\u0639\u062f. \u0634\u063a\u0651\u0644 \u0645\u0644\u0641 volumes-table.sql \u0645\u0646 Supabase \u0623\u0648\u0644\u064b\u0627.':'');
+ if(volumesMissing)return;
+ const gs=volGroups();
+ if(!gs.length){box.innerHTML='<div class="empty">\u0644\u0627 \u062a\u0648\u062c\u062f \u0641\u0635\u0648\u0644 \u0628\u0639\u062f. \u0627\u0646\u0634\u0631 \u0641\u0635\u0644\u064b\u0627 \u0623\u0648\u0644\u064b\u0627.</div>';return}
+ box.innerHTML=gs.map(g=>{
+  const v=volumes.find(x=>Number(x.number)===g.n)||{};
+  const a=g.items[0].number,b=g.items[g.items.length-1].number;
+  return `<div class="vol-item" data-n="${g.n}">
+   <div class="vol-cover">${v.cover_url?`<img src="${esc(pub(v.cover_url))}" alt="">`:g.n}</div>
+   <div>
+    <h3>\u0645\u062c\u0644\u062f ${g.n}</h3>
+    <div class="vol-range">\u0627\u0644\u0641\u0635\u0648\u0644 ${esc(a)}${a!==b?' - '+esc(b):''} &bull; ${g.items.length} \u0641\u0635\u0648\u0644</div>
+    <label class="field">\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0645\u062c\u0644\u062f (\u0627\u062e\u062a\u064a\u0627\u0631\u064a)<input data-f="title" value="${esc(v.title||'')}" placeholder="\u0645\u062b\u0627\u0644: \u0627\u0644\u0642\u0648\u0633 \u0627\u0644\u0623\u0648\u0644"></label>
+    <label class="field">\u0635\u0648\u0631\u0629 \u0627\u0644\u0639\u0631\u0636<input data-f="file" type="file" accept="image/*"></label>
+    <div class="row"><button class="btn primary" data-save="${g.n}">\u062d\u0641\u0638</button>${v.cover_url?`<button class="btn danger" data-rm="${g.n}">\u062d\u0630\u0641 \u0627\u0644\u0635\u0648\u0631\u0629</button>`:''}</div>
+   </div></div>`}).join('');
+ box.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>saveVolume(+b.dataset.save,false));
+ box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>saveVolume(+b.dataset.rm,true));
+}
+async function saveVolume(n,removeCover){
+ if(busy||!cur)return;
+ const el=document.querySelector(`.vol-item[data-n="${n}"]`),old=volumes.find(x=>Number(x.number)===n)||{};
+ const title=el.querySelector('[data-f=title]').value.trim(),f=el.querySelector('[data-f=file]').files[0];
+ busy=true;el.querySelectorAll('button').forEach(b=>b.disabled=true);
+ try{
+  if(!(await session()))throw new Error('\u0627\u0646\u062a\u0647\u062a \u0627\u0644\u062c\u0644\u0633\u0629. \u0633\u062c\u0651\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0645\u062c\u062f\u062f\u064b\u0627.');
+  let cover_url=old.cover_url||null,oldPath=volPath(old.cover_url);
+  if(removeCover)cover_url=null;
+  else if(f){
+   const up=await toWebp(f);
+   const path=`${cur.id}/volumes/v${n}-${Date.now()}${extOf(up)}`;
+   const u=await db.storage.from(BUCKET).upload(path,up,{contentType:up.type||'image/jpeg',cacheControl:'31536000'});
+   if(u.error)throw u.error;
+   cover_url=db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  const r=await db.from('volumes').upsert({manga_id:cur.id,number:n,title:title||null,cover_url},{onConflict:'manga_id,number'});
+  if(r.error)throw r.error;
+  if(oldPath&&oldPath!==volPath(cover_url))try{await removeFiles([oldPath])}catch{}
+  await loadVolumes();renderVolumes();toast('\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0645\u062c\u0644\u062f.');
+ }catch(e){console.error(e);toast('\u0641\u0634\u0644 \u0627\u0644\u062d\u0641\u0638: '+e.message,'err');el.querySelectorAll('button').forEach(b=>b.disabled=false)}
+ finally{busy=false}
 }
 
 /* ---------- \u0627\u0644\u0635\u0641\u062d\u0627\u062a ---------- */
