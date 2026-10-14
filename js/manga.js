@@ -4,7 +4,8 @@
 
     const root = document.getElementById("manga-page");
     const id = new URLSearchParams(location.search).get("id");
-    const STEP = 10;
+    const VOL_SIZE = 4;      // عدد الفصول بكل مجلد
+    const VSTEP = 6;         // عدد المجلدات المعروضة بكل دفعة
 
     const fail = (title, text) => { root.innerHTML = V.empty("!", title, text); };
 
@@ -16,7 +17,7 @@
 
     try {
 
-        const [m, chapters] = await Promise.all([VortexAPI.mangaById(id), VortexAPI.chaptersByManga(id)]);
+        const [m, chapters, volumes] = await Promise.all([VortexAPI.mangaById(id), VortexAPI.chaptersByManga(id), VortexAPI.volumesByManga(id)]);
 
         if (!m) { fail("العمل غير موجود", "ربما تم حذفه أو الرابط غير صحيح."); return; }
 
@@ -79,21 +80,41 @@
         favBtn.addEventListener("click", () => { V.favs.toggle(m.id); syncFav(); favBtn.classList.add("pop"); setTimeout(() => favBtn.classList.remove("pop"), 400); });
         syncFav();
 
-        /* ---------- قائمة الفصول: بحث + ترتيب + عرض تدريجي ---------- */
-        const st = { q: "", desc: true, shown: STEP };
+        /* ---------- المجلدات: كل 4 فصول بمجلد (تلقائيًا) ---------- */
+        const asc = [...chapters].sort((a, b) => Number(a.number) - Number(b.number));
+        const groups = [];
+        asc.forEach((c, i) => {
+            const n = Math.floor(i / VOL_SIZE) + 1;
+            if (!groups[n - 1]) groups[n - 1] = { n, items: [], meta: volumes.find(v => Number(v.number) === n) || {} };
+            groups[n - 1].items.push(c);
+        });
+
+        const st = { q: "", desc: true, shown: VSTEP, open: new Set() };
         const listEl = document.getElementById("ch-list");
         const moreEl = document.getElementById("ch-more");
         const infoEl = document.getElementById("ch-info");
+        const ordered = () => (st.desc ? [...groups].reverse() : groups);
+        const openFirst = () => { st.open = new Set(); const f = ordered()[0]; if (f) st.open.add(f.n); };
+        openFirst();
 
-        function visible() {
+        function view() {
             const q = st.q.trim().toLowerCase();
-            let l = chapters.filter(c => !q || String(c.number).startsWith(q) || String(c.title || "").toLowerCase().includes(q));
-            l.sort((a, b) => st.desc ? Number(b.number) - Number(a.number) : Number(a.number) - Number(b.number));
-            if (/^\d+$/.test(q)) {                      // تطابق تام لرقم الفصل يظهر أولاً
-                const i = l.findIndex(c => String(c.number) === q);
-                if (i > 0) l.unshift(l.splice(i, 1)[0]);
+            const out = [];
+            ordered().forEach(g => {
+                let l = g.items.filter(c => !q || String(c.number).startsWith(q) || String(c.title || "").toLowerCase().includes(q));
+                if (!l.length) return;
+                l = [...l].sort((a, b) => st.desc ? Number(b.number) - Number(a.number) : Number(a.number) - Number(b.number));
+                if (/^\d+$/.test(q)) {
+                    const i = l.findIndex(c => String(c.number) === q);
+                    if (i > 0) l.unshift(l.splice(i, 1)[0]);
+                }
+                out.push({ g, items: l });
+            });
+            if (/^\d+$/.test(q)) {
+                const i = out.findIndex(x => x.items.some(c => String(c.number) === q));
+                if (i > 0) out.unshift(out.splice(i, 1)[0]);
             }
-            return l;
+            return out;
         }
 
         function row(c) {
@@ -122,30 +143,71 @@
             </a>`;
         }
 
+        function volume(x, forceOpen) {
+            const g = x.g, meta = g.meta;
+            const cover = meta.cover_url ? VortexAPI.fileUrl(meta.cover_url) : "";
+            const first = g.items[0].number, last = g.items[g.items.length - 1].number;
+            const total = g.items.reduce((a, c) => a + (Number(c.views) || 0), 0);
+            const hasViews = g.items.some(c => c.views !== undefined);
+            const fresh = g.items.some(c => (c.created_at || c.published_at) && (Date.now() - new Date(c.created_at || c.published_at)) < 7 * 86400000);
+            const open = forceOpen || st.open.has(g.n);
+            return `
+            <section class="vol${open ? " open" : ""}" data-n="${g.n}">
+                <button type="button" class="vol-head" aria-expanded="${open}">
+                    <div class="vol-cover">${cover ? `<img src="${V.esc(cover)}" alt="" loading="lazy">` : `<b>${g.n}</b>`}</div>
+                    <div class="vol-info">
+                        <small>مجلد ${g.n}${fresh ? ` <span class="ch-badge new">جديد</span>` : ""}</small>
+                        <h3>${V.esc(meta.title || "المجلد " + g.n)}</h3>
+                        <div class="vol-meta">
+                            <span>${V.icon("book", 14)}${String(first) === String(last) ? "فصل " + V.esc(first) : "فصول " + V.esc(first) + " - " + V.esc(last)}</span>
+                            <span>${V.icon("list", 14)}${g.items.length} فصل</span>
+                            ${hasViews ? `<span class="ch-views">${V.icon("eye", 14)}<bdi dir="ltr">${V.num(total)}</bdi></span>` : ""}
+                        </div>
+                    </div>
+                    <span class="vol-chev">${V.icon("chevron", 22)}</span>
+                </button>
+                <div class="vol-body"><div class="vol-rows">${x.items.map(row).join("")}</div></div>
+            </section>`;
+        }
+
         function render() {
-            const l = visible();
-            const part = l.slice(0, st.shown);
-            listEl.innerHTML = part.length ? part.map(row).join("")
+            const l = view();
+            const searching = !!st.q.trim();
+            const part = searching ? l : l.slice(0, st.shown);
+            listEl.innerHTML = part.length ? part.map(x => volume(x, searching)).join("")
                 : V.empty(V.icon("search", 26), chapters.length ? "لا توجد فصول مطابقة" : "لا توجد فصول بعد",
                     chapters.length ? "جرّب رقماً أو كلمة أخرى." : "سيتم إضافة الفصول قريبًا.");
-            infoEl.textContent = chapters.length ? (st.q ? `${l.length} نتيجة من ${chapters.length} فصل` : `عرض ${part.length} من ${l.length} فصل`) : "";
-            const left = l.length - part.length;
+            if (!chapters.length) infoEl.textContent = "";
+            else if (searching) infoEl.textContent = `${l.reduce((a, x) => a + x.items.length, 0)} نتيجة من ${chapters.length} فصل`;
+            else infoEl.textContent = `${groups.length} مجلد · ${chapters.length} فصل`;
+            const left = searching ? 0 : l.length - part.length;
             moreEl.classList.toggle("hidden", left <= 0);
-            moreEl.textContent = `عرض المزيد (${Math.min(STEP, left)} من ${left} متبقي)`;
+            moreEl.textContent = `عرض المزيد (${left} مجلد متبقي)`;
         }
+
+        listEl.addEventListener("click", e => {
+            const h = e.target.closest(".vol-head");
+            if (!h) return;
+            const sec = h.closest(".vol"), n = Number(sec.dataset.n);
+            const on = !sec.classList.contains("open");
+            sec.classList.toggle("open", on);
+            h.setAttribute("aria-expanded", on);
+            on ? st.open.add(n) : st.open.delete(n);
+        });
 
         let t;
         document.getElementById("ch-q").addEventListener("input", e => {
             clearTimeout(t);
-            t = setTimeout(() => { st.q = e.target.value; st.shown = STEP; render(); }, 150);
+            t = setTimeout(() => { st.q = e.target.value; st.shown = VSTEP; render(); }, 150);
         });
         document.getElementById("ch-sort").addEventListener("click", () => {
             st.desc = !st.desc;
             document.getElementById("ch-sort-label").textContent = st.desc ? "الأحدث أولاً" : "الأقدم أولاً";
-            st.shown = STEP;
+            st.shown = VSTEP;
+            openFirst();
             render();
         });
-        moreEl.addEventListener("click", () => { st.shown += STEP; render(); });
+        moreEl.addEventListener("click", () => { st.shown += VSTEP; render(); });
 
         render();
 
