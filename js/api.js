@@ -75,6 +75,11 @@ const VortexAPI = (() => {
                 return get(`chapters?select=${base}&manga_id=eq.${e}&order=number.desc`);
             }
         },
+        /* صور وعناوين المجلدات (اختيارية): جدول volumes */
+        volumesByManga: async (id) => {
+            try { return await get(`volumes?select=number,title,cover_url&manga_id=eq.${encodeURIComponent(id)}`); }
+            catch (e) { return []; }
+        },
         /* تسجيل مشاهدة (دالة increment_chapter_views في Supabase) */
         addView: async (id) => {
             const res = await fetch(`${url}/rest/v1/rpc/increment_chapter_views`, {
