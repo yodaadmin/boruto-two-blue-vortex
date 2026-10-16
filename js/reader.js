@@ -278,7 +278,7 @@
 
     /* ---------- النوافذ ---------- */
 
-    const MODALS = ["chapters-modal", "pages-modal"];
+    const MODALS = ["chapters-modal"];
 
     function closeAll() {
         $("reader-settings").classList.remove("open");
@@ -305,31 +305,6 @@
         const cu = $("chapters-list").querySelector(".current");
         if (cu) cu.scrollIntoView({ block: "center" });
     }
-
-    /* مصغرات الصفحات */
-    let thumbsBuilt = false;
-    function openPages() {
-        if (!wraps.length) return;
-        closeAll();
-        if (!thumbsBuilt) {
-            thumbsBuilt = true;
-            $("pages-grid").innerHTML = srcs.map((src, i) =>
-                `<button type="button" class="thumb" data-i="${i}" aria-label="الصفحة ${i + 1}"><img src="${V.esc(src)}" alt="" loading="lazy" draggable="false"><b>${i + 1}</b></button>`).join("");
-        }
-        $("pages-grid").querySelectorAll(".thumb").forEach((t, i) =>
-            t.classList.toggle("current", i === cur || (S.mode === "double" && i === cur + 1)));
-        $("pages-modal").classList.add("open");
-        $("reader-overlay").classList.add("open");
-        const c = $("pages-grid").querySelector(".thumb.current");
-        if (c) c.scrollIntoView({ block: "center" });
-    }
-
-    $("pages-grid").addEventListener("click", e => {
-        const t = e.target.closest(".thumb");
-        if (!t) return;
-        closeAll();
-        goTo(+t.dataset.i, false);
-    });
 
     /* قائمة الفصول: مجموعة حسب المجلد + بحث */
     function volMap() {
@@ -363,11 +338,8 @@
 
     $("toggle-settings").addEventListener("click", () => $("reader-settings").classList.contains("open") ? closeAll() : openSettings());
     $("toggle-chapters").addEventListener("click", openChapters);
-    $("toggle-pages").addEventListener("click", openPages);
-    $("page-counter").addEventListener("click", openPages);
     $("close-settings").addEventListener("click", closeAll);
     $("close-chapters").addEventListener("click", closeAll);
-    $("close-pages").addEventListener("click", closeAll);
     $("reader-overlay").addEventListener("click", closeAll);
 
     /* ---------- ملء الشاشة ---------- */
@@ -460,7 +432,6 @@
             if (c === "KeyF") { toggleFs(); return; }
             if (c === "KeyS") { $("reader-settings").classList.contains("open") ? closeAll() : openSettings(); return; }
             if (c === "KeyC") { $("chapters-modal").classList.contains("open") ? closeAll() : openChapters(); return; }
-            if (c === "KeyG") { $("pages-modal").classList.contains("open") ? closeAll() : openPages(); return; }
             if (c === "KeyA") { setAuto(!auto); return; }
             if (c === "KeyN") { go("next-chapter"); return; }
             if (c === "KeyP") { go("prev-chapter"); return; }
