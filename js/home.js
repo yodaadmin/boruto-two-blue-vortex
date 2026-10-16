@@ -46,20 +46,19 @@
         if (recent.length) {
             const m = recent[0];
             const cover = VortexAPI.fileUrl(m.cover_url);
-            const tags = (m.genres || []).slice(0, 4).map(g => `<span class="tag">${V.esc(g)}</span>`).join("");
+            const meta = [m.status ? `<span class="st">${V.esc(String(m.status).split(" ")[0])}</span>` : "",
+                ...(m.genres || []).slice(0, 3).map(g => `<span>${V.esc(g)}</span>`)].filter(Boolean).join("");
 
             featuredEl.innerHTML = `
                 ${cover ? `<div class="feature-bg" style="background-image:url('${V.esc(cover)}')"></div>` : ""}
-                <img class="feature-swirl" src="assets/vortex-mark-white.png" alt="">
                 <div class="feature-inner">
                     <div class="feature-poster">${cover ? `<img src="${V.esc(cover)}" alt="${V.esc(m.title)}">` : ""}</div>
                     <div class="feature-text">
-                        <span class="feature-kicker"><i></i> مميّز الآن</span>
-                        ${tags ? `<div class="tags">${tags}</div>` : ""}
+                        ${meta ? `<div class="feature-meta">${meta}</div>` : ""}
                         <h1>${V.esc(m.title)}</h1>
                         <p>${V.esc(m.description || "")}</p>
                         <div class="feature-actions">
-                            <a id="feature-read" class="btn primary glow" href="manga.html?id=${m.id}">${V.icon("play", 18)} ابدأ القراءة</a>
+                            <a id="feature-read" class="btn primary" href="manga.html?id=${m.id}">${V.icon("play", 18)} ابدأ القراءة</a>
                             <a class="btn secondary" href="manga.html?id=${m.id}">${V.icon("info", 18)} تفاصيل العمل</a>
                         </div>
                     </div>
@@ -80,7 +79,7 @@
                 <a class="latest-card" style="--i:${i}" href="reader.html?chapter=${c.id}">
                     <div class="latest-cover">${cover ? `<img src="${V.esc(cover)}" alt="" loading="lazy">` : ""}</div>
                     <div class="latest-info">
-                        ${fresh ? `<span class="new-badge"><i></i> جديد</span>` : ""}
+                        ${fresh ? `<span class="new-badge">جديد</span>` : ""}
                         <h3>${V.esc(c.manga?.title || "")}</h3>
                         <div class="latest-chapter">الفصل ${V.esc(c.number)}</div>
                         <div class="latest-time">${ago(stamp)}</div>
