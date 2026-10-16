@@ -15,6 +15,20 @@
     const pagesOf = c => (c.pages && c.pages[0] && c.pages[0].count) || 0;
     const hasViews = list => list.some(c => c.views !== undefined);
 
+    const readJSON = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
+    const isDone = cid => { try { return localStorage.getItem("vortex-done-" + cid) === "1"; } catch (e) { return false; } };
+
+    function toast(msg) {
+        let t = document.getElementById("m-toast");
+        if (!t) { t = document.createElement("div"); t.id = "m-toast"; t.className = "m-toast"; document.body.appendChild(t); }
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(toast.t);
+        toast.t = setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    const statusClass = s => /مستمر|ongoing/i.test(s || "") ? "ok" : /مكتمل|منته|complete/i.test(s || "") ? "done" : "";
+
     try {
 
         const [m, chapters, volumes] = await Promise.all([VortexAPI.mangaById(id), VortexAPI.chaptersByManga(id), VortexAPI.volumesByManga(id)]);
@@ -24,38 +38,87 @@
         document.title = `VORTEX GROUP — ${m.title}`;
 
         const cover = VortexAPI.fileUrl(m.cover_url);
-        const genres = (m.genres || []).map(g => `<span class="tag">${V.esc(g)}</span>`).join("");
+        const genres = (m.genres || []).map(g => `<a class="tag" href="browse.html?mode=all&genre=${encodeURIComponent(g)}">${V.esc(g)}</a>`).join("");
         const first = chapters.length ? chapters[chapters.length - 1] : null;
         const last = chapters.length ? chapters[0] : null;
-        const resume = chapters.find(c => readPos(c.id) > 0);   // أعلى فصل فيه موضع محفوظ
+
+        /* آخر فصل قرأه الزائر (يحفظه القارئ)، وإلا أعلى فصل فيه موضع محفوظ */
+        const lastRec = readJSON("vortex-last-" + m.id);
+        const resume = (lastRec && chapters.find(c => c.id === lastRec.c)) || chapters.find(c => readPos(c.id) > 0) || null;
+        const resumePos = resume ? readPos(resume.id) : 0;
+        const resumePages = resume ? pagesOf(resume) : 0;
+        const resumePct = resume && resumePages ? Math.min(100, Math.round(((resumePos + 1) / resumePages) * 100)) : 0;
 
         const totalViews = chapters.reduce((a, c) => a + (Number(c.views) || 0), 0);
-        const info = [
-            ["الحالة", m.status], ["المؤلف", m.author], ["الرسام", m.artist],
-            ["الاسم الإنجليزي", m.english], ["الاسم الياباني", m.japanese],
-            ["المشاهدات", hasViews(chapters) ? V.num(totalViews) : ""]
-        ].filter(r => r[1]).map(r => `<div class="info-row"><span>${r[0]}</span><strong>${V.esc(r[1])}</strong></div>`).join("");
+        const volCount = Math.ceil(chapters.length / VOL_SIZE);
+        const latestStamp = chapters.reduce((a, c) => { const d = c.published_at || c.created_at; return d && (!a || d > a) ? d : a; }, "");
+
+        const stats = [
+            ["book", chapters.length, "فصل"],
+            ["layers", volCount, "مجلد"],
+            hasViews(chapters) ? ["eye", V.num(totalViews), "مشاهدة"] : null,
+            latestStamp ? ["calendar", V.dateYMD(latestStamp), "آخر تحديث"] : null
+        ].filter(Boolean).map(r => `
+            <div class="stat">
+                <span class="stat-ico">${V.icon(r[0], 20)}</span>
+                <div><b dir="ltr">${V.esc(r[1])}</b><small>${r[2]}</small></div>
+            </div>`).join("");
+
+        const facts = [["المؤلف", m.author], ["الرسام", m.artist]]
+            .filter(r => r[1])
+            .map(r => `<div class="fact"><small>${r[0]}</small><strong>${V.esc(r[1])}</strong></div>`).join("");
+
+        const altNames = [m.english, m.japanese].filter(Boolean).map(x => V.esc(x)).join("  /  ");
+
+        const startBtn = first ? `<a class="btn primary" href="reader.html?chapter=${first.id}">${V.icon("play", 18)} ابدأ من الفصل ${V.esc(first.number)}</a>` : "";
 
         root.innerHTML = `
-        <section class="manga-header">
-            <div class="manga-poster">${cover ? `<img src="${V.esc(cover)}" alt="${V.esc(m.title)}">` : ""}</div>
-            <div class="manga-details">
-                <span class="eyebrow">مانجا</span>
-                <h1>${V.esc(m.title)}</h1>
-                ${genres ? `<div class="tags">${genres}</div>` : ""}
-                <div class="info-list">${info}</div>
-                <p class="manga-description">${V.esc(m.description || "لا يوجد وصف.")}</p>
-                <div class="hero-actions">
-                    ${resume ? `<a class="btn primary glow" href="reader.html?chapter=${resume.id}">${V.icon("play", 18)} متابعة القراءة · فصل ${V.esc(resume.number)}</a>` : (first ? `<a class="btn primary" href="reader.html?chapter=${first.id}">${V.icon("play", 18)} ابدأ القراءة</a>` : "")}
-                    ${last && first && last.id !== first.id ? `<a class="btn secondary" href="reader.html?chapter=${last.id}">آخر فصل (${V.esc(last.number)})</a>` : ""}
-                    <button type="button" id="fav-btn" class="btn secondary fav" aria-pressed="false">${V.icon("heart", 18)} <span id="fav-label">إضافة للمفضلة</span></button>
+        <section class="mhero">
+            ${cover ? `<div class="mhero-bg" style="background-image:url('${V.esc(cover)}')"></div>` : ""}
+            <img class="mhero-swirl" src="assets/vortex-mark-white.png" alt="">
+            <div class="mhero-inner">
+                <div class="mposter-wrap">
+                    <div class="mposter" id="mposter">${cover ? `<img src="${V.esc(cover)}" alt="${V.esc(m.title)}">` : ""}</div>
+                    ${m.status ? `<span class="status-pill ${statusClass(m.status)}"><i></i>${V.esc(m.status)}</span>` : ""}
+                </div>
+                <div class="mdetails">
+                    <h1>${V.esc(m.title)}</h1>
+                    ${altNames ? `<div class="alt-names">${altNames}</div>` : ""}
+                    ${genres ? `<div class="tags">${genres}</div>` : ""}
+
+                    <div class="stats">${stats}</div>
+
+                    <div class="desc">
+                        <p class="manga-description clamp" id="desc">${V.esc(m.description || "لا يوجد وصف لهذا العمل بعد.")}</p>
+                        <button type="button" class="desc-toggle hidden" id="desc-toggle">عرض المزيد ${V.icon("down", 16)}</button>
+                    </div>
+
+                    ${facts ? `<div class="facts">${facts}</div>` : ""}
+
+                    ${resume ? `
+                    <a class="resume-card" href="reader.html?chapter=${resume.id}">
+                        <span class="resume-ico">${V.icon("bookmark", 22)}</span>
+                        <div class="resume-main">
+                            <small>أكمل من حيث توقفت</small>
+                            <b>${V.esc(resume.title || "الفصل " + resume.number)}</b>
+                            ${resumePct ? `<div class="resume-bar"><i style="width:${resumePct}%"></i></div><em>الصفحة ${resumePos + 1} من ${resumePages}</em>` : ""}
+                        </div>
+                        <span class="resume-go">${V.icon("chevron", 20)}</span>
+                    </a>` : ""}
+
+                    <div class="hero-actions">
+                        ${resume ? "" : startBtn}
+                        ${last && first && last.id !== first.id ? `<a class="btn secondary" href="reader.html?chapter=${last.id}">${V.icon("clock", 18)} آخر فصل (${V.esc(last.number)})</a>` : ""}
+                        <button type="button" id="fav-btn" class="btn secondary fav" aria-pressed="false">${V.icon("heart", 18)} <span id="fav-label">إضافة للمفضلة</span></button>
+                        <button type="button" id="share-btn" class="btn secondary" aria-label="مشاركة">${V.icon("share", 18)} مشاركة</button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section class="section chapters-sec">
             <div class="section-head">
-                <div><span class="eyebrow">الفصول</span><h2>قائمة الفصول</h2></div>
+                <div><span class="eyebrow">الفصول</span><h2>المجلدات والفصول</h2></div>
                 <span class="ch-total">${chapters.length} فصل</span>
             </div>
 
@@ -67,9 +130,14 @@
             <div id="ch-info" class="ch-info"></div>
             <div id="ch-list" class="ch-list"></div>
             <div class="ch-more"><button type="button" id="ch-more" class="btn secondary hidden"></button></div>
+        </section>
+
+        <section class="section related hidden" id="related">
+            <div class="section-head"><div><span class="eyebrow">اكتشف المزيد</span><h2>أعمال مشابهة</h2></div></div>
+            <div class="related-rail" id="related-rail"></div>
         </section>`;
 
-        /* ---------- المفضلة ---------- */
+        /* ---------- المفضلة + المشاركة ---------- */
         const favBtn = document.getElementById("fav-btn");
         const syncFav = () => {
             const on = V.favs.has(m.id);
@@ -77,8 +145,49 @@
             favBtn.setAttribute("aria-pressed", on);
             document.getElementById("fav-label").textContent = on ? "في المفضلة" : "إضافة للمفضلة";
         };
-        favBtn.addEventListener("click", () => { V.favs.toggle(m.id); syncFav(); favBtn.classList.add("pop"); setTimeout(() => favBtn.classList.remove("pop"), 400); });
+        favBtn.addEventListener("click", () => {
+            V.favs.toggle(m.id); syncFav();
+            favBtn.classList.add("pop"); setTimeout(() => favBtn.classList.remove("pop"), 400);
+            toast(V.favs.has(m.id) ? "أُضيف إلى المفضلة" : "أُزيل من المفضلة");
+        });
         syncFav();
+
+        document.getElementById("share-btn").addEventListener("click", async () => {
+            try {
+                if (navigator.share) { await navigator.share({ title: m.title, url: location.href }); return; }
+                await navigator.clipboard.writeText(location.href);
+                toast("تم نسخ رابط العمل");
+            } catch (e) { /* أُلغيت المشاركة */ }
+        });
+
+        /* وصف قابل للطي */
+        const descEl = document.getElementById("desc"), descBtn = document.getElementById("desc-toggle");
+        requestAnimationFrame(() => {
+            if (descEl.scrollHeight > descEl.clientHeight + 4) descBtn.classList.remove("hidden");
+        });
+        descBtn.addEventListener("click", () => {
+            const open = descEl.classList.toggle("clamp") === false;
+            descBtn.firstChild.textContent = open ? "عرض أقل " : "عرض المزيد ";
+            descBtn.classList.toggle("open", open);
+        });
+
+        /* ميلان خفيف للغلاف مع حركة المؤشر (للشاشات الكبيرة) */
+        const poster = document.getElementById("mposter");
+        if (poster && matchMedia("(hover: hover) and (min-width: 900px)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            poster.addEventListener("pointermove", e => {
+                const r = poster.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+                poster.style.transform = `perspective(700px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale(1.02)`;
+            });
+            poster.addEventListener("pointerleave", () => { poster.style.transform = ""; });
+        }
+
+        /* أعمال مشابهة */
+        VortexAPI.relatedManga(m, 12).then(list => {
+            if (!list.length) return;
+            document.getElementById("related-rail").innerHTML = list.map(x => `<div class="related-item">${V.mangaCard(x)}</div>`).join("");
+            document.getElementById("related").classList.remove("hidden");
+        }).catch(() => {});
 
         /* ---------- المجلدات: كل 4 فصول بمجلد (تلقائيًا) ---------- */
         const asc = [...chapters].sort((a, b) => Number(a.number) - Number(b.number));
@@ -122,16 +231,17 @@
             const date = V.dateYMD(stamp);
             const fresh = (c.created_at || c.published_at) && (Date.now() - new Date(c.created_at || c.published_at)) < 7 * 86400000;
             const pos = readPos(c.id);
+            const done = isDone(c.id);
             const n = String(c.number);
             const pg = pagesOf(c);
             const views = c.views !== undefined ? Number(c.views) || 0 : null;
             return `
-            <a class="ch-row${fresh ? " is-new" : ""}" href="reader.html?chapter=${c.id}">
+            <a class="ch-row${fresh ? " is-new" : ""}${done ? " is-done" : ""}" href="reader.html?chapter=${c.id}">
                 <div class="ch-num${n.length > 3 ? " long" : ""}"><small>فصل</small><b>${V.esc(n)}</b></div>
                 <div class="ch-main">
                     <div class="ch-title">${V.esc(c.title || "الفصل " + n)}
                         ${fresh ? `<span class="ch-badge new">جديد</span>` : ""}
-                        ${pos > 0 ? `<span class="ch-badge resume">متابعة · ص ${pos + 1}</span>` : ""}
+                        ${done ? `<span class="ch-badge read">${V.icon("check", 12)} مقروء</span>` : (pos > 0 ? `<span class="ch-badge resume">متابعة · ص ${pos + 1}</span>` : "")}
                     </div>
                     <div class="ch-meta">
                         ${date ? `<span class="ch-date">${V.icon("calendar", 14)}<bdi dir="ltr">${date}</bdi></span>` : ""}
@@ -151,6 +261,8 @@
             const hasViews = g.items.some(c => c.views !== undefined);
             const fresh = g.items.some(c => (c.created_at || c.published_at) && (Date.now() - new Date(c.created_at || c.published_at)) < 7 * 86400000);
             const open = forceOpen || st.open.has(g.n);
+            const readCount = g.items.filter(c => isDone(c.id)).length;
+            const pct = Math.round((readCount / g.items.length) * 100);
             return `
             <section class="vol${open ? " open" : ""}" data-n="${g.n}">
                 <button type="button" class="vol-head" aria-expanded="${open}">
@@ -161,10 +273,12 @@
                         <div class="vol-meta">
                             <span>${V.icon("book", 14)}${String(first) === String(last) ? "فصل " + V.esc(first) : "فصول " + V.esc(first) + " - " + V.esc(last)}</span>
                             <span>${V.icon("list", 14)}${g.items.length} فصل</span>
+                            ${readCount ? `<span class="vol-read">${V.icon("check", 14)}${readCount}/${g.items.length} مقروء</span>` : ""}
                             ${hasViews ? `<span class="ch-views">${V.icon("eye", 14)}<bdi dir="ltr">${V.num(total)}</bdi></span>` : ""}
                         </div>
                     </div>
                     <span class="vol-chev">${V.icon("chevron", 22)}</span>
+                    ${readCount ? `<span class="vol-bar"><i style="width:${pct}%"></i></span>` : ""}
                 </button>
                 <div class="vol-body"><div class="vol-rows">${x.items.map(row).join("")}</div></div>
             </section>`;
