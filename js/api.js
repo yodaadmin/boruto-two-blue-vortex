@@ -80,6 +80,20 @@ const VortexAPI = (() => {
             try { return await get(`volumes?select=number,title,cover_url&manga_id=eq.${encodeURIComponent(id)}`); }
             catch (e) { return []; }
         },
+        /* أعمال مشابهة (نفس التصنيفات) مع بديل: أحدث الأعمال */
+        relatedManga: async (m, n = 12) => {
+            const cols = "id,title,status,cover_url,genres";
+            const id = encodeURIComponent(m.id);
+            try {
+                if (m.genres && m.genres.length) {
+                    const arr = "{" + m.genres.map(g => '"' + String(g).replace(/(["\\])/g, "\\$1") + '"').join(",") + "}";
+                    const rows = await get(`manga?select=${cols}&id=neq.${id}&genres=ov.${encodeURIComponent(arr)}&order=created_at.desc&limit=${n}`);
+                    if (rows.length) return rows;
+                }
+            } catch (e) {}
+            try { return await get(`manga?select=${cols}&id=neq.${id}&order=created_at.desc&limit=${n}`); }
+            catch (e) { return []; }
+        },
         /* تسجيل مشاهدة (دالة increment_chapter_views في Supabase) */
         addView: async (id) => {
             const res = await fetch(`${url}/rest/v1/rpc/increment_chapter_views`, {
@@ -94,7 +108,7 @@ const VortexAPI = (() => {
             get(`pages?select=page_number,storage_path&chapter_id=eq.${encodeURIComponent(id)}&order=page_number.asc`),
         getChapter: async (id) => {
             const e = encodeURIComponent(id);
-            const rows = await get(`chapters?select=*,manga(id,title)&id=eq.${e}&limit=1`);
+            const rows = await get(`chapters?select=*,manga(id,title,cover_url)&id=eq.${e}&limit=1`);
             const ch = rows[0];
             if (!ch) return null;
             const [pages, siblings] = await Promise.all([
@@ -105,6 +119,7 @@ const VortexAPI = (() => {
             return {
                 ...ch,
                 manga_title: ch.manga ? ch.manga.title : "",
+                manga_cover: ch.manga ? ch.manga.cover_url : "",
                 pages,
                 previous_chapter: i > 0 ? siblings[i - 1].id : null,
                 next_chapter: i >= 0 && i < siblings.length - 1 ? siblings[i + 1].id : null
