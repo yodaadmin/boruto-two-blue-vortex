@@ -71,3 +71,21 @@
 @media (prefers-reduced-motion: reduce) {
     .skeleton .manga-cover, .sk-line { animation: none; }
 }
+
+
+/* ===== REFINEMENT ===== */
+.bbar { border-radius: var(--radius-lg); background: var(--vortex-black-2); }
+.pill { border-radius: 6px; font-weight: 600; font-size: 13.5px; padding: 8px 16px; }
+.pill:hover { border-color: rgba(118, 229, 253, 0.45); }
+.pill.on { background: var(--vortex-cyan); border-color: var(--vortex-cyan); color: #031116; }
+.seg { border-radius: 8px; }
+.seg button { font-weight: 600; border-radius: 5px; }
+.seg button.on { background: rgba(19, 171, 210, 0.18); }
+.chip { border-radius: 6px; font-weight: 500; }
+.active-pill { border-radius: 6px; font-weight: 600; background: rgba(19, 171, 210, 0.12); }
+.bsec h2 { font-size: 21px; font-weight: 700; }
+.bsec h2::before { display: none; }
+.manga-tag { border-radius: 4px; background: rgba(7, 9, 12, 0.85); backdrop-filter: none; border: 1px solid var(--border-strong); font-weight: 600; }
+[data-page="browse"] .manga-card:hover { transform: none; box-shadow: none; border-color: rgba(118, 229, 253, 0.45); }
+.rail-item { flex-basis: 164px; }
+.skeleton .manga-cover, .sk-line { background-color: rgba(255, 255, 255, 0.04); }
