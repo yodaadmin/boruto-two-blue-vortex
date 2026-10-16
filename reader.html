@@ -21,10 +21,14 @@
         <div id="reader-title" class="reader-title"><b>جارٍ تحميل الفصل...</b></div>
 
         <div class="reader-header-actions">
-            <a id="manga-link" href="index.html" class="reader-icon-btn" title="صفحة المانجا" aria-label="صفحة المانجا"><i data-icon="book"></i></a>
-            <button id="toggle-chapters" type="button" class="reader-icon-btn" title="الفصول" aria-label="قائمة الفصول"><i data-icon="list"></i></button>
-            <button id="toggle-fullscreen" type="button" class="reader-icon-btn" title="ملء الشاشة" aria-label="ملء الشاشة"></button>
-            <button id="toggle-settings" type="button" class="reader-icon-btn" title="إعدادات القارئ" aria-label="إعدادات القارئ" aria-expanded="false"><i data-icon="settings"></i></button>
+            <a id="prev-chapter" href="#" class="reader-icon-btn hide-sm hidden" title="الفصل السابق (P)" aria-label="الفصل السابق"><i data-icon="right"></i></a>
+            <a id="next-chapter" href="#" class="reader-icon-btn hide-sm hidden" title="الفصل التالي (N)" aria-label="الفصل التالي"><i data-icon="left"></i></a>
+            <span class="header-sep hide-sm"></span>
+            <a id="manga-link" href="index.html" class="reader-icon-btn hide-sm" title="صفحة المانجا" aria-label="صفحة المانجا"><i data-icon="book"></i></a>
+            <button id="toggle-pages" type="button" class="reader-icon-btn" title="كل الصفحات (G)" aria-label="كل الصفحات"><i data-icon="grid"></i></button>
+            <button id="toggle-chapters" type="button" class="reader-icon-btn" title="الفصول (C)" aria-label="قائمة الفصول"><i data-icon="list"></i></button>
+            <button id="toggle-fullscreen" type="button" class="reader-icon-btn" title="ملء الشاشة (F)" aria-label="ملء الشاشة"></button>
+            <button id="toggle-settings" type="button" class="reader-icon-btn" title="إعدادات القارئ (S)" aria-label="إعدادات القارئ" aria-expanded="false"><i data-icon="settings"></i></button>
         </div>
     </div>
     <div class="reader-progress"><span id="reader-progress"></span></div>
@@ -79,8 +83,18 @@
     </div>
 
     <div class="settings-section">
+        <label class="settings-label"><span class="lbl"><i data-icon="arrows_h" data-size="16"></i> عرض الصفحة (Webtoon)</span> <b id="width-value">920px</b></label>
+        <input id="set-width" type="range" min="560" max="1200" step="40" value="920">
+    </div>
+
+    <div class="settings-section">
         <label class="settings-label"><span class="lbl"><i data-icon="rows" data-size="16"></i> المسافة بين الصفحات (Webtoon)</span> <b id="gap-value">0</b></label>
         <input id="set-gap" type="range" min="0" max="80" step="4" value="0">
+    </div>
+
+    <div class="settings-section">
+        <label class="settings-label"><span class="lbl"><i data-icon="play" data-size="16"></i> سرعة التمرير التلقائي</span> <b id="speed-value">4</b></label>
+        <input id="set-speed" type="range" min="1" max="10" step="1" value="4">
     </div>
 
     <div class="settings-section card">
@@ -89,6 +103,25 @@
             <input id="remember-position" type="checkbox">
             <span class="toggle-switch"></span>
         </label>
+        <label class="toggle-setting">
+            <span><strong>إخفاء الأدوات تلقائيًا</strong><small>تختفي أثناء النزول وتظهر عند الصعود أو اللمس</small></span>
+            <input id="autohide" type="checkbox">
+            <span class="toggle-switch"></span>
+        </label>
+    </div>
+
+    <div class="settings-section keys">
+        <label class="settings-label"><span class="lbl"><i data-icon="keyboard" data-size="16"></i> اختصارات لوحة المفاتيح</span></label>
+        <div class="keys-grid">
+            <span><kbd>←</kbd><kbd>→</kbd> تنقل بين الصفحات</span>
+            <span><kbd>N</kbd><kbd>P</kbd> الفصل التالي / السابق</span>
+            <span><kbd>A</kbd> تمرير تلقائي</span>
+            <span><kbd>G</kbd> كل الصفحات</span>
+            <span><kbd>C</kbd> قائمة الفصول</span>
+            <span><kbd>F</kbd> ملء الشاشة</span>
+            <span><kbd>M</kbd> تغيير نمط القراءة</span>
+            <span><kbd>S</kbd> الإعدادات</span>
+        </div>
     </div>
 
     <div class="settings-footer">
@@ -103,7 +136,19 @@
             <h2>الفصول</h2>
             <button id="close-chapters" type="button" class="settings-close" aria-label="إغلاق"><i data-icon="close"></i></button>
         </div>
+        <label class="modal-search"><i data-icon="search" data-size="18"></i><input id="chapters-q" type="search" inputmode="search" placeholder="ابحث برقم الفصل أو العنوان..."></label>
         <div id="chapters-list" class="chapters-list"><div class="loading-spinner"></div></div>
+    </div>
+</div>
+
+<!-- ============ PAGES MODAL ============ -->
+<div id="pages-modal" class="chapters-modal" aria-hidden="true">
+    <div class="chapters-panel wide">
+        <div class="settings-header">
+            <h2>كل الصفحات</h2>
+            <button id="close-pages" type="button" class="settings-close" aria-label="إغلاق"><i data-icon="close"></i></button>
+        </div>
+        <div id="pages-grid" class="pages-grid"></div>
     </div>
 </div>
 
@@ -131,11 +176,11 @@
     <section id="reader-content" class="reader-content hidden">
 
         <div id="reader-chapter-info" class="reader-chapter-info">
-            <div>
+            <a id="reader-cover-link" class="intro-cover" href="#"><img id="reader-cover" alt=""></a>
+            <div class="intro-text">
                 <span id="reader-manga-name" class="eyebrow">المانجا</span>
                 <h1 id="reader-chapter-name">الفصل</h1>
                 <div id="reader-chips" class="reader-chips"></div>
-                <p id="reader-chapter-description" class="hidden"></p>
             </div>
             <a id="reader-info-link" href="#" class="btn secondary"><i data-icon="book" data-size="18"></i> صفحة المانجا</a>
         </div>
@@ -145,11 +190,17 @@
         <div id="reader-end" class="reader-end">
             <div class="reader-end-badge"><i data-icon="check" data-size="26"></i></div>
             <h2>انتهى الفصل</h2>
-            <p>انتقل إلى فصل آخر أو ارجع إلى صفحة المانجا.</p>
+            <p id="end-text">انتقل إلى فصل آخر أو ارجع إلى صفحة المانجا.</p>
+
+            <a id="reader-next" href="#" class="next-card hidden">
+                <span class="next-card-main"><small>الفصل التالي</small><b id="end-next-title">—</b></span>
+                <span class="next-card-go"><i data-icon="left" data-size="22"></i></span>
+            </a>
+
             <div class="reader-navigation">
                 <a id="reader-previous" href="#" class="btn secondary hidden"><i data-icon="right" data-size="18"></i> الفصل السابق</a>
                 <a id="reader-manga" href="#" class="btn secondary"><i data-icon="book" data-size="18"></i> صفحة المانجا</a>
-                <a id="reader-next" href="#" class="btn primary hidden">الفصل التالي <i data-icon="left" data-size="18"></i></a>
+                <button id="end-fav" type="button" class="btn secondary"><i data-icon="heart" data-size="18"></i> <span id="end-fav-label">إضافة للمفضلة</span></button>
             </div>
         </div>
 
@@ -163,12 +214,17 @@
     </div>
 </div>
 
+<!-- ============ NEXT CHAPTER PILL ============ -->
+<a id="next-pill" href="#" class="next-pill"><span>الفصل التالي</span><i data-icon="left" data-size="18"></i></a>
+
 <!-- ============ BOTTOM BAR ============ -->
 <nav id="reader-bottom-bar" class="reader-bottom-bar" aria-label="أدوات القراءة">
     <div id="reader-bottom-inner" class="reader-bottom-inner">
         <button id="previous-page" type="button" class="reader-control" aria-label="الصفحة السابقة"></button>
-        <div id="page-counter" class="page-counter"><strong>0</strong><span>/</span><span>0</span></div>
+        <button id="page-counter" type="button" class="page-counter" aria-label="كل الصفحات"><strong>0</strong><span>/</span><span>0</span></button>
         <button id="next-page" type="button" class="reader-control" aria-label="الصفحة التالية"></button>
+        <span class="reader-control-divider only-vertical"></span>
+        <button id="auto-btn" type="button" class="reader-control only-vertical" aria-label="تمرير تلقائي (A)" title="تمرير تلقائي (A)"></button>
         <span class="reader-control-divider"></span>
         <button id="zoom-out" type="button" class="reader-control" aria-label="تصغير"><i data-icon="minus" data-size="18"></i></button>
         <button id="zoom-reset" type="button" class="reader-control zoom-val" aria-label="إعادة التكبير">100%</button>
