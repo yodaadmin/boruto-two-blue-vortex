@@ -186,8 +186,7 @@ body:not([data-mode="vertical"]) .scrub { display: none; }
 .reader-control:hover { background: rgba(19, 171, 210, 0.2); color: var(--vortex-cyan-light); }
 .reader-control:active { transform: scale(0.9); }
 .reader-control.zoom-val { min-width: 54px; font-variant-numeric: tabular-nums; }
-.page-counter { height: 40px; border-radius: 999px; color: #fff; background: transparent; cursor: pointer; transition: background var(--transition); min-width: 74px; padding: 0 6px; display: flex; align-items: center; justify-content: center; gap: 5px; direction: ltr; font-size: 14px; font-weight: 800; }
-.page-counter:hover { background: rgba(19, 171, 210, 0.2); }
+.page-counter { height: 40px; border-radius: 999px; color: #fff; background: transparent; min-width: 74px; padding: 0 6px; display: flex; align-items: center; justify-content: center; gap: 5px; direction: ltr; font-size: 14px; font-weight: 800; }
 .page-counter strong { color: var(--vortex-cyan-light); }
 .page-counter span { opacity: 0.55; }
 .reader-control-divider { width: 1px; height: 22px; margin-inline: 5px; background: rgba(255, 255, 255, 0.16); }
