@@ -25,7 +25,6 @@
             <a id="next-chapter" href="#" class="reader-icon-btn hide-sm hidden" title="الفصل التالي (N)" aria-label="الفصل التالي"><i data-icon="left"></i></a>
             <span class="header-sep hide-sm"></span>
             <a id="manga-link" href="index.html" class="reader-icon-btn hide-sm" title="صفحة المانجا" aria-label="صفحة المانجا"><i data-icon="book"></i></a>
-            <button id="toggle-pages" type="button" class="reader-icon-btn" title="كل الصفحات (G)" aria-label="كل الصفحات"><i data-icon="grid"></i></button>
             <button id="toggle-chapters" type="button" class="reader-icon-btn" title="الفصول (C)" aria-label="قائمة الفصول"><i data-icon="list"></i></button>
             <button id="toggle-fullscreen" type="button" class="reader-icon-btn" title="ملء الشاشة (F)" aria-label="ملء الشاشة"></button>
             <button id="toggle-settings" type="button" class="reader-icon-btn" title="إعدادات القارئ (S)" aria-label="إعدادات القارئ" aria-expanded="false"><i data-icon="settings"></i></button>
@@ -116,7 +115,6 @@
             <span><kbd>←</kbd><kbd>→</kbd> تنقل بين الصفحات</span>
             <span><kbd>N</kbd><kbd>P</kbd> الفصل التالي / السابق</span>
             <span><kbd>A</kbd> تمرير تلقائي</span>
-            <span><kbd>G</kbd> كل الصفحات</span>
             <span><kbd>C</kbd> قائمة الفصول</span>
             <span><kbd>F</kbd> ملء الشاشة</span>
             <span><kbd>M</kbd> تغيير نمط القراءة</span>
@@ -138,17 +136,6 @@
         </div>
         <label class="modal-search"><i data-icon="search" data-size="18"></i><input id="chapters-q" type="search" inputmode="search" placeholder="ابحث برقم الفصل أو العنوان..."></label>
         <div id="chapters-list" class="chapters-list"><div class="loading-spinner"></div></div>
-    </div>
-</div>
-
-<!-- ============ PAGES MODAL ============ -->
-<div id="pages-modal" class="chapters-modal" aria-hidden="true">
-    <div class="chapters-panel wide">
-        <div class="settings-header">
-            <h2>كل الصفحات</h2>
-            <button id="close-pages" type="button" class="settings-close" aria-label="إغلاق"><i data-icon="close"></i></button>
-        </div>
-        <div id="pages-grid" class="pages-grid"></div>
     </div>
 </div>
 
@@ -221,7 +208,7 @@
 <nav id="reader-bottom-bar" class="reader-bottom-bar" aria-label="أدوات القراءة">
     <div id="reader-bottom-inner" class="reader-bottom-inner">
         <button id="previous-page" type="button" class="reader-control" aria-label="الصفحة السابقة"></button>
-        <button id="page-counter" type="button" class="page-counter" aria-label="كل الصفحات"><strong>0</strong><span>/</span><span>0</span></button>
+        <div id="page-counter" class="page-counter"><strong>0</strong><span>/</span><span>0</span></div>
         <button id="next-page" type="button" class="reader-control" aria-label="الصفحة التالية"></button>
         <span class="reader-control-divider only-vertical"></span>
         <button id="auto-btn" type="button" class="reader-control only-vertical" aria-label="تمرير تلقائي (A)" title="تمرير تلقائي (A)"></button>
