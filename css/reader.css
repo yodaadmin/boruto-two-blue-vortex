@@ -327,3 +327,16 @@ kbd { min-width: 24px; padding: 2px 7px; border: 1px solid rgba(255, 255, 255, 0
     .reader-body * { display: none !important; }
     .reader-body::before { content: "الطباعة غير متاحة"; display: block; padding: 40px; font-size: 24px; text-align: center; color: #000; }
 }
+
+
+/* ===== REFINEMENT — القارئ: ألوان صلبة بلا توهّج ===== */
+.reader-icon-btn.on, .settings-option.active, .chapter-item.current, .reader-control.auto-on, .reader-end-badge, .next-pill, .next-card-go {
+    background: var(--vortex-cyan); color: #031116; box-shadow: none; border-color: transparent;
+}
+.reader-progress span { background: var(--vortex-cyan); box-shadow: none; border-radius: 0; }
+.scrub-thumb { background: var(--vortex-cyan); box-shadow: none; }
+.next-pill { border-radius: 8px; font-weight: 700; }
+.next-card { border-radius: 12px; border-color: var(--border-strong); background: rgba(255, 255, 255, 0.04); box-shadow: none; }
+.next-card:hover { transform: none; box-shadow: none; border-color: rgba(118, 229, 253, 0.5); }
+.next-card-main b { font-weight: 700; }
+.next-card-go { border-radius: 8px; }
