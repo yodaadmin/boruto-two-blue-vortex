@@ -168,7 +168,7 @@ V.favs = {
                 </a>
                 <nav class="site-nav">${items}</nav>
                 <div class="header-actions">
-                    <a class="header-action" href="search.html" aria-label="بحث">${V.icon("search")}</a>
+                    <a class="header-search" href="search.html" aria-label="بحث">${V.icon("search")}<span>ابحث عن عمل</span></a>
                     <button class="header-action mobile-menu-button" id="menu-btn" aria-label="القائمة">${V.icon("menu")}</button>
                 </div>
             </div>
@@ -185,7 +185,7 @@ V.favs = {
         footer.innerHTML = `
         <footer class="site-footer">
             <div class="site-footer-inner">
-                <p>© ${new Date().getFullYear()} VORTEX GROUP</p>
+                <a class="footer-mark" href="index.html"><img src="assets/vortex-mark-cyan.png" alt="" width="26" height="26"><b>VORTEX</b></a>
                 <div class="site-footer-links">
                     <a href="browse.html">تصفح</a>
                     <a href="search.html">بحث</a>
