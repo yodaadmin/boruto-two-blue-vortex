@@ -78,3 +78,12 @@
     .search-bar input { flex-basis: 100%; }
     .search-bar .btn { flex: 1; }
 }
+
+
+/* ===== REFINEMENT ===== */
+.filters { border-radius: var(--radius-lg); background: var(--vortex-black-2); }
+.fgroup summary { font-weight: 600; }
+.fcount { border-radius: 4px; font-weight: 700; }
+.fchip { border-radius: 6px; font-weight: 500; }
+.fchip:hover { border-color: rgba(118, 229, 253, 0.45); }
+.fchip.active { background: var(--vortex-cyan); border-color: var(--vortex-cyan); color: #031116; }
